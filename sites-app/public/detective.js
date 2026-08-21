@@ -22,7 +22,7 @@ const state = {
 
 const errorMessages = {
   case_not_found: "找不到這個案件。請確認案件編號。",
-  case_full: "本案偵探已滿（上限 8 位），請等待下一局。",
+  case_full: "本案偵探已滿（上限 36 位），請等待下一局。",
   case_already_started: "案件已經開辦，現在無法加入。",
   nickname_too_short: "偵探代號至少需要兩個字。",
   nickname_taken: "這個偵探代號已有人使用。",
@@ -155,7 +155,7 @@ function renderHome() {
         </div>
         <div class="hero-proof">
           <span class="proof-chip">三幕破案</span>
-          <span class="proof-chip">4–8 位偵探</span>
+          <span class="proof-chip">4–36 位偵探</span>
           <span class="proof-chip">真實發票證據</span>
           <span class="proof-chip">不需註冊</span>
         </div>
@@ -261,10 +261,10 @@ function renderLobby() {
               </div>` : ""}
           </section>
           <section class="panel">
-            <p class="eyebrow">${room.players.length} / 8 DETECTIVES</p>
+            <p class="eyebrow">${room.players.length} / 36 DETECTIVES</p>
             <h2>報到名單</h2>
             <div class="live-ticker"><span>現場快報</span><strong>${room.players.length >= 4 ? "已達開案門檻，隨時可以撕封條！" : `再 ${4 - room.players.length} 位偵探即可開案`}</strong></div>
-            <p class="panel-note">滿 4 人開案、8 人滿座。Demo 可補示範線民（會自動認領空身分），單人也能順跑完整一局。</p>
+            <p class="panel-note">滿 4 人開案、單局最多 36 位偵探。Demo 可補示範線民（會自動認領空身分），單人也能順跑完整一局。</p>
             ${demoMode ? `<div class="demo-cue"><span>5-MIN RUN OF SHOW</span><strong>${escapeHtml(demoCue(room))}</strong><small>答案一出就按「快轉」，不等待動畫。</small></div>` : ""}
             <div class="case-brief">
               <strong>案情摘要</strong>
@@ -296,7 +296,7 @@ function renderLobby() {
         <h1>${escapeHtml(state.playerName ?? "偵探")}，報到完成</h1>
         <p>${state.room?.viewerIdentity ? `你以「${escapeHtml(state.room.viewerIdentity)}」的身分應訊——第二幕若被傳喚，請照螢幕唸出口供。` : "案件資料正在封存。等主持人按下「開始辦案」，第一張污漬發票就會出現。"}</p>
         <div class="waiting-list">${(state.room?.players ?? []).map((player) => `<span class="waiting-chip">${escapeHtml(player.nickname)}</span>`).join("")}</div>
-        <p><strong>${state.room?.players?.length ?? 0} / 8</strong> 位偵探已入局</p>
+        <p><strong>${state.room?.players?.length ?? 0} / 36</strong> 位偵探已入局</p>
       </div>
     </section>
   `;

@@ -419,7 +419,7 @@ export function roomAction(roomCode: string, action: string, body: Record<string
   if (action === "join") {
     // 中途入局允許（結案後不行）：晚到的偵探從當下開始作答
     if (room.phase === "results") throw Object.assign(new Error("case_already_started"), { status: 409 });
-    if (room.players.length >= 8) throw Object.assign(new Error("case_full"), { status: 409 });
+    if (room.players.length >= 36) throw Object.assign(new Error("case_full"), { status: 409 });
     const nickname = String(body.nickname ?? "").trim().replace(/\s+/g, " ").slice(0, 16);
     if (nickname.length < 2) throw Object.assign(new Error("nickname_too_short"), { status: 400 });
     if (room.players.some((player) => player.nickname.toLowerCase() === nickname.toLowerCase())) throw Object.assign(new Error("nickname_taken"), { status: 409 });
