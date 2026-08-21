@@ -292,468 +292,9 @@ function renderNextStage() {
     <div class="stage-track" aria-label="ç”¢å“é–‹ç™¼éšæ®µ">
       ${["Intake","Frame","Risk","Decide","Spec","Execute","Launch"].map((label,index) => `<div class="stage-node ${index < 5 ? "done" : index === 5 ? "next" : ""}"><span>${index}</span><strong>${label}</strong></div>`).join("")}
     </div>
-    <div class="lab-note warning"><span>âœ¦</span><div><strong>AI-native PM åˆ¤æ–·</strong>#4 çš„å•†å®¶è¾¨è­˜èˆ‡ #5 çš„è‡ªæˆ‘èªçŸ¥å…±äº«ã€Œçœ‹ç·šç´¢ã€åšåˆ¤æ–·ã€ç¿»è­‰æ“šã€æ ¸å¿ƒå¾ªç’°ï¼Œå› æ­¤åˆä½µæˆä¸€å€‹æ›´å®Œæ•´çš„éŠæˆ²ã€‚</div></div>
-    <div class="section-head"><div><p class="eyebrow">Nine design archetypes</p><h2>å„è‡ªçš„ç”¢å“èªè¨€èˆ‡ä¸‹ä¸€å€‹ Gate</h2><p>éˆæ„Ÿä¾†æºç”¨æ–¼æ–¹æ³•èˆ‡ art directionï¼Œä¸ç›´æ¥è¤‡è£½ç¬¬ä¸‰æ–¹ä½œå“ã€‚</p></div></div>
-    <section class="design-matrix">
-      ${lab.demos.map(demo => `<article class="design-brief design-brief-${demo.id}">
-        <div class="design-brief-number">${String(demo.rank).padStart(2,"0")}</div><div class="design-brief-icon">${demo.icon}</div>
-        <p class="design-kicker">${escapeHtml(demo.design.pattern)}</p><h3>${escapeHtml(demo.title)}</h3>
-        <blockquote>${escapeHtml(demo.design.principle)}</blockquote>
-        <dl><div><dt>èªæ°£</dt><dd>${escapeHtml(demo.design.voice)}</dd></div><div><dt>æˆåŠŸæŒ‡æ¨™</dt><dd>${escapeHtml(demo.nextStage.successMetric)}</dd></div><div><dt>ä¸‹ä¸€ Gate</dt><dd>${escapeHtml(demo.nextStage.gate)}</dd></div></dl>
-        <div class="design-brief-actions"><a href="#/demo/${demo.id}">é–‹å•Ÿé«˜æ“¬çœŸ Demo â†’</a><a href="${escapeHtml(demo.design.referenceUrl)}" target="_blank" rel="noopener">åƒè€ƒå…¥å£ï¼š${escapeHtml(demo.design.reference)}</a></div>
-      </article>`).join("")}
-    </section>
-    <div class="section-head"><div><p class="eyebrow">Dependency-ordered roadmap</p><h2>ç”¢å“åŒ–ä»»å‹™åœ–</h2></div></div>
-    <section class="roadmap-board">
-      <div class="roadmap-lane"><span>01 Â· Shared spine</span><h3>å…ˆå›ºå®šä¸å¯åˆ†æ­§çš„åº•åº§</h3><ul><li>å“é …ï¼å•†å®¶æ­£è¦åŒ–è³‡æ–™å¥‘ç´„</li><li>æ¨è«–ç¢ºå®šæ€§èˆ‡é™åˆ¶æ–‡æ¡ˆ</li><li>éš±ç§åˆ†é¡ã€äº‹ä»¶åŸ‹é»ã€å¯åŠæ€§</li></ul></div>
-      <div class="roadmap-arrow">â†’</div>
-      <div class="roadmap-lane"><span>02 Â· Evidence lanes</span><h3>ä¸‰æ¢ç·šä¸¦è¡Œé©—è­‰</h3><ul><li>Utilityï¼šåƒ¹æ ¼ã€åº«å­˜ã€ä¿å›ºã€å†°ç®±</li><li>Riskï¼šå¬å›</li><li>Socialï¼šæ¨ç†ã€å…©çœŸä¸€å‡ã€å‘³è¦ºã€è¶¨å‹¢ã€ç¨€æœ‰ç¨®</li></ul></div>
-      <div class="roadmap-arrow">â†’</div>
-      <div class="roadmap-lane"><span>03 Â· Commit gate</span><h3>åªè®“è­‰æ“šéé–€æª»è€…é€²å·¥ç¨‹</h3><ul><li>å®Œæˆç‡ â‰¥80%</li><li>ç†è§£ï¼å¹«åŠ© â‰¥4ï¼›ä¿¡ä»» â‰¥3.5</li><li>è³‡æ–™ä¾è³´å¯è§£ã€ç„¡æ³•è¦é˜»å¡</li></ul></div>
-    </section>
-    <section class="brief-section"><h2>é€™ä¸€éšæ®µçš„ Definition of Done</h2><div class="brief-card"><ul><li>æ¯é …ç”¢å“æœ‰ç¨ç«‹ art directionã€æ ¸å¿ƒå¾ªç’°ã€æˆåŠŸæŒ‡æ¨™èˆ‡ä¸‹ä¸€ Gateã€‚</li><li>æ¡Œæ©Ÿã€æ‰‹æ©Ÿã€éµç›¤æ“ä½œã€ç›´æ¥ URL èˆ‡è¿”å›ï¼å‰é€²çš†å¯ç”¨ã€‚</li><li>ä¸å‡ºç¾æœªè§£é‡‹çš„ AI æ¨è«–ï¼›æ¯å€‹çµæœéƒ½èƒ½è¿½åˆ°è³‡æ–™èˆ‡é™åˆ¶ã€‚</li><li>å®Œæˆ 5â€“8 ä½ç›®æ¨™ä½¿ç”¨è€…æ¸¬è©¦å¾Œï¼Œæ‰æ›´æ–°è­‰æ“šå¾Œæ’åèˆ‡å·¥ç¨‹æ‰¿è«¾ã€‚</li></ul></div></section>
-  </div>`;
-}
-
-function renderDashboard() {
-  const rows = lab.demos.map((demo) => ({ demo, metric: metricsFor(demo) }));
-  const evidenceRank = [...rows].filter((row) => row.metric.feedbackCount).sort((a, b) => scoreMetric(b.metric) - scoreMetric(a.metric));
-  const rankMap = new Map(evidenceRank.map((row, index) => [row.demo.id, index + 1]));
-  const feedback = readStore(STORAGE.feedback);
-  const events = readStore(STORAGE.events);
-  const concerns = feedback.flatMap((row) => row.untrusted ? [{ demo: getDemo(row.concept_id)?.title, text: row.untrusted }] : []).slice(-8).reverse();
-
-  app.innerHTML = `<div class="page">
-    <div class="dashboard-hero"><div><p class="eyebrow">Evidence dashboard</p><h1>æ’åæœƒè®Šï¼Œè­‰æ“šè¦ç•™ä¸‹ã€‚</h1><p class="lead">ç›®å‰ ${events.length} ç­†äº‹ä»¶ã€${feedback.length} ä»½å›é¥‹ã€‚æ¨£æœ¬ä¸è¶³æ™‚ä¸ç”¢ç”ŸæˆåŠŸçµè«–ã€‚</p></div>
-      <div class="dashboard-actions"><button class="button button-secondary" data-export="json">åŒ¯å‡º JSON</button><button class="button button-secondary" data-export="csv">åŒ¯å‡º CSV</button></div>
-    </div>
-    <div class="gate-grid">
-      <div class="gate"><strong>â‰¥ 80%</strong><span>ä»»å‹™å®Œæˆç‡</span></div><div class="gate"><strong>â‰¥ 4/5</strong><span>ç†è§£åº¦</span></div><div class="gate"><strong>â‰¥ 4/5</strong><span>å¹«åŠ©åº¦</span></div><div class="gate"><strong>â‰¥ 3.5/5</strong><span>ä¿¡ä»»åº¦</span></div><div class="gate"><strong>â‰¥ 60%</strong><span>ä½¿ç”¨æ„é¡˜ï¼ˆ4â€“5 åˆ†ï¼‰</span></div>
-    </div>
-    <div class="lab-note warning"><span>âš–ï¸</span><div><strong>æ±ºç­–ä¿è­·æ¬„</strong>è‡³å°‘ 5 ä»½æœ‰æ•ˆå›é¥‹ä¸”æ‰€æœ‰é–€æª»éƒ½é€šéï¼Œæ‰é¡¯ç¤º Buildï¼›å¤–éƒ¨è³‡æ–™ä¾è³´æœªè§£å‰ä»ç¶­æŒ Need Evidenceã€‚</div></div>
-    <div class="table-wrap"><table><thead><tr><th>åŸæ’ï¼è©•ç´š</th><th>æ¦‚å¿µ</th><th>è­‰æ“šæ’</th><th>è­‰æ“šè©•ç´š</th><th>é–‹å§‹ç‡</th><th>å®Œæˆç‡</th><th>åƒ¹å€¼æ™‚é–“</th><th>ç†è§£</th><th>å¹«åŠ©</th><th>ä¿¡ä»»</th><th>ä½¿ç”¨æ„é¡˜</th><th>é€šçŸ¥</th><th>è³‡æ–™æˆæ¬Š</th><th>n</th><th>å»ºè­°</th></tr></thead><tbody>
-      ${rows.map(({ demo, metric }) => `<tr><td>#${demo.rank}ï¼${demo.grade}</td><td><a href="#/demo/${demo.id}">${escapeHtml(demo.title)}</a></td><td>${rankMap.get(demo.id) ? `#${rankMap.get(demo.id)}` : "â€”"}</td><td>${metric.evidenceGrade}</td><td>${metric.startRate == null ? "â€”" : `${fmt(metric.startRate)}%`}</td><td>${metric.completionRate == null ? "â€”" : `${fmt(metric.completionRate)}%`}</td><td>${metric.timeToValue == null ? "â€”" : `${fmt(metric.timeToValue / 1000)}s`}</td><td>${fmt(metric.understanding)}</td><td>${fmt(metric.helpfulness)}</td><td>${fmt(metric.trust)}</td><td>${metric.willingnessRate == null ? "â€”" : `${fmt(metric.willingnessRate)}%`}</td><td>${metric.notificationRate == null ? "â€”" : `${fmt(metric.notificationRate)}%`}</td><td>${metric.dataRate == null ? "â€”" : `${fmt(metric.dataRate)}%`}</td><td>${metric.feedbackCount}</td><td>${decisionBadge(metric.decision)}</td></tr>`).join("")}
-    </tbody></table></div>
-    <div class="section-head"><div><p class="eyebrow">Qualitative evidence</p><h2>ä¸»è¦ä¸ä¿¡ä»»é»</h2></div></div>
-    ${concerns.length ? `<ul class="concern-list">${concerns.map(item => `<li><strong>${escapeHtml(item.demo || "æœªçŸ¥æ¦‚å¿µ")}ï¼š</strong>${escapeHtml(item.text)}</li>`).join("")}</ul>` : `<div class="empty-state">é‚„æ²’æœ‰è³ªæ€§å›é¥‹ã€‚è«‹å…ˆå®Œæˆä»»ä¸€ Demoï¼Œä¸¦ç•™ä¸‹ã€Œæœ€ä¸å¯ä¿¡çš„éƒ¨åˆ†ã€ã€‚</div>`}
-    <div class="section-head"><div><p class="eyebrow">Current recommendation</p><h2>ä¸‹ä¸€è¼ªå…ˆé©—è­‰ä»€éº¼</h2></div></div>
-    <div class="brief-card"><p><strong>ç›®å‰ä¸å®£å‘Šä»»ä½•æ¦‚å¿µå·²é€šéã€‚</strong>è‹¥ä»Šå¤©å¿…é ˆå®‰æ’é †åºï¼Œä¾ RICE èˆ‡é¢¨éšªçµ„åˆå„ªå…ˆæ¸¬ï¼šåƒ¹æ ¼åˆºå®¢ï¼ˆå»£æ³›ã€çœéŒ¢åƒ¹å€¼æ¸…æ¥šï¼‰ã€å›¤è²¨é¬¼æ‰“ç‰†ï¼ˆä½æˆæœ¬é©—è­‰æ¨è«–æ ¡æ­£ï¼‰ã€å•†å“å¬å›é›·é”ï¼ˆé«˜å½±éŸ¿ä½†å¤–éƒ¨ä¾è³´æœ€å¤§ï¼‰ã€‚å‘³è¦º DNA å¯ç•¶ä½œç¤¾äº¤åˆ†äº«å°ç…§çµ„ã€‚</p></div>
-  </div>`;
-
-  document.querySelectorAll("[data-export]").forEach((button) => button.addEventListener("click", () => exportEvidence(button.dataset.export, rows)));
-}
-
-function scoreMetric(metric) {
-  return [metric.understanding, metric.helpfulness, metric.trust, metric.willingness].filter(Number.isFinite).reduce((a, b) => a + b, 0);
-}
-
-function exportEvidence(type, rows) {
-  const payload = {
-    exported_at: new Date().toISOString(),
-    dataset: lab.meta,
-    summary: rows.map(({ demo, metric }) => ({ concept_id: demo.id, original_rank: demo.rank, original_grade: demo.grade, ...metric })),
-    feedback: readStore(STORAGE.feedback),
-    events: readStore(STORAGE.events),
-  };
-  let content;
-  let mime;
-  let extension;
-  if (type === "csv") {
-    const headers = ["concept_id","original_rank","original_grade","opened","started","completed","completion_rate","time_to_value_ms","understanding","helpfulness","trust","willingness_rate","notification_rate","data_permission_rate","feedback_count","decision"];
-    const csvRows = payload.summary.map(row => [row.concept_id,row.original_rank,row.original_grade,row.opened,row.started,row.completed,row.completionRate,row.timeToValue,row.understanding,row.helpfulness,row.trust,row.willingnessRate,row.notificationRate,row.dataRate,row.feedbackCount,row.decision]);
-    content = [headers, ...csvRows].map(line => line.map(value => `"${String(value ?? "").replaceAll('"','""')}"`).join(",")).join("\n");
-    mime = "text/csv;charset=utf-8";
-    extension = "csv";
-  } else {
-    content = JSON.stringify(payload, null, 2);
-    mime = "application/json";
-    extension = "json";
-  }
-  const url = URL.createObjectURL(new Blob([content], { type: mime }));
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = `invoice-lab-evidence-${new Date().toISOString().slice(0,10)}.${extension}`;
-  link.click();
-  URL.revokeObjectURL(url);
-  showToast(`å·²åŒ¯å‡º ${extension.toUpperCase()}`);
-}
-
-function demoShell(demo, state, body, step, total = 4) {
-  const currentIndex = lab.demos.findIndex((item) => item.id === demo.id);
-  const prev = lab.demos[(currentIndex - 1 + lab.demos.length) % lab.demos.length];
-  const next = lab.demos[(currentIndex + 1) % lab.demos.length];
-  return `<div class="page demo-page">
-    <div class="demo-breadcrumb"><a href="#/gallery">ä¹é …å¯¦é©—</a><span>/</span><span>${originalRankLabel(demo)} ${escapeHtml(demo.title)}</span></div>
-    <div class="demo-layout">
-      <article class="experiment theme-${demo.id}" data-product-theme="${demo.id}">
-        <header class="experiment-head"><span class="demo-icon" aria-hidden="true">${demo.icon}</span><div><span class="demo-number">ORIGINAL RANK ${originalRankLabel(demo)} Â· ${demo.grade}</span><h1>${escapeHtml(demo.title)}</h1></div><span class="step-count">${Math.min(step, total)} / ${total}</span></header>
-        <div class="progress" aria-label="é«”é©—é€²åº¦"><span style="width:${Math.min(100, Math.max(4, step / total * 100))}%"></span></div>
-        <div class="experiment-body">${body}</div>
-      </article>
-      <aside class="side-stack">
-        <div class="side-card"><h3>é€™æ¬¡è¦é©—è­‰</h3><p>${escapeHtml(demo.assumption)}</p></div>
-        <div class="side-card design-signature"><span class="design-signature-label">DESIGN ARCHETYPE</span><h3>${escapeHtml(demo.design.pattern)}</h3><p>${escapeHtml(demo.design.principle)}</p><a href="#/next-stage">æŸ¥çœ‹ç”¢å“åŒ–è—åœ– â†’</a></div>
-        <div class="side-card"><h3>è³‡æ–™èˆ‡ä¾è³´</h3><p>${escapeHtml(demo.dependency)}</p><p style="margin-top:8px">${decisionBadge(metricsFor(demo).decision)}</p></div>
-        <div class="side-card"><h3>å¿«é€Ÿç§»å‹•</h3><div class="side-nav"><a href="#/demo/${prev.id}" aria-label="ä¸Šä¸€å€‹ Demoï¼š${escapeHtml(prev.title)}">â† ä¸Šä¸€å€‹</a><a href="#/demo/${next.id}" aria-label="ä¸‹ä¸€å€‹ Demoï¼š${escapeHtml(next.title)}">ä¸‹ä¸€å€‹ â†’</a><a href="#/gallery">Gallery</a><a href="#/dashboard">çœ‹è­‰æ“š</a></div></div>
-      </aside>
-    </div>
-  </div>`;
-}
-
-function startScreen(demo, copy, extra = "") {
-  return `<div class="start-visual"><span class="demo-icon" aria-hidden="true">${demo.icon}</span></div>
-    <p class="eyebrow">${escapeHtml(demo.status)}</p><h2>${escapeHtml(copy.title)}</h2><p class="lead">${escapeHtml(copy.body)}</p>
-    ${extra}<div class="experiment-actions"><button class="button button-primary" data-act="start">é–‹å§‹é€™é …å¯¦é©—</button><a class="button button-ghost" href="#/gallery">å…ˆçœ‹å…¶ä»–æ¦‚å¿µ</a></div>`;
-}
-
-function evidenceDetails(demo, content) {
-  return `<details class="evidence" data-evidence><summary>ç‚ºä»€éº¼å¾—åˆ°é€™å€‹çµæœï¼Ÿ</summary><div class="evidence-inner">${content}<p><strong>è³‡æ–™ä¾è³´ï¼š</strong>${escapeHtml(demo.dependency)}</p></div></details>`;
-}
-
-function resultActions(demo, state, shareTitle, { feedback = true } = {}) {
-  return `<div class="experiment-actions"><button class="button button-secondary" data-act="share" data-share-title="${escapeHtml(shareTitle)}">é è¦½åˆ†äº«å¡</button>${feedback ? `<button class="button button-primary" data-act="feedback">å®Œæˆä¸¦ç•™ä¸‹å›é¥‹</button>` : ""}</div>`;
-}
-
-function feedbackScreen(demo) {
-  return `<form class="feedback" id="feedback-form">
-    <div class="feedback-intro"><p class="eyebrow">æœ€å¾Œ 60 ç§’</p><h2>é€™å€‹æ¦‚å¿µï¼Œå€¼å¾—å¾€ä¸‹åšå—ï¼Ÿ</h2><p>è«‹ä¾å‰›å‰›çš„é«”é©—å›ç­”ã€‚è³‡æ–™åªç•™åœ¨é€™å°è£ç½®ï¼ŒåŒ¯å‡ºå¾Œæ‰æœƒè¢«åœ˜éšŠä½¿ç”¨ã€‚</p></div>
-    <div class="rating-grid">${Object.entries(ratingLabels).map(([key, label]) => `<fieldset class="rating-field"><legend>${label}</legend><div class="stars" aria-label="${label}ï¼Œ1 åˆ° 5 åˆ†">${[1,2,3,4,5].map(value => `<input required id="${demo.id}-${key}-${value}" name="${key}" type="radio" value="${value}"><label for="${demo.id}-${key}-${value}" title="${value} åˆ†">${value}</label>`).join("")}</div></fieldset>`).join("")}</div>
-    <div class="toggle-grid"><label class="toggle-card"><span>é¡˜æ„é–‹å•Ÿç›¸é—œé€šçŸ¥</span><input name="notification" type="checkbox"></label><label class="toggle-card"><span>é¡˜æ„æä¾›å¿…è¦è³‡æ–™æ¬Šé™</span><input name="dataPermission" type="checkbox"></label></div>
-    <div class="feedback-fields"><label class="field"><span>æœ€æœ‰åƒ¹å€¼çš„éƒ¨åˆ†</span><textarea name="valuable" placeholder="å“ªä¸€åˆ»è®“ä½ è¦ºå¾—æœ‰ç”¨ï¼Ÿ"></textarea></label><label class="field"><span>æœ€ä¸å¯ä¿¡çš„éƒ¨åˆ†</span><textarea name="untrusted" placeholder="å“ªå€‹æ¨è«–è®“ä½ æ‡·ç–‘ï¼Ÿ"></textarea></label></div>
-    <label class="field" style="margin-top:10px"><span>å…¶ä»–å›é¥‹ï¼ˆé¸å¡«ï¼‰</span><textarea name="note" placeholder="å¦‚æœæ­£å¼ä¸Šç·šï¼Œä½ å¸Œæœ›å®ƒæ€éº¼åšï¼Ÿ"></textarea></label>
-    <div class="experiment-actions"><button class="button button-primary" type="submit">é€å‡ºé€™ä»½è­‰æ“š</button><button class="button button-ghost" type="button" data-act="result">å›çœ‹çµæœ</button></div>
-  </form>`;
-}
-
-function completionScreen(demo) {
-  const metric = metricsFor(demo);
-  return `<div class="complete-card"><div><div class="complete-check" aria-hidden="true">âœ“</div><p class="eyebrow">Evidence captured</p><h2>ä½ çš„å›é¥‹å·²åŠ å…¥å¯¦é©—</h2><p>ç›®å‰é€™å€‹æ¦‚å¿µæœ‰ ${metric.feedbackCount} ä»½å›é¥‹ï¼Œæ±ºç­–ç‹€æ…‹ç‚º <strong>${metric.decision}</strong>ã€‚é”åˆ°æ¨£æœ¬èˆ‡å…¨éƒ¨é–€æª»å‰ï¼Œä¸æœƒè¢«æ¨™æˆé©—è­‰æˆåŠŸã€‚</p><div class="experiment-actions" style="justify-content:center"><button class="button button-primary" data-act="restart">é‡æ–°é«”é©—</button><a class="button button-secondary" href="#/dashboard">æŸ¥çœ‹è­‰æ“šå„€è¡¨æ¿</a></div></div></div>`;
-}
-
-function bindShared(demo, state, renderResultStep) {
-  document.querySelectorAll("[data-evidence]").forEach((details) => details.addEventListener("toggle", () => {
-    if (details.open) track("evidence_expanded", demo, state);
-  }, { once: true }));
-  document.querySelectorAll('[data-act="share"]').forEach((button) => button.addEventListener("click", () => openShare(demo, state, button.dataset.shareTitle)));
-  document.querySelectorAll('[data-act="feedback"]').forEach((button) => button.addEventListener("click", () => updateState(demo, { step: "feedback", resultStep: renderResultStep })));
-  document.querySelectorAll('[data-act="result"]').forEach((button) => button.addEventListener("click", () => updateState(demo, { step: state.resultStep ?? renderResultStep })));
-  document.querySelectorAll('[data-act="restart"]').forEach((button) => button.addEventListener("click", () => {
-    const fresh = initialState(demo);
-    fresh.opened = true;
-    demoStates.set(demo.id, fresh);
-    track("demo_restarted", demo, fresh);
-    renderRoute({ focus: true });
-  }));
-  const form = document.querySelector("#feedback-form");
-  if (form) form.addEventListener("submit", (event) => submitFeedback(event, demo, state));
-}
-
-function submitFeedback(event, demo, state) {
-  event.preventDefault();
-  const form = new FormData(event.currentTarget);
-  const entry = {
-    concept_id: demo.id,
-    rank: demo.rank,
-    session_id: sessionId(),
-    at: new Date().toISOString(),
-    understanding: Number(form.get("understanding")),
-    helpfulness: Number(form.get("helpfulness")),
-    trust: Number(form.get("trust")),
-    willingness: Number(form.get("willingness")),
-    notification: form.get("notification") === "on",
-    dataPermission: form.get("dataPermission") === "on",
-    valuable: String(form.get("valuable") || "").trim(),
-    untrusted: String(form.get("untrusted") || "").trim(),
-    note: String(form.get("note") || "").trim(),
-  };
-  const feedback = readStore(STORAGE.feedback);
-  feedback.push(entry);
-  writeStore(STORAGE.feedback, feedback);
-  track("feedback_submitted", demo, state, { result: `${entry.understanding}/${entry.helpfulness}/${entry.trust}/${entry.willingness}` });
-  updateState(demo, { step: "complete", feedbackDone: true });
-  showToast("å›é¥‹å·²è¨˜éŒ„åœ¨é€™å°è£ç½®");
-}
-
-function openShare(demo, state, title) {
-  track("share_clicked", demo, state, { result: title });
-  const shareUrl = `${location.origin}${location.pathname}#/demo/${demo.id}`;
-  modalRoot.innerHTML = `<div class="modal-backdrop" data-modal-backdrop><section class="modal" role="dialog" aria-modal="true" aria-labelledby="share-heading"><header class="modal-head"><h3 id="share-heading">éš±ç§å®‰å…¨åˆ†äº«é è¦½</h3><button class="modal-close" data-close aria-label="é—œé–‰">Ã—</button></header><div class="share-card"><small>ç™¼ç¥¨è…¦æ´å¯¦é©—å®¤ Â· #${demo.rank}</small><h2>${escapeHtml(title)}</h2><p>${escapeHtml(demo.tagline)}</p><span class="privacy-chip">ä¸å«å•†å®¶ã€é‡‘é¡ã€æ—¥æœŸèˆ‡å€‹äººæ˜ç´°</span></div><div class="modal-actions"><button class="button button-primary button-wide" data-copy data-url="${escapeHtml(shareUrl)}">è¤‡è£½åˆ†äº«æ–‡å­—èˆ‡é€£çµ</button></div></section></div>`;
-  const close = () => { modalRoot.innerHTML = ""; };
-  modalRoot.querySelector("[data-close]").addEventListener("click", close);
-  modalRoot.querySelector("[data-modal-backdrop]").addEventListener("click", (event) => { if (event.target === event.currentTarget) close(); });
-  modalRoot.querySelector("[data-copy]").addEventListener("click", async (event) => {
-    const text = `${title}ï½œ${demo.tagline}\n${event.currentTarget.dataset.url}`;
-    try { await navigator.clipboard.writeText(text); showToast("åˆ†äº«æ–‡å­—å·²è¤‡è£½"); } catch { showToast("ç€è¦½å™¨æœªå…è¨±è¤‡è£½ï¼Œè«‹æ‰‹å‹•è¤‡è£½ç¶²å€"); }
-  });
-  modalRoot.querySelector("[data-close]").focus();
-}
-
-function renderRecall(demo, state) {
-  let body;
-  if (state.step === 0) body = startScreen(demo, { title: "ä½ è²·éçš„æ±è¥¿ï¼Œå‡ºäº‹æ™‚æ‰¾å¾—åˆ°ä½ å—ï¼Ÿ", body: "ç”¨ä¸€å€‹è™›æ§‹å¬å›äº‹ä»¶ï¼Œæ¸¬è©¦ç™¼ç¥¨è‡ªå‹•æ¯”å°æ˜¯å¦èƒ½åœ¨ 30 ç§’å…§å¸¶ä¾†å¯ä¿¡ã€å¯è¡Œå‹•çš„åƒ¹å€¼ã€‚" }, `<div class="lab-note error"><span>!</span><div><strong>é‡è¦</strong>æœ¬äº‹ä»¶å®Œå…¨è™›æ§‹ï¼›æ­£å¼ç‰ˆå¿…é ˆä¾è³´æ¬Šå¨å¬å›ä¾†æºèˆ‡å•†å“ç´šç™¼ç¥¨æ˜ç´°ã€‚</div></div>`);
-  else if (state.step === 1) body = `<p class="eyebrow">Step 1 Â· æ¨¡æ“¬å¤–éƒ¨äº‹ä»¶</p><div class="event-card"><span class="event-date">${lab.recallEvent.published} Â· è™›æ§‹äº‹ä»¶</span><h2>${escapeHtml(lab.recallEvent.title)}</h2><p>${escapeHtml(lab.recallEvent.reason)}ã€‚å¯èƒ½æ‰¹è™Ÿï¼š${escapeHtml(lab.recallEvent.batch)}ï¼›ç¤ºç¯„è²©å”®å€é–“ ${lab.recallEvent.window.join(" â€“ ")}ã€‚</p></div><div class="experiment-actions"><button class="button button-primary" data-act="scan">æƒææˆ‘çš„ç¤ºç¯„ç™¼ç¥¨</button></div>`;
-  else if (state.step === 2) body = `<p class="eyebrow">Step 2 Â· è‡ªå‹•æ¯”å°</p><div class="scan-box"><div class="scan-beam"></div><div class="scan-copy"><strong>æ­£åœ¨æ¯”å° 10 å¼µå›ºå®šç™¼ç¥¨</strong><p>å“å â†’ æ—¥æœŸ â†’ å•†å®¶ â†’ æ‰¹è™Ÿå¯å¾—æ€§</p></div></div><div class="lab-note warning" style="margin-top:16px"><span>ğŸ”</span><div>æ‰¹è™Ÿé€šå¸¸ä¸åœ¨ç™¼ç¥¨ä¸Šï¼Œæ‰€ä»¥å³ä½¿å“åã€æ—¥æœŸç›¸ç¬¦ï¼Œä¹Ÿä¸èƒ½å®£ç¨±ç™¾åˆ†ä¹‹ç™¾å‘½ä¸­ã€‚</div></div>`;
-  else if (state.step === "feedback") body = feedbackScreen(demo);
-  else if (state.step === "complete") body = completionScreen(demo);
-  else {
-    markComplete(demo, state, "possible_match_86");
-    body = `<p class="eyebrow">Step 3 Â· ç¬¬ä¸€å€‹åƒ¹å€¼</p><div class="result-card"><div class="result-banner warning"><span class="status-badge" style="background:white;color:#8a2713">å¯èƒ½å‘½ä¸­</span><h2>æ‰¾åˆ° 1 ç­†éœ€è¦ä½ ç¢ºèª</h2><p>ä¸æ˜¯åˆ¤å®šä¸­æ¨™ï¼Œè€Œæ˜¯æŠŠæœ€å€¼å¾—ç¢ºèªçš„é‚£ä¸€ç­†å…ˆæ‰¾å‡ºä¾†ã€‚</p></div><div class="result-content"><div class="confidence"><div class="confidence-score">${lab.recallEvent.confidence}%</div><div><strong>åŒ¹é…å¯ä¿¡åº¦</strong><p>å“åã€è³¼è²·æ—¥æœŸç›¸ç¬¦ï¼›ç™¼ç¥¨æ²’æœ‰æ‰¹è™Ÿï¼Œæ‰€ä»¥ä»éœ€æŸ¥çœ‹ç“¶èº«ã€‚</p></div></div><div class="invoice-card"><div class="invoice-line"><span>å•†å“</span><strong>æ¸…æ¶¼æ°£æ³¡æ°´ 500ml</strong></div><div class="invoice-line"><span>æ—¥æœŸï¼å•†å®¶</span><strong>2026-08-12 Â· æ—¥æ—¥ä¾¿åˆ©</strong></div><div class="invoice-line"><span>å»ºè­°</span><strong>ç¢ºèªç“¶èº«æ‰¹è™Ÿ QX0812</strong></div></div>${evidenceDetails(demo, `<ul class="evidence-list"><li>å“åå®Œæ•´ç›¸ç¬¦ï¼šæ¸…æ¶¼æ°£æ³¡æ°´ 500ml</li><li>è³¼è²·æ—¥è½åœ¨ç¤ºç¯„è²©å”®å€é–“å…§</li><li>å•†å®¶å±¬æ–¼äº‹ä»¶ç¤ºç¯„é€šè·¯</li></ul><p><strong>ç¼ºå£ï¼š</strong>ç™¼ç¥¨æ²’æœ‰æ‰¹è™Ÿï¼Œä¸èƒ½æŠŠã€Œå¯èƒ½å‘½ä¸­ã€å¯«æˆã€Œå·²è²·åˆ°å¬å›å“ã€ã€‚æ­£å¼ä¸Šç·šé‚„éœ€æ¬Šå¨ã€ç©©å®šä¸”å¯ç¨½æ ¸çš„å¬å›äº‹ä»¶è³‡æ–™ã€‚</p>`)}<h3 style="margin-top:20px">ä½ æœƒæ€éº¼è™•ç†ï¼Ÿ</h3><div class="choice-grid">${["å·²ç¢ºèªï¼Œæ˜¯é€™é …å•†å“","ä¸æ˜¯é€™é …å•†å“","å·²ç¶“è™•ç†å®Œç•¢"].map((label, index) => `<button class="choice-card ${state.resolution === index ? "selected" : ""}" data-resolution="${index}"><strong>${label}</strong><small>${["ä¸‹ä¸€æ­¥æŸ¥çœ‹æ‰¹è™Ÿèˆ‡è™•ç†æŒ‡å¼•","å¹«åŠ©ç³»çµ±ä¿®æ­£éŒ¯èª¤åŒ¹é…","é—œé–‰é€™æ¬¡æé†’ä¸¦ç•™ä¸‹ç‹€æ…‹"][index]}</small></button>`).join("")}</div>${state.resolution != null ? `<div class="lab-note" style="margin-top:14px"><span>âœ“</span><div>${["å·²è¨˜éŒ„ï¼šä»éœ€ç”±ä½ ç¢ºèªç“¶èº«æ‰¹è™Ÿã€‚","å·²è¨˜éŒ„ç‚ºèª¤åˆ¤ï¼›é€™æ˜¯æ¨¡å‹å¿…é ˆå­¸æœƒçš„åè­‰ã€‚","å·²è¨˜éŒ„å®Œæˆï¼›æ­£å¼ç‰ˆå¯åœæ­¢é‡è¤‡æé†’ã€‚"][state.resolution]}</div></div>` : ""}${resultActions(demo, state, "æˆ‘çš„ç™¼ç¥¨å¹«æˆ‘æŠ“åˆ°ä¸€ç­†å¬å›é¢¨éšª")}</div></div>`;
-  }
-  app.innerHTML = demoShell(demo, state, body, state.step === "feedback" || state.step === "complete" ? 4 : Number(state.step) + 1, 4);
-  if (state.step === 0) document.querySelector('[data-act="start"]').addEventListener("click", () => startDemo(demo));
-  if (state.step === 1) document.querySelector('[data-act="scan"]').addEventListener("click", () => { updateState(demo, { step: 2 }); setTimeout(() => { if (location.hash.includes("/recall") && stateFor(demo).step === 2) updateState(demo, { step: 3 }, { focus: true }); }, 850); });
-  document.querySelectorAll("[data-resolution]").forEach(button => button.addEventListener("click", () => updateState(demo, { resolution: Number(button.dataset.resolution) })));
-  bindShared(demo, state, 3);
-}
-
-function renderPrice(demo, state) {
-  const products = [...new Set(lab.priceHistory.map(item => item.product))];
-  const selected = state.product || products[0];
-  const history = lab.priceHistory.filter(item => item.product === selected);
-  let body;
-  if (state.step === 0) body = startScreen(demo, { title: "ä½ è¨˜å¾—åƒ¹æ ¼ï¼Œä½†è¨˜å¾—å–®ä½åƒ¹å—ï¼Ÿ", body: "å¾è‡ªå·±çš„å›ºå®šæ­·å²ç™¼ç¥¨æ¯”åŒå•†å“ã€åŒè¦æ ¼ï¼Œæ‰¾å‡ºåƒ¹æ ¼è®ŠåŒ–ã€‚é€™ä¸æ˜¯å³æ™‚å¸‚å ´æ¯”åƒ¹ã€‚" });
-  else if (state.step === 1) body = `<p class="eyebrow">Step 1 Â· é¸ä¸€å€‹å•†å“</p><h2>å“ªå€‹æœ€è¿‘å¯èƒ½è¢«åˆºåˆ°ï¼Ÿ</h2><p class="lead">å…ˆé¸å•†å“ï¼Œå†ç”¨ç›¸åŒè¦æ ¼çš„æ­·å²ç´€éŒ„æ¯”è¼ƒã€‚</p><div class="choice-grid">${products.map(product => `<button class="choice-card ${selected === product ? "selected" : ""}" data-product="${escapeHtml(product)}"><strong>${escapeHtml(product)}</strong><small>${lab.priceHistory.filter(item => item.product === product).length} ç­†å¯æ¯”ç´€éŒ„</small></button>`).join("")}</div><div class="experiment-actions"><button class="button button-primary" data-act="compare">æ¯”è¼ƒæ­·å²å–®ä½åƒ¹</button></div>`;
-  else if (state.step === "feedback") body = feedbackScreen(demo);
-  else if (state.step === "complete") body = completionScreen(demo);
-  else {
-    markComplete(demo, state, `price_${selected}`);
-    const ordered = [...history].sort((a,b) => state.sort === "recent" ? b.date.localeCompare(a.date) : a.unitPrice - b.unitPrice);
-    const max = Math.max(...history.map(item => item.unitPrice));
-    const min = Math.min(...history.map(item => item.unitPrice));
-    const diff = (max - min) / min * 100;
-    body = `<p class="eyebrow">Step 2 Â· å€‹äººæ­·å²æ¯”åƒ¹</p><div class="result-card"><div class="result-banner"><h2>åŒè¦æ ¼æœ€å¤šå·® ${fmt(diff)}%</h2><p>${escapeHtml(selected)} Â· åªæ¯”è¼ƒä½ çš„å›ºå®šç¤ºç¯„ç´€éŒ„</p></div><div class="result-content"><div class="button-row"><button class="filter-tab ${state.sort !== "recent" ? "active" : ""}" data-sort="low">æœ€ä½å–®ä½åƒ¹</button><button class="filter-tab ${state.sort === "recent" ? "active" : ""}" data-sort="recent">æœ€è¿‘è³¼è²·</button></div><div class="result-list" style="margin-top:15px">${ordered.map((item, index) => `<div class="result-row"><div><strong>${item.date} Â· ${escapeHtml(item.merchant)}</strong><p>${escapeHtml(item.product)}</p></div><div class="score">$${item.price}<small style="display:block;font-size:9px;color:var(--hint)">${selected.includes("è¡›ç”Ÿç´™") ? `$${item.unitPrice}/åŒ…` : `$${item.unitPrice}/ml`}</small></div></div>`).join("")}</div>${evidenceDetails(demo, `<p>åªæ¯”è¼ƒæ­£è¦åŒ–å¾Œçš„åŒå•†å“ã€åŒè¦æ ¼ï¼Œå…ˆæ›ç®—æˆå–®ä½åƒ¹æ ¼å†æ’åºã€‚Demo æ²’æœ‰å³æ™‚å¸‚å ´è³‡æ–™ï¼Œå› æ­¤çµè«–åªèƒ½æ˜¯ã€Œæ¯”ä½ è‡ªå·±çš„æ­·å²åƒ¹æ ¼é«˜ï¼ä½ã€ï¼Œä¸èƒ½å®£ç¨±å…¨å¸‚å ´æœ€ä¾¿å®œã€‚</p>`)}<div class="lab-note warning" style="margin-top:14px"><span>!</span><div><strong>ä¸æ˜¯å³æ™‚å¸‚åƒ¹</strong>æ­£å¼ç‰ˆè‹¥è¦å›ç­”ã€Œé™„è¿‘å“ªè£¡æœ€ä¾¿å®œã€ï¼Œé‚„éœ€è¦æ–°é®®çš„å•†å®¶åƒ¹æ ¼èˆ‡è·é›¢è³‡æ–™ã€‚</div></div>${resultActions(demo, state, `æˆ‘è²· ${selected} æœ€å¤šå·®äº† ${fmt(diff)}%`)}</div></div>`;
-  }
-  app.innerHTML = demoShell(demo, state, body, state.step === "feedback" || state.step === "complete" ? 4 : Number(state.step) + 1, 4);
-  if (state.step === 0) document.querySelector('[data-act="start"]').addEventListener("click", () => startDemo(demo, { product: products[0] }));
-  document.querySelectorAll("[data-product]").forEach(button => button.addEventListener("click", () => updateState(demo, { product: button.dataset.product })));
-  document.querySelector('[data-act="compare"]')?.addEventListener("click", () => updateState(demo, { step: 2 }, { focus: true }));
-  document.querySelectorAll("[data-sort]").forEach(button => button.addEventListener("click", () => updateState(demo, { sort: button.dataset.sort })));
-  bindShared(demo, state, 2);
-}
-
-function renderStock(demo, state) {
-  let body;
-  if (state.step === 0) body = startScreen(demo, { title: "ä½ æ˜¯çœŸçš„éœ€è¦ï¼Œé‚„æ˜¯åˆå¿˜äº†å®¶è£¡æœ‰ï¼Ÿ", body: "ç”¨é‡è¤‡è³¼è²·é€±æœŸæ¨ä¼°å®¶ä¸­åº«å­˜ï¼Œå†è®“ä½ ä¸€éµæ ¡æ­£ã€‚é‡é»æ˜¯æ¸¬è©¦ä½ æ˜¯å¦æ¥å—é€™ç¨®æ¨è«–ã€‚" });
-  else if (state.step === 1) body = `<p class="eyebrow">Step 1 Â· ç™¼ç¾é‡è¤‡è³¼è²·</p><h2>9 å¤©å…§è²·äº†å…©ä¸²è¡›ç”Ÿç´™</h2><p class="lead">åŒå•†å“ã€åŒè¦æ ¼ï¼Œ8/09 èˆ‡ 8/14 å„è²· 12 åŒ…ã€‚</p><div class="metric-grid"><div class="metric-card"><span>è³¼è²·æ¬¡æ•¸</span><strong>2 æ¬¡</strong></div><div class="metric-card"><span>ç¸½åŒ…æ•¸</span><strong>24 åŒ…</strong></div><div class="metric-card"><span>é–“éš”</span><strong>5 å¤©</strong></div></div><div class="experiment-actions"><button class="button button-primary" data-act="estimate">è®“ç³»çµ±çŒœå®¶ä¸­åº«å­˜</button></div>`;
-  else if (state.step === 2) {
-    markValue(demo, state, "estimated_3_packs");
-    body = `<p class="eyebrow">Step 2 Â· åº«å­˜æ¨ä¼°</p><div class="personality-card"><span class="persona-label">å›¤è²¨é¬¼æç¤º</span><h2>å®¶è£¡å¯èƒ½é‚„æœ‰ 3 åŒ…</h2><p>ä¾å…©æ¬¡è³¼è²·é–“éš”èˆ‡ç¤ºç¯„ç”¨é‡ä¼°ç®—ã€‚é€™ä¸æ˜¯ç›¤é»çµæœï¼Œè«‹ä½ æ ¡æ­£ã€‚</p></div>${evidenceDetails(demo, `<p>24 åŒ… Ã· ç¤ºç¯„å®¶åº­æ¯æ—¥å¹³å‡ 1.1 åŒ…çš„ã€ŒæŠ½å–å–®ä½ã€æ›ç®—å¾Œï¼Œæ‰£é™¤æ¨ä¼°æ¶ˆè€—é‡ã€‚çœŸå¯¦ç‰ˆéœ€çŸ¥é“å®¶åº­äººæ•¸ã€ä½¿ç”¨å ´æ™¯èˆ‡æ˜¯å¦ä»£è³¼ï¼›æ‰€ä»¥çµæœåªå¯å¯«ã€Œå¯èƒ½ã€ã€‚</p>`)}<h3 style="margin-top:20px">å¯¦éš›æƒ…æ³æ˜¯ï¼Ÿ</h3><div class="choice-grid">${[["still","çœŸçš„é‚„æœ‰","ç¶­æŒæé†’ï¼Œä½†å»¶å¾Œè£œè²¨"],["empty","å·²ç¶“ç”¨å®Œ","æé«˜ä½ çš„å€‹äººæ¶ˆè€—ç‡"],["mute","ä¸è¦æé†’","æ­¤å•†å“åœæ­¢åº«å­˜æ¨ä¼°"]].map(([id,title,copy]) => `<button class="choice-card" data-stock="${id}"><strong>${title}</strong><small>${copy}</small></button>`).join("")}</div>`;
-  } else if (state.step === "feedback") body = feedbackScreen(demo);
-  else if (state.step === "complete") body = completionScreen(demo);
-  else {
-    markComplete(demo, state, `stock_${state.stockAnswer}`);
-    const copy = { still:["æ ¡æ­£å®Œæˆï¼šå»¶å¾Œè£œè²¨","ä¸‹æ¬¡æé†’æœƒç­‰åˆ°æ¨ä¼°å‰© 1 åŒ…ã€‚"], empty:["æ ¡æ­£å®Œæˆï¼šæé«˜æ¶ˆè€—ç‡","ç³»çµ±æœƒç¸®çŸ­ä½ çš„å€‹äººè£œè²¨é€±æœŸã€‚"], mute:["å·²åœæ­¢é€™é …æé†’","ä»ä¿ç•™ç™¼ç¥¨ç´€éŒ„ï¼Œä¸å†åšåº«å­˜é€šçŸ¥ã€‚"] }[state.stockAnswer];
-    body = `<p class="eyebrow">Step 3 Â· ä½ çš„å›ç­”æ”¹è®Šçµæœ</p><div class="result-card"><div class="result-banner"><h2>${copy[0]}</h2><p>${copy[1]}</p></div><div class="result-content"><div class="lab-note"><span>â†»</span><div><strong>ä¸æ˜¯ä¸€æ¬¡åˆ¤å®š</strong>é€™å€‹æ¦‚å¿µçš„åƒ¹å€¼å–æ±ºæ–¼ä½¿ç”¨è€…æ˜¯å¦é¡˜æ„æ ¡æ­£ï¼Œä»¥åŠæ ¡æ­£å¾Œä¸‹ä¸€æ¬¡çœŸçš„æ›´æº–ã€‚</div></div>${resultActions(demo, state, copy[0])}</div></div>`;
-  }
-  app.innerHTML = demoShell(demo, state, body, state.step === "feedback" || state.step === "complete" ? 4 : Number(state.step) + 1, 4);
-  document.querySelector('[data-act="start"]')?.addEventListener("click", () => startDemo(demo));
-  document.querySelector('[data-act="estimate"]')?.addEventListener("click", () => updateState(demo, { step: 2 }, { focus: true }));
-  document.querySelectorAll("[data-stock]").forEach(button => button.addEventListener("click", () => updateState(demo, { stockAnswer: button.dataset.stock, step: 3 }, { focus: true })));
-  bindShared(demo, state, 3);
-}
-
-function renderDetective(demo, state) {
-  const merchantTotal = 2;
-  const truthTotal = 3;
-  const questionTotal = merchantTotal + truthTotal;
-  const chapterTabs = `<div class="case-file-tabs" aria-label="æ¡ˆä»¶ç« ç¯€"><span class="case-file-tab ${state.phase === "merchant" ? "active" : "done"}"><b>01</b> å•†å®¶èº«åˆ†</span><span class="case-file-tab ${state.phase === "truth" ? "active" : state.phase === "transition" || state.phase === "merchant" ? "" : "done"}"><b>02</b> æ¶ˆè²»è­‰è©</span></div>`;
-  let body;
-  if (state.step === 0) body = startScreen(demo, { title: "å…ˆæŸ¥èº«åˆ†ï¼Œå†æŠ“å‡ºèª°åœ¨èªªè¬Šã€‚", body: "åŒä¸€å ´ç™¼ç¥¨æ¨ç†éŠæˆ²ã€å…©å€‹ç« ç¯€ã€äº”å®—æ¡ˆä»¶ï¼šå…ˆç”¨ç™¼ç¥¨ç·šç´¢èªå‡ºå•†å®¶ï¼Œå†æ‰¾å‡ºè‡ªå·±æ¶ˆè²»ç´€éŒ„è£¡çš„å‡è©±ã€‚" }, `<div class="case-intro"><span>CHAPTER 01</span><strong>é€™æ˜¯èª°ï¼Ÿ</strong><i>2 æ¡ˆ</i><span>CHAPTER 02</span><strong>èª°åœ¨èªªè¬Šï¼Ÿ</strong><i>3 æ¡ˆ</i></div>`);
-  else if (state.step === "summary") {
-    markComplete(demo, state, `combined_score_${state.score}_of_${questionTotal}`);
-    const badge = state.score === questionTotal ? "é¦–å¸­ç™¼ç¥¨åµæ¢" : state.score >= 4 ? "æ¶ˆè²»å´å¯«é«˜æ‰‹" : "ç™¼ç¥¨è¿·éœ§è¡Œè€…";
-    body = `<p class="eyebrow">æ¡ˆä»¶ç¸½çµ Â· Case closed</p><div class="personality-card detective-certificate"><span class="persona-label">ç™¼ç¥¨æ¨ç†å±€çµæ¡ˆè­‰æ›¸</span><h2>${escapeHtml(badge)}</h2><strong class="final-detective-score">${state.score} / ${questionTotal}</strong><div class="case-scoreboard"><span><b>${state.merchantScore}/${merchantTotal}</b>å•†å®¶èº«åˆ†</span><span><b>${state.truthScore}/${truthTotal}</b>æ¶ˆè²»è­‰è©</span><span><b>${state.bestStreak}</b>æœ€é•·é€£å‹</span></div><p>ä½ ä¸åªè¦çœ‹æ‡‚ç™¼ç¥¨å¯«äº†èª°ï¼Œé‚„è¦åˆ†è¾¨è‡ªå·±çš„è¨˜æ†¶æœ‰æ²’æœ‰èªªè¬Šã€‚æ¯ä¸€é¡Œæ­æ›‰éƒ½é™„å¯è¿½æº¯è­‰æ“šã€‚</p></div>${resultActions(demo, state, `æˆ‘çš„ç™¼ç¥¨åµæ¢åŠ›ï¼š${state.score}/${questionTotal}ï¼Œå°è™Ÿã€Œ${badge}ã€`)}`;
-  } else if (state.step === "feedback") body = feedbackScreen(demo);
-  else if (state.step === "complete") body = completionScreen(demo);
-  else if (state.phase === "transition") {
-    body = `${chapterTabs}<div class="chapter-transition"><span class="case-stamp">IDENTITY VERIFIED</span><p class="eyebrow">ç¬¬ä¸€ç« å®Œæˆ</p><h2>å•†å®¶èªå¾—äº†ã€‚<br>ç¾åœ¨ï¼Œè¼ªåˆ°ä½ çš„è¨˜æ†¶æ¥å—åµè¨Šã€‚</h2><p>æ¥ä¸‹ä¾†ä¸‰å®—æ¡ˆä»¶ï¼Œæ¯é¡Œæœ‰å…©å¥çœŸè©±ã€ä¸€å¥å‡è©±ã€‚æ‰¾å‡ºèˆ‡ç™¼ç¥¨è­‰æ“šä¸ç¬¦çš„é‚£ä¸€å¥ã€‚</p><div class="case-scoreboard"><span><b>${state.merchantScore}/${merchantTotal}</b>èº«åˆ†æŸ¥é©—</span><span><b>${state.bestStreak}</b>ç›®å‰æœ€é•·é€£å‹</span></div><div class="experiment-actions"><button class="button button-primary" data-act="begin-truth">é–‹å•Ÿæ¶ˆè²»è­‰è©å·å®—</button></div></div>`;
-  } else if (state.phase === "merchant") {
-    const round = lab.detectiveRounds[state.merchantRound];
-    body = `${chapterTabs}<div class="round-meta"><span>å•†å®¶èº«åˆ† Â· æ¡ˆä»¶ ${state.merchantRound + 1} / ${merchantTotal}</span><span>ç¸½åˆ† ${state.score} Â· é€£å‹ ${state.streak}</span></div><p class="eyebrow" style="margin-top:18px">ç™¼ç¥¨ç™»è¨˜å</p><h2>${escapeHtml(round.legal)}</h2><ul class="clue-list">${round.clues.map(clue => `<li>${escapeHtml(clue)}</li>`).join("")}</ul><div class="choice-grid">${round.options.map((option,index) => `<button class="choice-card ${state.revealed ? index === round.answer ? "correct" : index === state.selected ? "wrong" : "" : ""}" data-merchant-answer="${index}" ${state.revealed ? "disabled" : ""}><strong>${escapeHtml(option)}</strong><small>${state.revealed && index === round.answer ? "èº«åˆ†æ ¸é©—å®Œæˆ" : "é¸é€™å€‹ç­”æ¡ˆ"}</small></button>`).join("")}</div>${state.revealed ? `<div class="lab-note ${state.selected === round.answer ? "" : "error"}" style="margin-top:16px"><span>${state.selected === round.answer ? "âœ“" : "Ã—"}</span><div><strong>${state.selected === round.answer ? "èº«åˆ†å»åˆ" : "æ¨ç†å¤±æº–"}</strong>${escapeHtml(round.why)}</div></div><div class="experiment-actions"><button class="button button-primary" data-act="next-merchant">${state.merchantRound === merchantTotal - 1 ? "å®Œæˆèº«åˆ†æŸ¥é©—" : "ä¸‹ä¸€å®—æ¡ˆä»¶"}</button></div>` : ""}`;
-  } else {
-    const round = lab.truthRounds[state.truthRound];
-    body = `${chapterTabs}<div class="round-meta"><span>æ¶ˆè²»è­‰è© Â· æ¡ˆä»¶ ${state.truthRound + 1} / ${truthTotal}</span><span>ç¸½åˆ† ${state.score} Â· é€£å‹ ${state.streak}</span></div><p class="eyebrow" style="margin-top:18px">æ‰¾å‡ºèˆ‡ç™¼ç¥¨ä¸ç¬¦çš„è­‰è©</p><h2>å…©å¥æ˜¯çœŸçš„ï¼Œä¸€å¥åœ¨èªªè¬Šã€‚</h2><div class="choice-grid truth-case-grid">${round.statements.map((statement,index) => `<button class="choice-card ${state.revealed ? index === round.answer ? "correct" : index === state.selected ? "wrong" : "" : ""}" data-truth-answer="${index}" ${state.revealed ? "disabled" : ""}><span class="statement-number">è­‰è© ${String.fromCharCode(65 + index)}</span><strong>${escapeHtml(statement)}</strong></button>`).join("")}</div>${state.revealed ? `<div class="lab-note ${state.selected === round.answer ? "" : "error"}" style="margin-top:16px"><span>${state.selected === round.answer ? "âœ“" : "Ã—"}</span><div><strong>${state.selected === round.answer ? "æŠ“åˆ°å‡è©±" : "è¢«è¨˜æ†¶èª¤å°äº†"}</strong>${escapeHtml(round.evidence)}</div></div><div class="experiment-actions"><button class="button button-primary" data-act="next-truth-case">${state.truthRound === truthTotal - 1 ? "æŸ¥çœ‹ç¶œåˆçµæ¡ˆ" : "åµè¨Šä¸‹ä¸€çµ„è­‰è©"}</button></div>` : ""}`;
-  }
-  const progressStep = state.step === "summary" || state.step === "feedback" || state.step === "complete" ? 7 : state.step === 0 ? 1 : state.phase === "merchant" ? state.merchantRound + 2 : state.phase === "transition" ? 3 : state.truthRound + 4;
-  app.innerHTML = demoShell(demo, state, body, progressStep, 7);
-  document.querySelector('[data-act="start"]')?.addEventListener("click", () => startDemo(demo, { phase: "merchant", merchantRound: 0, truthRound: 0, merchantScore: 0, truthScore: 0, score: 0, streak: 0, bestStreak: 0, selected: null, revealed: false }));
-  document.querySelectorAll("[data-merchant-answer]").forEach(button => button.addEventListener("click", () => {
-    const selectedAnswer = Number(button.dataset.merchantAnswer);
-    const correct = selectedAnswer === lab.detectiveRounds[state.merchantRound].answer;
-    const streak = correct ? state.streak + 1 : 0;
-    updateState(demo, { selected: selectedAnswer, revealed: true, score: state.score + (correct ? 1 : 0), merchantScore: state.merchantScore + (correct ? 1 : 0), streak, bestStreak: Math.max(state.bestStreak, streak) });
-  }));
-  document.querySelector('[data-act="next-merchant"]')?.addEventListener("click", () => state.merchantRound === merchantTotal - 1 ? updateState(demo, { phase: "transition", selected: null, revealed: false }, { focus: true }) : updateState(demo, { merchantRound: state.merchantRound + 1, selected: null, revealed: false }, { focus: true }));
-  document.querySelector('[data-act="begin-truth"]')?.addEventListener("click", () => updateState(demo, { phase: "truth", selected: null, revealed: false }, { focus: true }));
-  document.querySelectorAll("[data-truth-answer]").forEach(button => button.addEventListener("click", () => {
-    const selectedAnswer = Number(button.dataset.truthAnswer);
-    const correct = selectedAnswer === lab.truthRounds[state.truthRound].answer;
-    const streak = correct ? state.streak + 1 : 0;
-    updateState(demo, { selected: selectedAnswer, revealed: true, score: state.score + (correct ? 1 : 0), truthScore: state.truthScore + (correct ? 1 : 0), streak, bestStreak: Math.max(state.bestStreak, streak) });
-  }));
-  document.querySelector('[data-act="next-truth-case"]')?.addEventListener("click", () => state.truthRound === truthTotal - 1 ? updateState(demo, { step: "summary", phase: "summary" }, { focus: true }) : updateState(demo, { truthRound: state.truthRound + 1, selected: null, revealed: false }, { focus: true }));
-  bindShared(demo, state, "summary");
-}
-
-function renderTruth(demo, state) {
-  renderDetective(demo, state);
-}
-
-function renderTaste(demo, state) {
-  let body;
-  if (state.step === 0) body = startScreen(demo, { title: "ä½ åƒçš„æ˜¯æ™šé¤ï¼Œç™¼ç¥¨çœ‹è¦‹çš„æ˜¯é¬¼æ ¼ã€‚", body: "ç”¨æ–™ç†é¡å‹ã€åƒ¹ä½ã€é‡è¤‡åº¦èˆ‡å†’éšªåº¦ç”Ÿæˆå¯åˆ†äº«äººè¨­ï¼›ä¸ä½¿ç”¨ç¤ºç¯„è³‡æ–™æ²’æœ‰çš„äº¤æ˜“æ™‚é–“ã€‚" }, `<div class="lab-note warning"><span>ğŸ•’</span><div><strong>èª ä¿¡é™åˆ¶</strong>å›ºå®šè³‡æ–™åªæœ‰æ—¥æœŸã€æ²’æœ‰äº¤æ˜“æ™‚é–“ï¼Œå› æ­¤ä¸åšå®µå¤œæˆ–ä½œæ¯æ¨è«–ã€‚</div></div>`);
-  else if (state.step === 1) body = `<p class="eyebrow">Step 1 Â· å¯ç”¨è¨Šè™Ÿ</p><h2>4 å¼µé¤é£²ï¼è¶…å•†ç™¼ç¥¨ï¼Œèƒ½èªªåˆ°å“ªè£¡ï¼Ÿ</h2><div class="metric-grid"><div class="metric-card"><span>ä¸»é£Ÿæ–™ç†</span><strong>3 ç¨®</strong></div><div class="metric-card"><span>åƒ¹ä½è·¨åº¦</span><strong>$145â€“220</strong></div><div class="metric-card"><span>é‡è¤‡å“é …</span><strong>æ°£æ³¡é£²</strong></div></div><div class="lab-note warning"><span>!</span><div>äº¤æ˜“æ™‚é–“ä¸å¯ç”¨ï¼Œæœ¬ Demo ä¸ä½¿ç”¨ã€Œæ·±å¤œã€ã€ã€Œæ—©é¤ã€æˆ–ä½œæ¯æ¨è«–ã€‚</div></div><div class="experiment-actions"><button class="button button-primary" data-act="reveal-taste">ç”Ÿæˆé£²é£Ÿé¬¼æ ¼</button></div>`;
-  else if (state.step === "feedback") body = feedbackScreen(demo);
-  else if (state.step === "complete") body = completionScreen(demo);
-  else {
-    markComplete(demo, state, "flavor_wanderer");
-    body = `<p class="eyebrow">Step 2 Â· æ¨¡æ“¬åˆ†æçµæœ</p><div class="personality-card"><span class="persona-label">ä½ çš„å‘³è¦º DNA</span><h2>è·¨åœ‹ä¸»é£Ÿå·¡éŠé¬¼</h2><p>æ‰“æ‹‹è±¬ã€è±šéª¨æ‹‰éºµã€å’–å“©é£¯è¼ªç•ªå‡ºå ´ï¼›ä½ æœƒå›è³¼é£²æ–™ï¼Œä½†ä¸»é£Ÿä¸å–œæ­¡è¢«åŒä¸€é–“åº—ç¶ä½ã€‚</p><div class="trait-grid"><div class="trait"><strong>æ–™ç†å†’éšª 82</strong><span>3 å¼µä¸»é£Ÿç™¼ç¥¨ã€3 ç¨®æ–™ç†ç³»</span></div><div class="trait"><strong>é‡è¤‡åº¦ 28</strong><span>ä¸»é£Ÿæ²’æœ‰é‡è¤‡è³¼è²·</span></div><div class="trait"><strong>åƒ¹ä½ 65</strong><span>ä¸»é£Ÿä¸­ä½æ•¸ç´„ $180</span></div><div class="trait"><strong>é£²æ–™å¿ èª  76</strong><span>èœœæ¡ƒæ°£æ³¡é£²å›è³¼ 2 æ¬¡</span></div></div></div>${evidenceDetails(demo, `<ul class="evidence-list"><li>æ–™ç†ï¼šæ³°å¼æ‰“æ‹‹è±¬ã€æ—¥å¼è±šéª¨æ‹‰éºµã€å’–å“©é£¯</li><li>ä¸»é£Ÿåƒ¹æ ¼ï¼š145ã€190ã€180 å…ƒ</li><li>èœœæ¡ƒæ°£æ³¡é£²åœ¨ 8/06 èˆ‡ 8/18 é‡è¤‡å‡ºç¾</li></ul><p><strong>ç›²é»ï¼š</strong>ç™¼ç¥¨ç„¡æ³•çŸ¥é“ä½ æ˜¯å¦åƒå®Œã€æ›¿èª°è²·ï¼Œä¹Ÿæ²’æœ‰äº¤æ˜“æ™‚é–“ã€‚å› æ­¤çµæœæ˜¯å¯åé§çš„è¶£å‘³è©®é‡‹ï¼Œä¸æ˜¯å¥åº·è¨ºæ–·ã€‚</p>`)}<div class="lab-note" style="margin-top:14px"><span>âœ¦</span><div><strong>å„ªå‹¢</strong>å®¹æ˜“å˜—é®®ã€‚<br><strong>ç›²é»</strong>å–®æœˆæ¨£æœ¬å°‘ï¼Œå¯èƒ½æŠŠå¶ç„¶è³¼è²·ç•¶æˆåå¥½ã€‚<br><strong>è¶£å‘³å»ºè­°</strong>ä¸‹ä¸€é¤æŒ‘ä¸€å€‹å¾æ²’å‡ºç¾åœ¨ç™¼ç¥¨è£¡çš„æ–™ç†ç³»ã€‚</div></div>${resultActions(demo, state, "æˆ‘çš„å‘³è¦º DNAï¼šè·¨åœ‹ä¸»é£Ÿå·¡éŠé¬¼")}`;
-  }
-  app.innerHTML = demoShell(demo, state, body, state.step === "feedback" || state.step === "complete" ? 4 : Number(state.step) + 1, 4);
-  document.querySelector('[data-act="start"]')?.addEventListener("click", () => startDemo(demo));
-  document.querySelector('[data-act="reveal-taste"]')?.addEventListener("click", () => updateState(demo, { step: 2 }, { focus: true }));
-  bindShared(demo, state, 2);
-}
-
-function renderTrend(demo, state) {
-  const selected = lab.trends.find(item => item.id === (state.trend || "peach"));
-  let body;
-  if (state.step === 0) body = startScreen(demo, { title: "ä½ æ˜¯å…ˆçŸ¥ï¼Œé‚„æ˜¯ç†±æ½®æ”¶å‰²å°¾ç­è»Šï¼Ÿ", body: "æ¯”è¼ƒå€‹äººè³¼è²·æ—¥èˆ‡åŒ¿åç¤ºç¯„ç¾¤é«”æ›²ç·šï¼Œæ¸¬è©¦è·Ÿé¢¨æŒ‡æ•¸æ˜¯å¦æœ‰è¶£ä¸”å¯ä¿¡ã€‚" });
-  else if (state.step === 1) body = `<p class="eyebrow">Step 1 Â· é¸æ“‡æœŸé–“è¶¨å‹¢</p><h2>ä½ æƒ³å°ç…§å“ªä¸€æ³¢ï¼Ÿ</h2><div class="choice-grid">${lab.trends.map(item => `<button class="choice-card ${selected.id === item.id ? "selected" : ""}" data-trend="${item.id}"><strong>${escapeHtml(item.name)}</strong><small>ç¤ºç¯„ç¾¤é«” 7 æ—¥æ›²ç·š</small></button>`).join("")}</div><div class="experiment-actions"><button class="button button-primary" data-act="trend-result">æŸ¥çœ‹è·Ÿé¢¨æŒ‡æ•¸</button></div>`;
-  else if (state.step === "feedback") body = feedbackScreen(demo);
-  else if (state.step === "complete") body = completionScreen(demo);
-  else {
-    markComplete(demo, state, `trend_${selected.id}_${selected.score}`);
-    body = `<p class="eyebrow">Step 2 Â· æ¨¡æ“¬ç¾¤é«”æ¯”è¼ƒ</p><div class="result-card"><div class="result-banner"><h2>${escapeHtml(selected.label)} Â· ${selected.score}</h2><p>å€‹äººè³¼è²·æ—¥èˆ‡ç¤ºç¯„ç¾¤é«”ç†±æ½®å³°å€¼çš„ç›¸å°ä½ç½®</p></div><div class="result-content"><div class="trend-chart" aria-label="ä¸ƒæ—¥ç¤ºç¯„è³¼è²·æ›²ç·š">${selected.curve.map((value,index) => `<div class="trend-bar ${index + 1 === selected.personalDay ? "personal" : ""}" style="height:${value}%" title="ç¬¬ ${index + 1} å¤©ï¼š${value}"><span>D${index + 1}${index + 1 === selected.personalDay ? " ä½ " : ""}</span></div>`).join("")}</div><p class="small muted" style="margin-top:30px">æ©˜è‰²æ˜¯ä½ çš„è³¼è²·æ—¥ï¼›ç¶ è‰²æ˜¯å›ºå®šåŒ¿åç¾¤é«”æ›²ç·šã€‚</p>${evidenceDetails(demo, `<p>åˆ†æ•¸ç”±ã€Œå€‹äººè³¼è²·æ—¥è·é›¢ç†±æ½®å³°å€¼ã€èˆ‡ã€Œè©²æ—¥ç¾¤é«”ç†±åº¦ã€çµ„åˆè€Œæˆã€‚é€™è£¡çš„ç¾¤é«”æ›²ç·šå®Œå…¨æ˜¯ç¤ºç¯„è³‡æ–™ï¼Œä¸ä»£è¡¨å¸‚å ´è¶¨å‹¢ï¼›æ­£å¼ç‰ˆéœ€è¦è¶³å¤ åŒ¿åæ¨£æœ¬èˆ‡æœŸé–“å•†å“å­—å…¸ã€‚</p>`)}<h3 style="margin-top:20px">æ›å¦ä¸€æ³¢æ¯”è¼ƒ</h3><div class="choice-grid">${lab.trends.map(item => `<button class="choice-card ${selected.id === item.id ? "selected" : ""}" data-trend-result="${item.id}"><strong>${escapeHtml(item.name)}</strong><small>${item.score} Â· ${escapeHtml(item.label)}</small></button>`).join("")}</div>${resultActions(demo, state, `æˆ‘çš„è·Ÿé¢¨æŒ‡æ•¸ ${selected.score}ï¼š${selected.label}`)}</div></div>`;
-  }
-  app.innerHTML = demoShell(demo, state, body, state.step === "feedback" || state.step === "complete" ? 4 : Number(state.step) + 1, 4);
-  document.querySelector('[data-act="start"]')?.addEventListener("click", () => startDemo(demo, { trend: "peach" }));
-  document.querySelectorAll("[data-trend]").forEach(button => button.addEventListener("click", () => updateState(demo, { trend: button.dataset.trend })));
-  document.querySelector('[data-act="trend-result"]')?.addEventListener("click", () => updateState(demo, { step: 2 }, { focus: true }));
-  document.querySelectorAll("[data-trend-result]").forEach(button => button.addEventListener("click", () => updateState(demo, { trend: button.dataset.trendResult })));
-  bindShared(demo, state, 2);
-}
-
-function renderRare(demo, state) {
-  const categories = ["å…¨éƒ¨", ...new Set(lab.rareFinds.map(item => item.category))];
-  const cutoff = state.period === "æœ€è¿‘ 14 å¤©" ? "2026-08-06" : state.period === "æœ€è¿‘ 30 å¤©" ? "2026-07-21" : "0000-00-00";
-  const results = lab.rareFinds.filter(item => (state.category === "å…¨éƒ¨" || item.category === state.category) && item.date >= cutoff && item.rarity >= state.rarity);
-  let body;
-  if (state.step === 0) body = startScreen(demo, { title: "33 å€‹äººè£¡ï¼Œå“ªä¸€ç­†åªæœ‰ä½ æœƒè²·ï¼Ÿ", body: "åœ¨åŒ¿åè¾¦å…¬å®¤åŸºæº–ä¸­æ‰¾å°‘è¦‹æ¨¡å¼ï¼Œæ¸¬è©¦å®ƒèƒ½å¦å‰µé€ å®‰å…¨ã€å¥½ç¬‘çš„åˆ†äº«ç†ç”±ã€‚" }, `<div class="lab-note"><span>ğŸ”’</span><div>åˆ†äº«å¡ä¸å«å§“åã€å•†å®¶ã€æ—¥æœŸã€é‡‘é¡æˆ–åŸå§‹æ˜ç´°ã€‚</div></div>`);
-  else if (state.step === 1) body = `<p class="eyebrow">Step 1 Â· è¨­å®šç¨€æœ‰åº¦</p><h2>å…ˆæ±ºå®šä½ æƒ³å¤šæ€ªã€‚</h2><div class="filter-form"><label class="field"><span>é¡å‹</span><select data-rare-category>${categories.map(value => `<option ${state.category === value ? "selected" : ""}>${value}</option>`).join("")}</select></label><label class="field"><span>æœŸé–“</span><select data-rare-period><option>å…¨éƒ¨</option><option>æœ€è¿‘ 14 å¤©</option><option>æœ€è¿‘ 30 å¤©</option></select></label><label class="field"><span>æœ€ä½ç¨€æœ‰åº¦</span><div class="range-line"><input data-rarity type="range" min="50" max="95" value="${state.rarity}"><strong>${state.rarity}</strong></div></label></div><div class="result-list">${results.map(item => `<div class="result-row"><div><strong>${escapeHtml(item.title)}</strong><p>${escapeHtml(item.item)} Â· ${escapeHtml(item.peerRate)}</p></div><div class="score">${item.rarity}</div></div>`).join("") || `<div class="empty-state">é€™å€‹æ¢ä»¶æ²’æœ‰ç¤ºç¯„çµæœï¼Œèª¿ä½ç¨€æœ‰åº¦å†æ‰¾ä¸€æ¬¡ã€‚</div>`}</div><div class="experiment-actions"><button class="button button-primary" data-act="rare-result" ${results.length ? "" : "disabled"}>æŸ¥çœ‹æœ€ç¨€æœ‰è­‰æ“š</button></div>`;
-  else if (state.step === "feedback") body = feedbackScreen(demo);
-  else if (state.step === "complete") body = completionScreen(demo);
-  else {
-    const top = results.sort((a,b) => b.rarity - a.rarity)[0] || lab.rareFinds[0];
-    markComplete(demo, state, `rare_${top.id}`);
-    const invoice = lab.invoices.find(item => item.id === top.invoice);
-    body = `<p class="eyebrow">Step 2 Â· ç¨€æœ‰ç¨®å ±å‘Š</p><div class="personality-card"><span class="persona-label">è¾¦å…¬å®¤ç¨€æœ‰ç¨® Â· ${top.rarity}</span><h2>${escapeHtml(top.title)}</h2><p>${escapeHtml(top.peerRate)}ã€‚åˆ†äº«æ™‚åªèªªé¡å‹ï¼Œä¸æ­éœ²åŸå§‹ç™¼ç¥¨ã€‚</p></div>${evidenceDetails(demo, `<div class="invoice-card"><div class="invoice-line"><span>ç¤ºç¯„å“é …</span><strong>${escapeHtml(top.item)}</strong></div><div class="invoice-line"><span>åŸå§‹ç™¼ç¥¨</span><strong>${invoice.id} Â· ${invoice.date}</strong></div><div class="invoice-line"><span>åŒ¿ååŸºæº–</span><strong>${escapeHtml(top.peerRate)}</strong></div></div><p>æ­£å¼ç‰ˆéœ€è¨­å®šæœ€å°ç¾¤é«”èˆ‡æ•æ„Ÿå“é¡æ’é™¤ï¼Œé¿å…å¾ç¨€æœ‰çµæœåæ¨å‡ºå€‹äººã€‚</p>`)}<div class="lab-note warning" style="margin-top:14px"><span>!</span><div><strong>åè­‰æ¢ä»¶</strong>è‹¥åŒäº‹è¦ºå¾—çµæœæœƒæš´éœ²ç§ç”Ÿæ´»ã€éœ€è¦çŒœå‡ºæœ¬äººï¼Œåˆ†äº«åƒ¹å€¼å°±ä¸æˆç«‹ã€‚</div></div>${resultActions(demo, state, `æˆ‘æ˜¯è¾¦å…¬å®¤ç¨€æœ‰ç¨®ï¼š${top.title}`)}`;
-  }
-  app.innerHTML = demoShell(demo, state, body, state.step === "feedback" || state.step === "complete" ? 4 : Number(state.step) + 1, 4);
-  document.querySelector('[data-act="start"]')?.addEventListener("click", () => startDemo(demo, { category: "å…¨éƒ¨", rarity: 60 }));
-  document.querySelector("[data-rare-category]")?.addEventListener("change", event => updateState(demo, { category: event.target.value }));
-  document.querySelector("[data-rare-period]")?.addEventListener("change", event => updateState(demo, { period: event.target.value }));
-  document.querySelector("[data-rarity]")?.addEventListener("input", event => updateState(demo, { rarity: Number(event.target.value) }));
-  document.querySelector('[data-act="rare-result"]')?.addEventListener("click", () => updateState(demo, { step: 2 }, { focus: true }));
-  bindShared(demo, state, 2);
-}
-
-function renderWarranty(demo, state) {
-  const selected = lab.warranties.find(item => item.id === (state.warranty || "mouse"));
-  let body;
-  if (state.step === 0) body = startScreen(demo, { title: "ç™¼ç¥¨é‚„åœ¨ï¼Œæ¬Šç›Šåˆ¥éæœŸã€‚", body: "å¾è³¼è²·æ—¥æ¨ä¼°å¯èƒ½æœŸé™ï¼Œè®“ä½ æ¨™è¨˜å¾…è™•ç†ï¼›æ²’æœ‰å•†å®¶è¦å‰‡æ™‚å¿…é ˆæ˜èªªåªæ˜¯ä¼°è¨ˆã€‚" });
-  else if (state.step === 1) body = `<p class="eyebrow">Step 1 Â· å³å°‡åˆ°æœŸ</p><h2>æœ‰ 1 é …å€¼å¾—ä»Šå¤©ç¢ºèª</h2><div class="result-list">${lab.warranties.map(item => `<button class="result-row" data-warranty="${item.id}" style="width:100%;text-align:left;cursor:pointer"><div><strong>${escapeHtml(item.item)}</strong><p>${item.purchase} Â· ${escapeHtml(item.merchant)} Â· ${escapeHtml(item.certainty)}</p></div><div class="score">${item.days ? `${item.days} å¤©` : "è¦å‰‡æœªçŸ¥"}</div></button>`).join("")}</div>`;
-  else if (state.step === 2) {
-    markValue(demo, state, `warranty_${selected.id}`);
-    body = `<p class="eyebrow">Step 2 Â· æœŸé™è©³æƒ…</p><div class="result-card"><div class="result-banner ${selected.certainty === "æœªçŸ¥" ? "warning" : ""}"><h2>${escapeHtml(selected.item)}</h2><p>${selected.certainty === "ä¼°è¨ˆ" ? `ä¼°è¨ˆå‰© ${selected.days} å¤©` : "ç„¡æ³•ç”±ç™¼ç¥¨åˆ¤å®šé€€æ›æœŸé™"}</p></div><div class="result-content"><div class="invoice-card"><div class="invoice-line"><span>å•†å®¶ï¼è³¼è²·æ—¥</span><strong>${escapeHtml(selected.merchant)} Â· ${selected.purchase}</strong></div><div class="invoice-line"><span>ç¤ºç¯„æœŸé™</span><strong>${selected.deadline} Â· ${escapeHtml(selected.certainty)}</strong></div><div class="invoice-line"><span>è¦å‰‡èªªæ˜</span><strong>${escapeHtml(selected.rule)}</strong></div></div>${evidenceDetails(demo, `<p>ç™¼ç¥¨èƒ½å¯é æä¾›è³¼è²·æ—¥æœŸèˆ‡å“é …ï¼Œä½†é€€æ›è²¨åŠä¿å›ºå—å•†å®¶ã€å“ç‰Œã€å•†å“ç‹€æ…‹èˆ‡æ³•è¦å½±éŸ¿ã€‚æ²’æœ‰æ­£å¼è¦å‰‡ä¾†æºæ™‚ï¼Œåªèƒ½æç¤ºã€Œè«‹ç¢ºèªã€ï¼Œä¸èƒ½ä¿è­‰æ¬Šåˆ©ã€‚</p>`)}<h3 style="margin-top:18px">æ¨™è¨˜ç‹€æ…‹</h3><div class="choice-grid">${["å¾…è™•ç†","å·²é€€è²¨","ä¿ç•™å•†å“"].map(value => `<button class="choice-card" data-warranty-status="${value}"><strong>${value}</strong></button>`).join("")}</div></div></div>`;
-  } else if (state.step === "feedback") body = feedbackScreen(demo);
-  else if (state.step === "complete") body = completionScreen(demo);
-  else {
-    markComplete(demo, state, `warranty_status_${state.warrantyStatus}`);
-    body = `<p class="eyebrow">Step 3 Â· ç”³è«‹è³‡æ–™æ¸…å–®</p><h2>${escapeHtml(state.warrantyStatus)}ï¼šè³‡æ–™å…ˆæº–å‚™å¥½</h2><ul class="evidence-list"><li>è³¼è²·è­‰æ˜ï¼šç¤ºç¯„ç™¼ç¥¨ ${selected.id === "mouse" ? "A01" : "A03"}</li><li>å•†å“å‹è™Ÿï¼ç…§ç‰‡ï¼šä»éœ€ä½¿ç”¨è€…è£œå……</li><li>å•†å®¶æˆ–å“ç‰Œè¦å‰‡ï¼šæ­£å¼ç‰ˆéœ€æŸ¥è­‰</li><li>è¯çµ¡ç´€éŒ„ï¼šå°šæœªå»ºç«‹</li></ul><div class="lab-note warning" style="margin-top:16px"><span>!</span><div>é€™æ˜¯æ•´ç†æ¸…å–®ï¼Œä¸æ˜¯æ³•å¾‹æˆ–é€€æ›è²¨è³‡æ ¼åˆ¤å®šã€‚</div></div>${resultActions(demo, state, `ç™¼ç¥¨å¹«æˆ‘æ‰¾å› ${selected.item} çš„è™•ç†æœŸé™`)}`;
-  }
-  app.innerHTML = demoShell(demo, state, body, state.step === "feedback" || state.step === "complete" ? 4 : Number(state.step) + 1, 4);
-  document.querySelector('[data-act="start"]')?.addEventListener("click", () => startDemo(demo, { warranty: "mouse" }));
-  document.querySelectorAll("[data-warranty]").forEach(button => button.addEventListener("click", () => updateState(demo, { warranty: button.dataset.warranty, step: 2 }, { focus: true })));
-  document.querySelectorAll("[data-warranty-status]").forEach(button => button.addEventListener("click", () => updateState(demo, { warrantyStatus: button.dataset.warrantyStatus, step: 3 }, { focus: true })));
-  bindShared(demo, state, 3);
-}
-
-function recipeResults(ingredients) {
-  return lab.recipes.map(recipe => {
-    const owned = recipe.needs.filter(item => ingredients.includes(item));
-    return { ...recipe, coverage: Math.round(owned.length / recipe.needs.length * 100), missing: recipe.needs.filter(item => !ingredients.includes(item)) };
-  }).sort((a,b) => b.coverage - a.coverage);
-}
-
-function renderFridge(demo, state) {
-  const recipes = recipeResults(state.ingredients);
-  let body;
-  if (state.step === 0) body = startScreen(demo, { title: "ä»Šæ™šåƒä»€éº¼ï¼Œå…ˆå¾ä½ å¯èƒ½æœ‰çš„é–‹å§‹ã€‚", body: "ç”±è¿‘æœŸé£Ÿå“ç™¼ç¥¨æ¨ä¼°é£Ÿæï¼Œè®“ä½ ä¸€æ­¥åˆªæ”¹å¾Œï¼Œç«‹å³é‡ç®—ä¸‰é“æ–™ç†èˆ‡è¦†è“‹ç‡ã€‚" });
-  else if (state.step === 1) body = `<p class="eyebrow">Step 1 Â· æ ¡æ­£å¯èƒ½é£Ÿæ</p><h2>é€™ä¸‰æ¨£ï¼Œå®¶è£¡é‚„æœ‰å—ï¼Ÿ</h2><p class="lead">ç™¼ç¥¨åªçŸ¥é“è²·éï¼Œä¸çŸ¥é“åƒå®Œæ²’ã€‚é»ä¸€ä¸‹å³å¯ä¿ç•™æˆ–ç§»é™¤ã€‚</p><div class="ingredient-list">${lab.ingredients.map(item => `<button class="ingredient ${state.ingredients.includes(item) ? "active" : ""}" data-ingredient="${item}" aria-pressed="${state.ingredients.includes(item)}">${state.ingredients.includes(item) ? "âœ“ " : "+ "}${item}</button>`).join("")}</div><div class="lab-note warning"><span>!</span><div>é®®å¥¶è³¼è²·æ—¥æ˜¯ 8/03ï¼Œå¯èƒ½å·²éä¿å­˜æœŸï¼›æœ¬ Demo åªæé†’ç¢ºèªï¼Œä¸åˆ¤å®šå¯é£Ÿç”¨ã€‚</div></div><div class="experiment-actions"><button class="button button-primary" data-act="recipes" ${state.ingredients.length ? "" : "disabled"}>ç”¨é€™äº›é£Ÿææ¨è–¦</button></div>`;
-  else if (state.step === "feedback") body = feedbackScreen(demo);
-  else if (state.step === "complete") body = completionScreen(demo);
-  else {
-    markComplete(demo, state, `recipes_${state.ingredients.join("_")}`);
-    body = `<p class="eyebrow">Step 2 Â· å³æ™‚é‡ç®— ${state.refreshes ? `Â· å·²æ›´æ–° ${state.refreshes} æ¬¡` : ""}</p><h2>ä»Šæ™šæœ€çœè…¦çš„ä¸‰å€‹é¸æ“‡</h2><div class="recipe-grid">${recipes.map(recipe => `<div class="recipe-card"><span class="coverage">${recipe.coverage}%</span><h3>${escapeHtml(recipe.name)}</h3><p>ç¼ºï¼š${recipe.missing.length ? recipe.missing.join("ã€") : "æ²’æœ‰"}</p><small class="hint">ç´„ ${recipe.minutes} åˆ†é˜</small></div>`).join("")}</div>${evidenceDetails(demo, `<p>è¦†è“‹ç‡ï¼ç›®å‰ç¢ºèªæ“æœ‰çš„å¿…è¦é£Ÿæ Ã· é£Ÿè­œå¿…è¦é£Ÿæã€‚å®ƒä¸ä»£è¡¨ç‡Ÿé¤Šã€å¥½åƒæˆ–é£Ÿå“å®‰å…¨ã€‚è³¼è²·æ—¥æœŸåªèƒ½ç”¨ä¾†æç¤ºå¯èƒ½éæœŸï¼Œä»éœ€ä½¿ç”¨è€…æª¢æŸ¥ã€‚</p>`)}<h3 style="margin-top:20px">æ”¹ä¸€ä¸‹å†°ç®±å…§å®¹ï¼Œçµæœæœƒç«‹åˆ»æ›´æ–°</h3><div class="ingredient-list">${lab.ingredients.map(item => `<button class="ingredient ${state.ingredients.includes(item) ? "active" : ""}" data-ingredient-result="${item}" aria-pressed="${state.ingredients.includes(item)}">${state.ingredients.includes(item) ? "âœ“ " : "+ "}${item}</button>`).join("")}</div>${resultActions(demo, state, `æˆ‘çš„ç™¼ç¥¨æ›¿ä»Šæ™šæ‰¾å‡º ${recipes[0].name}`)}`;
-  }
-  app.innerHTML = demoShell(demo, state, body, state.step === "feedback" || state.step === "complete" ? 4 : Number(state.step) + 1, 4);
-  document.querySelector('[data-act="start"]')?.addEventListener("click", () => startDemo(demo, { ingredients: [...lab.ingredients] }));
-  document.querySelectorAll("[data-ingredient]").forEach(button => button.addEventListener("click", () => toggleIngredient(demo, state, button.dataset.ingredient, false)));
-  document.querySelector('[data-act="recipes"]')?.addEventListener("click", () => updateState(demo, { step: 2 }, { focus: true }));
-  document.querySelectorAll("[data-ingredient-result]").forEach(button => button.addEventListener("click", () => toggleIngredient(demo, state, button.dataset.ingredientResult, true)));
-  bindShared(demo, state, 2);
-}
-
-function toggleIngredient(demo, state, item, countRefresh) {
-  const exists = state.ingredients.includes(item);
-  const ingredients = exists ? state.ingredients.filter(value => value !== item) : [...state.ingredients, item];
-  if (!ingredients.length) return showToast("è‡³å°‘ä¿ç•™ä¸€é …é£Ÿæï¼Œæ‰æœ‰å¯é©—è­‰çµæœ");
-  updateState(demo, { ingredients, refreshes: state.refreshes + (countRefresh ? 1 : 0) });
-}
-
-function renderDemo(demo) {
-  const state = stateFor(demo);
-  if (!state.opened) {
-    state.opened = true;
-    track("demo_opened", demo, state);
-  }
-  const renderers = { recall: renderRecall, price: renderPrice, stock: renderStock, detective: renderDetective, truth: renderTruth, taste: renderTaste, trend: renderTrend, rare: renderRare, warranty: renderWarranty, fridge: renderFridge };
-  renderers[demo.id](demo, state);
-}
-
-function renderRoute({ focus = true } = {}) {
-  modalRoot.innerHTML = "";
-  const route = currentRoute();
-  const routeDemo = route.page === "demo" && route.id ? getDemo(route.id) : null;
-  document.body.dataset.theme = routeDemo?.id ?? "lab";
-  setActiveNav(route.page === "demo" ? "gallery" : route.page);
-  if (route.page === "gallery") renderGallery();
-  else if (route.page === "brief") renderBrief();
-  else if (route.page === "next-stage") renderNextStage();
-  else if (route.page === "dashboard") renderDashboard();
-  else if (routeDemo) renderDemo(routeDemo);
-  else {
-    app.innerHTML = `<div class="fatal-error"><h1>æ‰¾ä¸åˆ°é€™é …å¯¦é©—</h1><p>ç¶²å€å¯èƒ½éæœŸï¼Œå›åˆ° Gallery é‡æ–°é¸æ“‡ã€‚</p><a class="button button-primary" href="#/gallery">å›åˆ° Gallery</a></div>`;
-  }
-  if (focus) {
-    window.scrollTo({ top: 0, behavior: "instant" });
-    app.focus({ preventScroll: true });
-  }
-}
-
-window.addEventListener("hashchange", () => renderRoute({ focus: true }));
-
-async function boot() {
-  try {
-    const response = await fetch("/data/lab-data.json", { cache: "no-store" });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    lab = await response.json();
-    if (!location.hash) history.replaceState(null, "", "#/gallery");
-    renderRoute({ focus: false });
-  } catch (error) {
-    app.innerHTML = `<div class="fatal-error"><h1>å¯¦é©—è³‡æ–™è¼‰å…¥å¤±æ•—</h1><p>${escapeHtml(error.message)}</p><button class="button button-primary" onclick="location.reload()">é‡æ–°è¼‰å…¥</button></div>`;
-  }
-}
-
-boot();
+    <div class="lab-note warning"><span>âœ¦×{ÖÚ$z{-®éÜj×ãÇ6ÖÆÃâG¶—FVÒç66÷&WÒ+rG¶W66T‡FÖÂ†—FVÒæÆ&VÂ—ÓÂ÷6ÖÆÃãÂö'WGFöãæ’æ¦ö–â‚""—ÓÂöF—câG·&W7VÇD7F–öç2†FVÖòÂ7FFRÂh‰y¨N‹yşš*hÈ~i[‚G·6VÆV7FVBç66÷&WŞûÉ¢G·6VÆV7FVBæÆ&VÇÖ—ÓÂöF—cãÂöF—cæ°¢Ğ¢æ–ææW$…DÔÂÒFVÖõ6†VÆÂ†FVÖòÂ7FFRÂ&öG’Â7FFRç7FWÓÓÒ&fVVF&6²"ÇÂ7FFRç7FWÓÓÒ&6ö×ÆWFR"òB¢çVÖ&W"‡7FFRç7FW’²ÂB“°¢Fö7VÖVçBçVW'•6VÆV7F÷"‚u¶FFÖ7CÒ'7F'B%Òr“òæFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â‚’Óâ7F'DFVÖò†FVÖòÂ²G&VæC¢'V6‚"Ò’“°¢Fö7VÖVçBçVW'•6VÆV7F÷$ÆÂ‚%¶FF×G&VæEÒ"’æf÷$V6‚†'WGFöâÓâ'WGFöâæFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â‚’ÓâWFFU7FFR†FVÖòÂ²G&VæC¢'WGFöâæFF6WBçG&VæBÒ’’“°¢Fö7VÖVçBçVW'•6VÆV7F÷"‚u¶FFÖ7CÒ'G&VæB×&W7VÇB%Òr“òæFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â‚’ÓâWFFU7FFR†FVÖòÂ²7FW¢"ÒÂ²fö7W3¢G'VRÒ’“°¢Fö7VÖVçBçVW'•6VÆV7F÷$ÆÂ‚%¶FF×G&VæB×&W7VÇEÒ"’æf÷$V6‚†'WGFöâÓâ'WGFöâæFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â‚’ÓâWFFU7FFR†FVÖòÂ²G&VæC¢'WGFöâæFF6WBçG&VæE&W7VÇBÒ’’“°¢&–æE6†&VB†FVÖòÂ7FFRÂ"“°§Ğ ¦gVæ7F–öâ&VæFW%&&R†FVÖòÂ7FFR’°¢6öç7B6FVv÷&–W2Ò².XZ˜:‚"ÂââææWr6WB†Æ"ç&&Tf–æG2æÖ†—FVÒÓâ—FVÒæ6FVv÷'’’•Ó°¢6öç7B7WFöfbÒ7FFRçW&–öBÓÓÒ.iÈ‹ùBZJ’"ò###bÓ‚Ób"¢7FFRçW&–öBÓÓÒ.iÈ‹ù3ZJ’"ò###bÓrÓ#"¢#ÓÓ#°¢6öç7B&W7VÇG2ÒÆ"ç&&Tf–æG2æf–ÇFW"†—FVÒÓâ‡7FFRæ6FVv÷'’ÓÓÒ.XZ˜:‚"ÇÂ—FVÒæ6FVv÷'’ÓÓÒ7FFRæ6FVv÷'’’bb—FVÒæFFRãÒ7WFöfbbb—FVÒç&&—G’ãÒ7FFRç&&—G’“°¢ÆWB&öG“°¢–b‡7FFRç7FWÓÓÒ’&öG’Ò7F'E67&VVâ†FVÖòÂ²F—FÆS¢#32X¾K«®Š:ûÈÎY:®KˆzØnXú®iÈKÚiÈ>‹+~ûÉò"Â&öG“¢.YÊXËşYŞ‹ênXZÎZêNYû®k©nKŠŞh›î[	Šh¾jŠ[ÈşûÈÎkŠÎŠšnZè>ˆ;ŞY
+nX›^˜
+ZèXZ8Z[ŞzÉy¨NXˆnKª¾ynyK8""ÒÂÆF—b6Æ73Ò&Æ"Öæ÷FR#ãÇ7ãï	ùI#Â÷7ããÆF—cîXˆnKª¾XÚKˆŞY
+¾Zy>YŞ8YXnZën8iz^iÉş8˜yšŞh‰nXéşZx¾iˆî{K8#ÂöF—cãÂöF—cæ“°¢VÇ6R–b‡7FFRç7FWÓÓÒ’&öG’ÒÇ6Æ73Ò&W–V'&÷r#å7FW+rŠŠŞZé®zˆiÈ[ªcÂ÷ãÆƒ#îXXk®Zé®KÚh;>ZI®h
+®8#Âöƒ#ãÆF—b6Æ73Ò&f–ÇFW"Öf÷&Ò#ãÆÆ&VÂ6Æ73Ò&f–VÆB#ãÇ7ãîšîYè³Â÷7ããÇ6VÆV7BFF×&&RÖ6FVv÷'“âG¶6FVv÷&–W2æÖ‡fÇVRÓâÆ÷F–öâG·7FFRæ6FVv÷'’ÓÓÒfÇVRò'6VÆV7FVB"¢"'ÓâG·fÇVWÓÂö÷F–öãæ’æ¦ö–â‚""—ÓÂ÷6VÆV7CãÂöÆ&VÃãÆÆ&VÂ6Æ73Ò&f–VÆB#ãÇ7ãîiÉş™i3Â÷7ããÇ6VÆV7BFF×&&R×W&–öCãÆ÷F–öãîXZ˜:ƒÂö÷F–öããÆ÷F–öãîiÈ‹ùBZJ“Âö÷F–öããÆ÷F–öãîiÈ‹ù3ZJ“Âö÷F–öããÂ÷6VÆV7CãÂöÆ&VÃãÆÆ&VÂ6Æ73Ò&f–VÆB#ãÇ7ãîiÈKØîzˆiÈ[ªcÂ÷7ããÆF—b6Æ73Ò'&ævRÖÆ–æR#ãÆ–çWBFF×&&—G’G—SÒ'&ævR"Ö–ãÒ#S"ÖƒÒ#“R"fÇVSÒ"G·7FFRç&&—G—Ò#ãÇ7G&öæsâG·7FFRç&&—G—ÓÂ÷7G&öæsãÂöF—cãÂöÆ&VÃãÂöF—cãÆF—b6Æ73Ò'&W7VÇBÖÆ—7B#âG·&W7VÇG2æÖ†—FVÒÓâÆF—b6Æ73Ò'&W7VÇB×&÷r#ãÆF—cãÇ7G&öæsâG¶W66T‡FÖÂ†—FVÒçF—FÆR—ÓÂ÷7G&öæsãÇâG¶W66T‡FÖÂ†—FVÒæ—FVÒ—Ò+rG¶W66T‡FÖÂ†—FVÒçVW%&FR—ÓÂ÷ãÂöF—cãÆF—b6Æ73Ò'66÷&R#âG¶—FVÒç&&—G—ÓÂöF—cãÂöF—cæ’æ¦ö–â‚""’ÇÂÆF—b6Æ73Ò&V×G’×7FFR#î˜	X¾j)ŞK»nk).iÈzK®zøN{YiéÎûÈÎŠ«şKØîzˆiÈ[ªnXhŞh›îKˆjÊ8#ÂöF—cæÓÂöF—cãÆF—b6Æ73Ò&W‡W&–ÖVçBÖ7F–öç2#ãÆ'WGFöâ6Æ73Ò&'WGFöâ'WGFöâ×&–Ö'’"FFÖ7CÒ'&&R×&W7VÇB"G·&W7VÇG2æÆVæwF‚ò""¢&F—6&ÆVB'Óîiú^yÈ¾iÈzˆiÈŠØi9£Âö'WGFöããÂöF—cæ°¢VÇ6R–b‡7FFRç7FWÓÓÒ&fVVF&6²"’&öG’ÒfVVF&6µ67&VVâ†FVÖò“°¢VÇ6R–b‡7FFRç7FWÓÓÒ&6ö×ÆWFR"’&öG’Ò6ö×ÆWF–öå67&VVâ†FVÖò“°¢VÇ6R°¢6öç7BF÷Ò&W7VÇG2ç6÷'B‚†Æ"’Óâ"ç&&—G’Òç&&—G’•³ÒÇÂÆ"ç&&Tf–æG5³Ó°¢Ö&´6ö×ÆWFR†FVÖòÂ7FFRÂ&&UòG·F÷æ–GÖ“°¢6öç7B–çfö–6RÒÆ"æ–çfö–6W2æf–æB†—FVÒÓâ—FVÒæ–BÓÓÒF÷æ–çfö–6R“°¢&öG’ÒÇ6Æ73Ò&W–V'&÷r#å7FW"+rzˆiÈzŠîZY£Â÷ãÆF—b6Æ73Ò'W'6öæÆ—G’Ö6&B#ãÇ7â6Æ73Ò'W'6öæÖÆ&VÂ#î‹ênXZÎZêNzˆiÈzŠâ+rG·F÷ç&&—G—ÓÂ÷7ããÆƒ#âG¶W66T‡FÖÂ‡F÷çF—FÆR—ÓÂöƒ#ãÇâG¶W66T‡FÖÂ‡F÷çVW%&FR—Ş8.XˆnKª¾i˜.Xú®Šª®šîYè¾ûÈÎKˆŞhúŞ™Ë.XéşZx¾y›ÎzZ8#Â÷ãÂöF—câG¶Wf–FVæ6TFWF–Ç2†FVÖòÂÆF—b6Æ73Ò&–çfö–6RÖ6&B#ãÆF—b6Æ73Ò&–çfö–6RÖÆ–æR#ãÇ7ãîzK®zøNY8šSÂ÷7ããÇ7G&öæsâG¶W66T‡FÖÂ‡F÷æ—FVÒ—ÓÂ÷7G&öæsãÂöF—cãÆF—b6Æ73Ò&–çfö–6RÖÆ–æR#ãÇ7ãîXéşZx¾y›ÎzZƒÂ÷7ããÇ7G&öæsâG¶–çfö–6Ræ–GÒ+rG¶–çfö–6RæFFWÓÂ÷7G&öæsãÂöF—cãÆF—b6Æ73Ò&–çfö–6RÖÆ–æR#ãÇ7ãîXËşYŞYû®k©cÂ÷7ããÇ7G&öæsâG¶W66T‡FÖÂ‡F÷çVW%&FR—ÓÂ÷7G&öæsãÂöF—cãÂöF—cãÇîjÚ>[Èşx˜™ÈŠŠŞZé®iÈ[ş{êNš¹Nˆˆ~iXşhIşY8šîhé.™šNûÈÎ˜şXXŞ[éîzˆiÈ{YiéÎXøŞhêX{®X¾K«®8#Â÷æ—ÓÆF—b6Æ73Ò&Æ"Öæ÷FRv&æ–ær"7G–ÆSÒ&Ö&v–â×F÷£G‚#ãÇ7ãâÂ÷7ããÆF—cãÇ7G&öæsîXøŞŠØj)ŞK»cÂ÷7G&öæsîˆº^YÎK¨¾Šk®[é~{YiéÎiÈ>i«N™Ë.zxyIşkK¾8™ÈŠhxÉÎX{®iÊÎK«®ûÈÎXˆnKª¾X;XÎ[KˆŞh‰z¸¾8#ÂöF—cãÂöF—câG·&W7VÇD7F–öç2†FVÖòÂ7FFRÂh‰iŠş‹ênXZÎZêNzˆiÈzŠîûÉ¢G·F÷çF—FÆWÖ—Ö°¢Ğ¢æ–ææW$…DÔÂÒFVÖõ6†VÆÂ†FVÖòÂ7FFRÂ&öG’Â7FFRç7FWÓÓÒ&fVVF&6²"ÇÂ7FFRç7FWÓÓÒ&6ö×ÆWFR"òB¢çVÖ&W"‡7FFRç7FW’²ÂB“°¢Fö7VÖVçBçVW'•6VÆV7F÷"‚u¶FFÖ7CÒ'7F'B%Òr“òæFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â‚’Óâ7F'DFVÖò†FVÖòÂ²6FVv÷'“¢.XZ˜:‚"Â&&—G“¢cÒ’“°¢Fö7VÖVçBçVW'•6VÆV7F÷"‚%¶FF×&&RÖ6FVv÷'•Ò"“òæFDWfVçDÆ—7FVæW"‚&6†ævR"ÂWfVçBÓâWFFU7FFR†FVÖòÂ²6FVv÷'“¢WfVçBçF&vWBçfÇVRÒ’“°¢Fö7VÖVçBçVW'•6VÆV7F÷"‚%¶FF×&&R×W&–öEÒ"“òæFDWfVçDÆ—7FVæW"‚&6†ævR"ÂWfVçBÓâWFFU7FFR†FVÖòÂ²W&–öC¢WfVçBçF&vWBçfÇVRÒ’“°¢Fö7VÖVçBçVW'•6VÆV7F÷"‚%¶FF×&&—G•Ò"“òæFDWfVçDÆ—7FVæW"‚&–çWB"ÂWfVçBÓâWFFU7FFR†FVÖòÂ²&&—G“¢çVÖ&W"†WfVçBçF&vWBçfÇVR’Ò’“°¢Fö7VÖVçBçVW'•6VÆV7F÷"‚u¶FFÖ7CÒ'&&R×&W7VÇB%Òr“òæFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â‚’ÓâWFFU7FFR†FVÖòÂ²7FW¢"ÒÂ²fö7W3¢G'VRÒ’“°¢&–æE6†&VB†FVÖòÂ7FFRÂ"“°§Ğ ¦gVæ7F–öâ&VæFW%v'&çG’†FVÖòÂ7FFR’°¢6öç7B6VÆV7FVBÒÆ"çv'&çF–W2æf–æB†—FVÒÓâ—FVÒæ–BÓÓÒ‡7FFRçv'&çG’ÇÂ&Ö÷W6R"’“°¢ÆWB&öG“°¢–b‡7FFRç7FWÓÓÒ’&öG’Ò7F'E67&VVâ†FVÖòÂ²F—FÆS¢.y›ÎzZ˜(NYÊûÈÎjÈ®y¸®XŠ^˜îiÉş8""Â&öG“¢.[éî‹;Î‹+~iz^hêKËXúşˆ;ŞiÉş™™ûÈÎŠé>KÚj‰Š‰[è^‰™^ynûÉ¾k).iÈYXnZënŠhşX˜~i˜.[ø^šiˆîŠª®Xú®iŠşKËŠˆ8""Ò“°¢VÇ6R–b‡7FFRç7FWÓÓÒ’&öG’ÒÇ6Æ73Ò&W–V'&÷r#å7FW+rXÛ>[~X‹iÉóÂ÷ãÆƒ#îiÈ’š^XÎ[é~K¸®ZJz+®Š¨ÓÂöƒ#ãÆF—b6Æ73Ò'&W7VÇBÖÆ—7B#âG¶Æ"çv'&çF–W2æÖ†—FVÒÓâÆ'WGFöâ6Æ73Ò'&W7VÇB×&÷r"FF×v'&çG“Ò"G¶—FVÒæ–GÒ"7G–ÆSÒ'v–GFƒ£S·FW‡BÖÆ–vã¦ÆVgC¶7W'6÷#§ö–çFW"#ãÆF—cãÇ7G&öæsâG¶W66T‡FÖÂ†—FVÒæ—FVÒ—ÓÂ÷7G&öæsãÇâG¶—FVÒçW&6†6WÒ+rG¶W66T‡FÖÂ†—FVÒæÖW&6†çB—Ò+rG¶W66T‡FÖÂ†—FVÒæ6W'F–çG’—ÓÂ÷ãÂöF—cãÆF—b6Æ73Ò'66÷&R#âG¶—FVÒæF—2òG¶—FVÒæF—7ÒZJ–¢.ŠhşX˜~iÊ®yúR'ÓÂöF—cãÂö'WGFöãæ’æ¦ö–â‚""—ÓÂöF—cæ°¢VÇ6R–b‡7FFRç7FWÓÓÒ"’°¢Ö&µfÇVR†FVÖòÂ7FFRÂv'&çG•òG·6VÆV7FVBæ–GÖ“°¢&öG’ÒÇ6Æ73Ò&W–V'&÷r#å7FW"+riÉş™™Š›>h8SÂ÷ãÆF—b6Æ73Ò'&W7VÇBÖ6&B#ãÆF—b6Æ73Ò'&W7VÇBÖ&ææW"G·6VÆV7FVBæ6W'F–çG’ÓÓÒ.iÊ®yúR"ò'v&æ–ær"¢"'Ò#ãÆƒ#âG¶W66T‡FÖÂ‡6VÆV7FVBæ—FVÒ—ÓÂöƒ#ãÇâG·6VÆV7FVBæ6W'F–çG’ÓÓÒ.KËŠˆ‚"òKËŠˆXš’G·6VÆV7FVBæF—7ÒZJ–¢.xJk9^yKy›ÎzZXŠNZé®˜hù¾iÉş™™'ÓÂ÷ãÂöF—cãÆF—b6Æ73Ò'&W7VÇBÖ6öçFVçB#ãÆF—b6Æ73Ò&–çfö–6RÖ6&B#ãÆF—b6Æ73Ò&–çfö–6RÖÆ–æR#ãÇ7ãîYXnZënûÈş‹;Î‹+~izSÂ÷7ããÇ7G&öæsâG¶W66T‡FÖÂ‡6VÆV7FVBæÖW&6†çB—Ò+rG·6VÆV7FVBçW&6†6WÓÂ÷7G&öæsãÂöF—cãÆF—b6Æ73Ò&–çfö–6RÖÆ–æR#ãÇ7ãîzK®zøNiÉş™™Â÷7ããÇ7G&öæsâG·6VÆV7FVBæFVFÆ–æWÒ+rG¶W66T‡FÖÂ‡6VÆV7FVBæ6W'F–çG’—ÓÂ÷7G&öæsãÂöF—cãÆF—b6Æ73Ò&–çfö–6RÖÆ–æR#ãÇ7ãîŠhşX˜~Šª®iˆãÂ÷7ããÇ7G&öæsâG¶W66T‡FÖÂ‡6VÆV7FVBç'VÆR—ÓÂ÷7G&öæsãÂöF—cãÂöF—câG¶Wf–FVæ6TFWF–Ç2†FVÖòÂÇîy›ÎzZˆ;ŞXúş™ÚhùKé¾‹;Î‹+~iz^iÉşˆˆ~Y8š^ûÈÎKØn˜hù¾‹*Xø®KùŞY»®Xù~YXnZën8Y8x˜Î8YXnY8x¸hX¾ˆˆ~k9^Šhş[Û™ûş8.k).iÈjÚ>[ÈşŠhşX˜~Kènk©i˜.ûÈÎXú®ˆ;ŞhùzK®8ÎŠ¸¾z+®Š¨Ş8ŞûÈÎKˆŞˆ;ŞKùŞŠØjÈ®XŠ8#Â÷æ—ÓÆƒ27G–ÆSÒ&Ö&v–â×F÷£‡‚#îj‰Š‰x¸hX³Âöƒ3ãÆF—b6Æ73Ò&6†ö–6RÖw&–B#âGµ².[è^‰™^yb"Â.[{.˜‹*‚"Â.KùŞyYYXnY8%ÒæÖ‡fÇVRÓâÆ'WGFöâ6Æ73Ò&6†ö–6RÖ6&B"FF×v'&çG’×7FGW3Ò"G·fÇVWÒ#ãÇ7G&öæsâG·fÇVWÓÂ÷7G&öæsãÂö'WGFöãæ’æ¦ö–â‚""—ÓÂöF—cãÂöF—cãÂöF—cæ°¢ÒVÇ6R–b‡7FFRç7FWÓÓÒ&fVVF&6²"’&öG’ÒfVVF&6µ67&VVâ†FVÖò“°¢VÇ6R–b‡7FFRç7FWÓÓÒ&6ö×ÆWFR"’&öG’Ò6ö×ÆWF–öå67&VVâ†FVÖò“°¢VÇ6R°¢Ö&´6ö×ÆWFR†FVÖòÂ7FFRÂv'&çG•÷7FGW5òG·7FFRçv'&çG•7FGW7Ö“°¢&öG’ÒÇ6Æ73Ò&W–V'&÷r#å7FW2+ryK>Š¸¾‹8~iikˆ^YjãÂ÷ãÆƒ#âG¶W66T‡FÖÂ‡7FFRçv'&çG•7FGW2—ŞûÉ®‹8~iiXXk©nX)Z[ÓÂöƒ#ãÇVÂ6Æ73Ò&Wf–FVæ6RÖÆ—7B#ãÆÆ“î‹;Î‹+~ŠØiˆîûÉ®zK®zøNy›ÎzZ‚G·6VÆV7FVBæ–BÓÓÒ&Ö÷W6R"ò$"¢$2'ÓÂöÆ“ãÆÆ“îYXnY8Yè¾‰™şûÈşxZ~x˜~ûÉ®K¸Ş™ÈKÛşyJˆ^Š9ÎXXSÂöÆ“ãÆÆ“îYXnZënh‰nY8x˜ÎŠhşX˜~ûÉ®jÚ>[Èşx˜™Èiú^ŠØ“ÂöÆ“ãÆÆ“îˆş{Z{H˜ÈNûÉ®[	®iÊ®[»®z¸³ÂöÆ“ãÂ÷VÃãÆF—b6Æ73Ò&Æ"Öæ÷FRv&æ–ær"7G–ÆSÒ&Ö&v–â×F÷£g‚#ãÇ7ãâÂ÷7ããÆF—cî˜	iŠşi[Nynkˆ^YjîûÈÎKˆŞiŠşk9^[è¾h‰n˜hù¾‹*‹8~jÎXŠNZé®8#ÂöF—cãÂöF—câG·&W7VÇD7F–öç2†FVÖòÂ7FFRÂy›ÎzZ[š¾h‰h›îY¹âG·6VÆV7FVBæ—FV×Òy¨N‰™^yniÉş™™—Ö°¢Ğ¢æ–ææW$…DÔÂÒFVÖõ6†VÆÂ†FVÖòÂ7FFRÂ&öG’Â7FFRç7FWÓÓÒ&fVVF&6²"ÇÂ7FFRç7FWÓÓÒ&6ö×ÆWFR"òB¢çVÖ&W"‡7FFRç7FW’²ÂB“°¢Fö7VÖVçBçVW'•6VÆV7F÷"‚u¶FFÖ7CÒ'7F'B%Òr“òæFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â‚’Óâ7F'DFVÖò†FVÖòÂ²v'&çG“¢&Ö÷W6R"Ò’“°¢Fö7VÖVçBçVW'•6VÆV7F÷$ÆÂ‚%¶FF×v'&çG•Ò"’æf÷$V6‚†'WGFöâÓâ'WGFöâæFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â‚’ÓâWFFU7FFR†FVÖòÂ²v'&çG“¢'WGFöâæFF6WBçv'&çG’Â7FW¢"ÒÂ²fö7W3¢G'VRÒ’’“°¢Fö7VÖVçBçVW'•6VÆV7F÷$ÆÂ‚%¶FF×v'&çG’×7FGW5Ò"’æf÷$V6‚†'WGFöâÓâ'WGFöâæFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â‚’ÓâWFFU7FFR†FVÖòÂ²v'&çG•7FGW3¢'WGFöâæFF6WBçv'&çG•7FGW2Â7FW¢2ÒÂ²fö7W3¢G'VRÒ’’“°¢&–æE6†&VB†FVÖòÂ7FFRÂ2“°§Ğ ¦gVæ7F–öâ&V6—U&W7VÇG2†–æw&VF–VçG2’°¢&WGW&âÆ"ç&V6—W2æÖ‡&V6—RÓâ°¢6öç7B÷væVBÒ&V6—RææVVG2æf–ÇFW"†—FVÒÓâ–æw&VF–VçG2æ–æ6ÇVFW2†—FVÒ’“°¢&WGW&â²ââç&V6—RÂ6÷fW&vS¢ÖF‚ç&÷VæB†÷væVBæÆVæwF‚ò&V6—RææVVG2æÆVæwF‚¢’ÂÖ—76–æs¢&V6—RææVVG2æf–ÇFW"†—FVÒÓâ–æw&VF–VçG2æ–æ6ÇVFW2†—FVÒ’’Ó°¢Ò’ç6÷'B‚†Æ"’Óâ"æ6÷fW&vRÒæ6÷fW&vR“°§Ğ ¦gVæ7F–öâ&VæFW$g&–FvR†FVÖòÂ7FFR’°¢6öç7B&V6—W2Ò&V6—U&W7VÇG2‡7FFRæ–æw&VF–VçG2“°¢ÆWB&öG“°¢–b‡7FFRç7FWÓÓÒ’&öG’Ò7F'E67&VVâ†FVÖòÂ²F—FÆS¢.K¸®i™®Y>K¸›«ÎûÈÎXX[éîKÚXúşˆ;ŞiÈy¨N™h¾Zx¾8""Â&öG“¢.yK‹ùiÉşš9şY8y›ÎzZhêKËš9şiÙûÈÎŠé>KÚKˆjÚ^XŠ®iK[èÎûÈÎz¸¾XÛ>˜xŞzé~Kˆ˜>iiynˆˆ~Šhn‰8¾xè~8""Ò“°¢VÇ6R–b‡7FFRç7FWÓÓÒ’&öG’ÒÇ6Æ73Ò&W–V'&÷r#å7FW+rj
+jÚ>Xúşˆ;Şš9şiÙÂ÷ãÆƒ#î˜	KˆjŠ>ûÈÎZënŠ:˜(NiÈYxîûÉóÂöƒ#ãÇ6Æ73Ò&ÆVB#îy›ÎzZXú®yú^˜>‹+~˜îûÈÎKˆŞyú^˜>Y>ZèÎk).8.›¹îKˆKˆ¾XÛ>XúşKùŞyYh‰nz{¾™šN8#Â÷ãÆF—b6Æ73Ò&–æw&VF–VçBÖÆ—7B#âG¶Æ"æ–æw&VF–VçG2æÖ†—FVÒÓâÆ'WGFöâ6Æ73Ò&–æw&VF–VçBG·7FFRæ–æw&VF–VçG2æ–æ6ÇVFW2†—FVÒ’ò&7F—fR"¢"'Ò"FFÖ–æw&VF–VçCÒ"G¶—FV×Ò"&–×&W76VCÒ"G·7FFRæ–æw&VF–VçG2æ–æ6ÇVFW2†—FVÒ—Ò#âG·7FFRæ–æw&VF–VçG2æ–æ6ÇVFW2†—FVÒ’ò.)É2"¢"²'ÒG¶—FV×ÓÂö'WGFöãæ’æ¦ö–â‚""—ÓÂöF—cãÆF—b6Æ73Ò&Æ"Öæ÷FRv&æ–ær#ãÇ7ãâÂ÷7ããÆF—cîšêîZ[n‹;Î‹+~iz^iŠò‚ó>ûÈÎXúşˆ;Ş[{.˜îKùŞZÙiÉşûÉ¾iÊÂFVÖòXú®hù˜i.z+®Š¨ŞûÈÎKˆŞXŠNZé®Xúşš9şyJ8#ÂöF—cãÂöF—cãÆF—b6Æ73Ò&W‡W&–ÖVçBÖ7F–öç2#ãÆ'WGFöâ6Æ73Ò&'WGFöâ'WGFöâ×&–Ö'’"FFÖ7CÒ'&V6—W2"G·7FFRæ–æw&VF–VçG2æÆVæwF‚ò""¢&F—6&ÆVB'ÓîyJ˜	K©¾š9şiÙhê‰jcÂö'WGFöããÂöF—cæ°¢VÇ6R–b‡7FFRç7FWÓÓÒ&fVVF&6²"’&öG’ÒfVVF&6µ67&VVâ†FVÖò“°¢VÇ6R–b‡7FFRç7FWÓÓÒ&6ö×ÆWFR"’&öG’Ò6ö×ÆWF–öå67&VVâ†FVÖò“°¢VÇ6R°¢Ö&´6ö×ÆWFR†FVÖòÂ7FFRÂ&V6—W5òG·7FFRæ–æw&VF–VçG2æ¦ö–â‚%ò"—Ö“°¢&öG’ÒÇ6Æ73Ò&W–V'&÷r#å7FW"+rXÛ>i˜.˜xŞzérG·7FFRç&Vg&W6†W2ò+r[{.i»NikG·7FFRç&Vg&W6†W7ÒjÊ¢"'ÓÂ÷ãÆƒ#îK¸®i™®iÈyÈˆZny¨NKˆX¾˜i8sÂöƒ#ãÆF—b6Æ73Ò'&V6—RÖw&–B#âG·&V6—W2æÖ‡&V6—RÓâÆF—b6Æ73Ò'&V6—RÖ6&B#ãÇ7â6Æ73Ò&6÷fW&vR#âG·&V6—Ræ6÷fW&vWÒSÂ÷7ããÆƒ3âG¶W66T‡FÖÂ‡&V6—RææÖR—ÓÂöƒ3ãÇî{Ë®ûÉ¢G·&V6—RæÖ—76–æræÆVæwF‚ò&V6—RæÖ—76–æræ¦ö–â‚.8"’¢.k).iÈ’'ÓÂ÷ãÇ6ÖÆÂ6Æ73Ò&†–çB#î{HBG·&V6—RæÖ–çWFW7ÒXˆn™	ƒÂ÷6ÖÆÃãÂöF—cæ’æ¦ö–â‚""—ÓÂöF—câG¶Wf–FVæ6TFWF–Ç2†FVÖòÂÇîŠhn‰8¾xè~ûÉŞyºîX˜Şz+®Š¨Şi8iÈy¨N[ø^Šhš9şiÙ;rš9şŠÙÎ[ø^Šhš9şiÙ8.Zè>KˆŞKº>ŠxyşšH®8Z[ŞY>h‰nš9şY8ZèXZ8.‹;Î‹+~iz^iÉşXú®ˆ;ŞyJKènhùzK®Xúşˆ;Ş˜îiÉşûÈÎK¸Ş™ÈKÛşyJˆ^jª.iú^8#Â÷æ—ÓÆƒ27G–ÆSÒ&Ö&v–â×F÷£#‚#îiKKˆKˆ¾XkzëXZ~ZëûÈÎ{YiéÎiÈ>z¸¾X‹¾i»NikÂöƒ3ãÆF—b6Æ73Ò&–æw&VF–VçBÖÆ—7B#âG¶Æ"æ–æw&VF–VçG2æÖ†—FVÒÓâÆ'WGFöâ6Æ73Ò&–æw&VF–VçBG·7FFRæ–æw&VF–VçG2æ–æ6ÇVFW2†—FVÒ’ò&7F—fR"¢"'Ò"FFÖ–æw&VF–VçB×&W7VÇCÒ"G¶—FV×Ò"&–×&W76VCÒ"G·7FFRæ–æw&VF–VçG2æ–æ6ÇVFW2†—FVÒ—Ò#âG·7FFRæ–æw&VF–VçG2æ–æ6ÇVFW2†—FVÒ’ò.)É2"¢"²'ÒG¶—FV×ÓÂö'WGFöãæ’æ¦ö–â‚""—ÓÂöF—câG·&W7VÇD7F–öç2†FVÖòÂ7FFRÂh‰y¨Ny›ÎzZi»şK¸®i™®h›îX{¢G·&V6—W5³ÒææÖWÖ—Ö°¢Ğ¢æ–ææW$…DÔÂÒFVÖõ6†VÆÂ†FVÖòÂ7FFRÂ&öG’Â7FFRç7FWÓÓÒ&fVVF&6²"ÇÂ7FFRç7FWÓÓÒ&6ö×ÆWFR"òB¢çVÖ&W"‡7FFRç7FW’²ÂB“°¢Fö7VÖVçBçVW'•6VÆV7F÷"‚u¶FFÖ7CÒ'7F'B%Òr“òæFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â‚’Óâ7F'DFVÖò†FVÖòÂ²–æw&VF–VçG3¢²ââæÆ"æ–æw&VF–VçG5ÒÒ’“°¢Fö7VÖVçBçVW'•6VÆV7F÷$ÆÂ‚%¶FFÖ–æw&VF–VçEÒ"’æf÷$V6‚†'WGFöâÓâ'WGFöâæFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â‚’ÓâFövvÆT–æw&VF–VçB†FVÖòÂ7FFRÂ'WGFöâæFF6WBæ–æw&VF–VçBÂfÇ6R’’“°¢Fö7VÖVçBçVW'•6VÆV7F÷"‚u¶FFÖ7CÒ'&V6—W2%Òr“òæFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â‚’ÓâWFFU7FFR†FVÖòÂ²7FW¢"ÒÂ²fö7W3¢G'VRÒ’“°¢Fö7VÖVçBçVW'•6VÆV7F÷$ÆÂ‚%¶FFÖ–æw&VF–VçB×&W7VÇEÒ"’æf÷$V6‚†'WGFöâÓâ'WGFöâæFDWfVçDÆ—7FVæW"‚&6Æ–6²"Â‚’ÓâFövvÆT–æw&VF–VçB†FVÖòÂ7FFRÂ'WGFöâæFF6WBæ–æw&VF–VçE&W7VÇBÂG'VR’’“°¢&–æE6†&VB†FVÖòÂ7FFRÂ"“°§Ğ ¦gVæ7F–öâFövvÆT–æw&VF–VçB†FVÖòÂ7FFRÂ—FVÒÂ6÷VçE&Vg&W6‚’°¢6öç7BW†—7G2Ò7FFRæ–æw&VF–VçG2æ–æ6ÇVFW2†—FVÒ“°¢6öç7B–æw&VF–VçG2ÒW†—7G2ò7FFRæ–æw&VF–VçG2æf–ÇFW"‡fÇVRÓâfÇVRÓÒ—FVÒ’¢²ââç7FFRæ–æw&VF–VçG2Â—FVÕÓ°¢–b‚–æw&VF–VçG2æÆVæwF‚’&WGW&â6†÷uFö7B‚.ˆ{>[	KùŞyYKˆš^š9şiÙûÈÎh˜ŞiÈXúşš™~ŠØ{YiéÂ"“°¢WFFU7FFR†FVÖòÂ²–æw&VF–VçG2Â&Vg&W6†W3¢7FFRç&Vg&W6†W2²†6÷VçE&Vg&W6‚ò¢’Ò“°§Ğ ¦gVæ7F–öâ&VæFW$FVÖò†FVÖò’°¢6öç7B7FFRÒ7FFTf÷"†FVÖò“°¢–b‚7FFRæ÷VæVB’°¢7FFRæ÷VæVBÒG'VS°¢G&6²‚&FVÖõö÷VæVB"ÂFVÖòÂ7FFR“°¢Ğ¢6öç7B&VæFW&W'2Ò²&V6ÆÃ¢&VæFW%&V6ÆÂÂ&–6S¢&VæFW%&–6RÂ7Fö6³¢&VæFW%7Fö6²ÂFWFV7F—fS¢&VæFW$FWFV7F—fRÂG'WFƒ¢&VæFW%G'WF‚ÂF7FS¢&VæFW%F7FRÂG&VæC¢&VæFW%G&VæBÂ&&S¢&VæFW%&&RÂv'&çG“¢&VæFW%v'&çG’Âg&–FvS¢&VæFW$g&–FvRÓ°¢&VæFW&W'5¶FVÖòæ–EÒ†FVÖòÂ7FFR“°§Ğ ¦gVæ7F–öâ&VæFW%&÷WFR‡²fö7W2ÒG'VRÒÒ·Ò’°¢ÖöFÅ&ö÷Bæ–ææW$…DÔÂÒ"#°¢6öç7B&÷WFRÒ7W'&VçE&÷WFR‚“°¢6öç7B&÷WFTFVÖòÒ&÷WFRçvRÓÓÒ&FVÖò"bb&÷WFRæ–BòvWDFVÖò‡&÷WFRæ–B’¢çVÆÃ°¢Fö7VÖVçBæ&öG’æFF6WBçF†VÖRÒ&÷WFTFVÖóòæ–Bóò&Æ"#°¢6WD7F—fTæb‡&÷WFRçvRÓÓÒ&FVÖò"ò&vÆÆW'’"¢&÷WFRçvR“°¢–b‡&÷WFRçvRÓÓÒ&vÆÆW'’"’&VæFW$vÆÆW'’‚“°¢VÇ6R–b‡&÷WFRçvRÓÓÒ&'&–Vb"’&VæFW$'&–Vb‚“°¢VÇ6R–b‡&÷WFRçvRÓÓÒ&æW‡B×7FvR"’&VæFW$æW‡E7FvR‚“°¢VÇ6R–b‡&÷WFRçvRÓÓÒ&F6†&ö&B"’&VæFW$F6†&ö&B‚“°¢VÇ6R–b‡&÷WFTFVÖò’&VæFW$FVÖò‡&÷WFTFVÖò“°¢VÇ6R°¢æ–ææW$…DÔÂÒÆF—b6Æ73Ò&fFÂÖW'&÷"#ãÆƒîh›îKˆŞX‹˜	š^Zúnš™sÂöƒãÇî{k.YØXúşˆ;Ş˜îiÉşûÈÎY¹îX‹vÆÆW'’˜xŞik˜i8~8#Â÷ãÆ6Æ73Ò&'WGFöâ'WGFöâ×&–Ö'’"‡&VcÒ"2övÆÆW'’#îY¹îX‹vÆÆW'“ÂöãÂöF—cæ°¢Ğ¢–b†fö7W2’°¢v–æF÷rç67&öÆÅFò‡²F÷¢Â&V†f–÷#¢&–ç7FçB"Ò“°¢æfö7W2‡²&WfVçE67&öÆÃ¢G'VRÒ“°¢Ğ§Ğ §v–æF÷ræFDWfVçDÆ—7FVæW"‚&†6†6†ævR"Â‚’Óâ&VæFW%&÷WFR‡²fö7W3¢G'VRÒ’“° ¦7–æ2gVæ7F–öâ&ö÷B‚’°¢G'’°¢6öç7B&W7öç6RÒv—BfWF6‚‚"öFFöÆ"ÖFFæ§6öâ"Â²66†S¢&æò×7F÷&R"Ò“°¢–b‚&W7öç6Ræö²’F‡&÷ræWrW'&÷"†…EEG·&W7öç6Rç7FGW7Ö“°¢Æ"Òv—B&W7öç6Ræ§6öâ‚“°¢–b‚Æö6F–öâæ†6‚’†—7F÷'’ç&WÆ6U7FFR†çVÆÂÂ""Â"2övÆÆW'’"“°¢&VæFW%&÷WFR‡²fö7W3¢fÇ6RÒ“°¢Ò6F6‚†W'&÷"’°¢æ–ææW$…DÔÂÒÆF—b6Æ73Ò&fFÂÖW'&÷"#ãÆƒîZúnš™~‹8~ii‹ÈXZ^ZKiYsÂöƒãÇâG¶W66T‡FÖÂ†W'&÷"æÖW76vR—ÓÂ÷ãÆ'WGFöâ6Æ73Ò&'WGFöâ'WGFöâ×&–Ö'’"öæ6Æ–6³Ò&Æö6F–öâç&VÆöB‚’#î˜xŞik‹ÈXZSÂö'WGFöããÂöF—cæ°¢Ğ§Ğ ¦&ö÷B‚“° 

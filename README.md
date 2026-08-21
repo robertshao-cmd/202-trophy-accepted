@@ -12,6 +12,9 @@
 
 網站目前由本機服務提供：
 
+- KAHOOT × DETECTIVE × INVOICE｜誰是犯人？多人 Prototype：<http://localhost:4174/detective.html>
+- 無動畫內部測試：<http://localhost:4174/detective.html?test=1>
+- 五分鐘簡報模式：<http://localhost:4174/detective.html?demo=1>
 - Gallery：<http://localhost:4173/#/gallery>
 - Validation Brief：<http://localhost:4173/#/brief>
 - Productization Blueprint：<http://localhost:4173/#/next-stage>
@@ -20,6 +23,13 @@
 若服務未啟動，在此資料夾執行：
 
 ```powershell
+node server.mjs
+```
+
+若 4173 已由實驗室使用，另開「誰是犯人？」：
+
+```powershell
+$env:PORT=4174
 node server.mjs
 ```
 
@@ -34,7 +44,7 @@ node --test
 1. `#/demo/recall` 商品召回雷達
 2. `#/demo/price` 買貴了嗎？價格刺客
 3. `#/demo/stock` 囤貨鬼打牆
-4. `#/demo/detective` 發票推理局：這是誰？誰在說謊？（合併 ORIGINAL RANK #4＋#5）
+4. `#/demo/detective` KAHOOT × DETECTIVE × INVOICE：用九題三幕找出「誰是犯人？」
    - 舊網址 `#/demo/truth` 會自動開啟相同合併版。
 6. `#/demo/taste` 味覺 DNA／飲食鬼格
 7. `#/demo/trend` 期間限定跟風雷達

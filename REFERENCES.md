@@ -1,4 +1,4 @@
-# 發票抓鬼所：UI／UX 參考與採用決策
+# 發票推理局：UI／UX 參考與採用決策
 
 來源書籤：`PM-Chrome-Bookmarks.html`。只保留能在一日黑客松直接轉成產品決策的參考。
 
@@ -24,10 +24,22 @@
    - 採用：Primary `#01AFA2`、Secondary `#FF9924`、Background `#F5F5F5`、文字 `#262626`。
    - 轉化：漫畫效果只做為活動皮膚，仍讓人一眼看出是發票載具產品。
 
+6. [CSS Reveal animation](https://codepen.io/epaezrubio/pen/OoMGXR)
+   - 採用：遮罩先蓋滿、再快速擦除的兩段式揭曉節奏。
+   - 轉化：答案先以綠色證物遮罩擦出，收據延遲進場，製造「先判決、後看證據」的舞台感。
+
+7. [Fast-Paced Quiz Game UI](https://dribbble.com/shots/25877882-Fast-Paced-Quiz-Game-UI)
+   - 採用：倒數、選項與即時排行必須維持強烈但清楚的視覺層級。
+   - 轉化：每個選項有固定色條、72px 以上手機觸控高度；前三名用 podium 標記，其他名次維持可掃讀列表。
+
+8. [Awwwards — Active Waiting](https://www.awwwards.com/brainfood-mobile-performance-vol3.pdf)
+   - 採用：等待不應只是被動 loading，要持續提供可理解的進度與下一步期待。
+   - 轉化：大廳顯示開案門檻，答題頁顯示已作答人數與證詞 badge，封存後立即顯示不可反悔狀態。
+
 ## 暫不採用
 
 - Product Hunt／BetaList：適合市場與定位研究，不會直接改善明天的現場體驗。
-- Awwwards／SiteInspire／Muzli：靈感範圍太廣，容易造成視覺 scope creep。
+- SiteInspire／Muzli：靈感範圍太廣，容易造成視覺 scope creep。
 - Brand New：適合完整品牌改版；本 Demo 只需要活動視覺皮膚，不應重做品牌。
 
 ## 通用鬼角色規則
