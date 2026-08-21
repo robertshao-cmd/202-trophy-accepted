@@ -48,13 +48,15 @@ test("a full three-act case runs to results and never leaks owner/is_lie/answer 
   const { cases } = JSON.parse(await readFile(new URL("../lib/cases.json", import.meta.url), "utf8"));
   const caseData = cases[0];
   const owner = caseData.owner;
-  const members = [...new Set(caseData.act2.flatMap((round) => round.members))];
-  const identities = [owner, ...members.filter((name) => name !== owner)].slice(0, 4);
 
   const created = await workerRequest("/api/detective/rooms", post({}));
   assert.equal(created.status, 201);
   const { room: createdRoom, hostKey } = await created.json();
   const code = createdRoom.code;
+  // 身分名單以伺服器公開的卡司為準（案件經過瘦身，與原始 JSON 不同）
+  const cast = createdRoom.identities.map((identity) => identity.name);
+  assert.ok(cast.includes(owner), "trimmed cast must still contain the culprit");
+  const identities = [owner, ...cast.filter((name) => name !== owner)].slice(0, 4);
 
   const players = [];
   for (const [index, identity] of identities.entries()) {
@@ -66,7 +68,7 @@ test("a full three-act case runs to results and never leaks owner/is_lie/answer 
   const started = await workerRequest(`/api/detective/rooms/${code}/start`, post({ hostKey }));
   assert.equal(started.status, 200);
   const startedRoom = await started.json();
-  assert.equal(startedRoom.stepCount, caseData.act1.length + caseData.act2.length + 7);
+  assert.equal(startedRoom.stepCount, Math.min(caseData.act1.length, 3) + Math.min(caseData.act2.length, 3) + 7);
 
   const forbiddenDuringQuestions = ['"is_lie"', '"answer"', '"owner"', '"liar"', '"correctChoice"', '"verdict"', '"betHistory"'];
   let sawOnStageLock = false;

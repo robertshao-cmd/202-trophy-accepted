@@ -8,7 +8,22 @@ type Act2Round = { round: number; theme: string; members: string[]; liar: string
 type Act3 = { reveal: string; first_bet: string; final_clue: string; final_bet: string; escape_bonus: string };
 type CaseData = { owner: string; date: string; confusable: number; invoices: Invoice[]; act1: Act1Question[]; act2: Act2Round[]; act3: Act3 };
 
-const cases = (casePack as { cases: CaseData[] }).cases;
+// 流程瘦身：第一幕／第二幕各取 3 題。
+// 第一幕先剔除「登記名一看就知道品牌」的簡單題，再取前 3；
+// 第二幕砍一輪非犯人輪（犯人所在的招牌店輪必留，潛逃分靠它）。
+const EASY_REG = /統一超商|全家便利商店|萊爾富國際|來來超商/;
+function trimCase(c: CaseData): CaseData {
+  const act1Pool = c.act1.filter((q) => !(q.type === "登記名破解" && EASY_REG.test(q.prompt)));
+  const act1 = (act1Pool.length >= 3 ? act1Pool : c.act1).slice(0, 3);
+  let act2 = c.act2;
+  while (act2.length > 3) {
+    const dropIndex = act2.findIndex((round) => round.liar !== c.owner);
+    act2 = act2.filter((_, index) => index !== dropIndex);
+  }
+  act2 = act2.map((round, index) => ({ ...round, round: index + 1 }));
+  return { ...c, act1, act2 };
+}
+const cases = (casePack as { cases: CaseData[] }).cases.map(trimCase);
 
 // ---------- 狀態機 ----------
 type StepKind = "intro" | "quiz" | "vote" | "timeline" | "bet" | "clue";
