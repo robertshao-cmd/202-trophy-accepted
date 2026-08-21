@@ -10,7 +10,13 @@
 
 ## 直接使用
 
-網站目前由本機服務提供：
+正式多人版：
+
+- 主遊戲：<https://202-trophy-accepted.robert-shao.workers.dev/detective.html>
+- 五分鐘簡報模式：<https://202-trophy-accepted.robert-shao.workers.dev/detective.html?demo=1>
+- 無動畫測試模式：<https://202-trophy-accepted.robert-shao.workers.dev/detective.html?test=1>
+
+本機開發：
 
 - KAHOOT × DETECTIVE × INVOICE｜誰是犯人？多人 Prototype：<http://localhost:4174/detective.html>
 - 無動畫內部測試：<http://localhost:4174/detective.html?test=1>

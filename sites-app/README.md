@@ -1,4 +1,19 @@
-# vinext-starter
+# 202 Trophy Accepted｜正式部署版
+
+KAHOOT × DETECTIVE × INVOICE 的 Cloudflare Worker 部署專案，包含完整多人房間 API 與靜態遊戲介面。
+
+- 正式網址：<https://202-trophy-accepted.robert-shao.workers.dev/detective.html>
+- 五分鐘簡報：<https://202-trophy-accepted.robert-shao.workers.dev/detective.html?demo=1>
+- 無動畫測試：<https://202-trophy-accepted.robert-shao.workers.dev/detective.html?test=1>
+
+## Architecture
+
+- `public/detective.*`：玩家／主持人介面
+- `app/api/detective/rooms/**`：多人房間與九題流程 API
+- `lib/game.ts`：題庫、計分與房間狀態
+- `worker/index.ts`：Cloudflare Worker 入口
+
+## Vinext foundation
 
 A clean full-stack starter running on
 [vinext](https://github.com/cloudflare/vinext), with optional Cloudflare D1 and
