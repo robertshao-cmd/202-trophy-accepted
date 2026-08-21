@@ -1,10 +1,10 @@
 # 202 Trophy Accepted｜Production App
 
-KAHOOT × DETECTIVE × INVOICE 的正式 Cloudflare Worker 專案，包含多人房間 API、九題三幕流程與漫畫偵探 UI。
+KAHOOT × DETECTIVE × INVOICE 的正式 Cloudflare Worker 專案，包含多人房間 API、Michelle 的案件包三幕流程、Rebecca 的攝影片頭與漫畫偵探 UI。
 
 - 正式網址：<https://202-trophy-accepted.robert-shao.workers.dev/detective.html>
-- 正式環境預設無動畫；不需要加 `?test=1`。
-- Rebecca 的 23 秒漫畫開場使用 `?intro=1` 主動播放；房號加入不會觸發。
+- 正式首頁預設播放 Rebecca 的 23 秒完整攝影片頭；房號加入不會重播。
+- 自測時使用 `?test=1` 或 `?motion=off` 關閉動畫；使用 `?intro=0` 只略過片頭。
 
 ## Team ownership
 
@@ -28,8 +28,10 @@ npm test
 ## Architecture
 
 - `public/detective.*`：主持人與玩家介面。
-- `public/intro.*`：Rebecca 開場的隔離式 pre-game layer，不改房間狀態。
+- `public/intro.*` 與 `public/intro-assets/*`：Rebecca 開場的隔離式 pre-game layer 與 GitLab 原始照片，不改房間狀態。
+- `public/home-detective.png`：首頁主辦警探真人主視覺。
 - `app/api/detective/rooms/**`：房間建立、加入、作答與主持控制。
-- `lib/game.ts`：九題題庫、計分與 edge-memory 房間狀態。
+- `lib/cases.json`：由真實發票編譯而成的案件包（敏感資訊依展示規則遮蔽）。
+- `lib/game.ts`：三幕流程、Jira 卡司頭像、計分與 edge-memory 房間狀態。
 - `worker/index.ts`：Cloudflare Worker 入口。
-- `tests/rendered-html.test.mjs`：正式 build、API 與無動畫來源驗證。
+- `tests/rendered-html.test.mjs`：正式 build、三幕 API、資料防洩漏與視覺資產驗證。

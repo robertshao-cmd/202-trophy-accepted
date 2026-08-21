@@ -1,6 +1,7 @@
 /*
  * Pre-game comic intro by Rebecca Chiu.
- * Adapted from AI Lab/invoice-guess-game commit bb158b4f5e483938f469c3f667d8f0232a0700d0.
+ * Synced from AI Lab/invoice-guess-game main at 3459994786776475ec92697b565be79537f8cd9b.
+ * The photographic panels and real-person assistant are Rebecca's complete intro treatment.
  * This file owns presentation only; room, question, score, and flow logic remain in detective.js.
  */
 (() => {
@@ -9,7 +10,11 @@
 
   const $ = (selector) => introEl.querySelector(selector);
   const params = new URLSearchParams(location.search);
-  const introOn = params.get("intro") === "1" && !params.get("room") && !params.get("preview");
+  const introOn = !params.get("room")
+    && !params.get("preview")
+    && params.get("intro") !== "0"
+    && params.get("test") !== "1"
+    && params.get("motion") !== "off";
   if (!introOn) return;
 
   const introTimers = [];
@@ -158,11 +163,26 @@
     board: '<rect x="26" y="14" width="148" height="114" rx="3" fill="#141a10" stroke="#f2f3f7" stroke-width="2.5"/><g><rect x="38" y="26" width="26" height="30" fill="#efe6cf" stroke="#14170f" stroke-width="1.5"/><rect x="88" y="22" width="26" height="30" fill="#efe6cf" stroke="#14170f" stroke-width="1.5"/><rect x="136" y="30" width="26" height="30" fill="#efe6cf" stroke="#14170f" stroke-width="1.5"/><rect x="60" y="82" width="26" height="30" fill="#efe6cf" stroke="#14170f" stroke-width="1.5"/><rect x="116" y="86" width="26" height="30" fill="#efe6cf" stroke="#14170f" stroke-width="1.5"/></g><g fill="#0c0f0a"><circle cx="51" cy="36" r="6"/><circle cx="101" cy="32" r="6"/><circle cx="149" cy="40" r="6"/><circle cx="73" cy="92" r="6"/><circle cx="129" cy="96" r="6"/></g><g stroke="#ff594b" stroke-width="1.6"><line x1="51" y1="41" x2="73" y2="87"/><line x1="101" y1="37" x2="73" y2="87"/><line x1="101" y1="37" x2="129" y2="91"/><line x1="149" y1="45" x2="129" y2="91"/><line x1="73" y1="92" x2="129" y2="96"/></g><g fill="#ff594b"><circle cx="51" cy="41" r="2.4"/><circle cx="101" cy="37" r="2.4"/><circle cx="149" cy="45" r="2.4"/><circle cx="73" cy="87" r="2.4"/><circle cx="129" cy="91" r="2.4"/></g>',
     suspects: '<g fill="#0c0f0a" stroke="#f2f3f7" stroke-width="2.5"><ellipse cx="40" cy="76" rx="18" ry="24"/><ellipse cx="80" cy="69" rx="18" ry="24"/><ellipse cx="120" cy="77" rx="18" ry="24"/><ellipse cx="160" cy="70" rx="18" ry="24"/></g><g fill="#f2f3f7"><rect x="30" y="71" width="7.5" height="3.4"/><rect x="42" y="71" width="7.5" height="3.4"/><rect x="70" y="64" width="7.5" height="3.4"/><rect x="82" y="64" width="7.5" height="3.4"/><rect x="110" y="72" width="7.5" height="3.4"/><rect x="122" y="72" width="7.5" height="3.4"/><rect x="150" y="65" width="7.5" height="3.4"/><rect x="162" y="65" width="7.5" height="3.4"/></g>',
   };
+  void ART; // Kept as the lightweight fallback artwork for future offline packaging.
 
-  function panel({ art = "", tilt = 0, background = "", lineColor = "#ffffff20", dense = 42, sound = "", soundPosition = [0, 0], bubble = "", bubbleType = "talk", bubblePosition = [0, 0] }) {
+  const INTRO_PHOTOS = [
+    "scene1-messy.jpg",
+    "scene2-magnifier.jpg",
+    "scene3-map.jpg",
+    "scene4-interrogation.jpg",
+    "scene5-wall.jpg",
+    "scene6-lineup.jpg",
+  ].map((name) => `/intro-assets/${name}`);
+
+  INTRO_PHOTOS.forEach((source) => {
+    const image = new Image();
+    image.src = source;
+  });
+
+  function panel({ photo = "", art = "", tilt = 0, background = "", lineColor = "#ffffff20", dense = 42, sound = "", soundPosition = [0, 0], bubble = "", bubbleType = "talk", bubblePosition = [0, 0] }) {
     const stage = $("#comicStage");
     stage.style.display = "block";
-    stage.innerHTML = `<div class="cpanel" style="--tilt:${tilt}deg${background ? `;--pbg:${background}` : ""}"><svg class="plines" viewBox="0 0 400 300" aria-hidden="true">${speedLines(200, 150, dense, lineColor)}</svg><svg class="part" viewBox="0 0 200 150" aria-hidden="true">${art}</svg>${sound ? `<div class="sfxWord" style="left:${soundPosition[0]}%;top:${soundPosition[1]}%">${sound}</div>` : ""}${bubble ? `<div class="bubble ${bubbleType}" style="left:${bubblePosition[0]}%;top:${bubblePosition[1]}%">${bubble}</div>` : ""}</div>`;
+    stage.innerHTML = `<div class="cpanel" style="--tilt:${tilt}deg${background ? `;--pbg:${background}` : ""}">${photo ? `<img class="pimg" src="${photo}" alt="" />` : ""}<svg class="plines" viewBox="0 0 400 300" aria-hidden="true">${speedLines(200, 150, dense, lineColor)}</svg>${photo ? "" : `<svg class="part" viewBox="0 0 200 150" aria-hidden="true">${art}</svg>`}${sound ? `<div class="sfxWord" style="left:${soundPosition[0]}%;top:${soundPosition[1]}%">${sound}</div>` : ""}${bubble ? `<div class="bubble ${bubbleType}" style="left:${bubblePosition[0]}%;top:${bubblePosition[1]}%">${bubble}</div>` : ""}</div><div class="noteTaker"><span class="noteDots">小助手紀錄中<i>⋯</i></span><img src="/intro-assets/assistant-cut.png" alt="Rebecca 的辦案助手正在紀錄" /></div>`;
     requestAnimationFrame(() => requestAnimationFrame(() => stage.querySelector(".cpanel")?.classList.add("in")));
   }
 
@@ -185,29 +205,29 @@
     after(1.2, () => {
       scream();
       $("#stageCap").textContent = "STEP 01 · 蒐集資訊";
-      panel({ art: ART.messy, bubble: "犯罪現場一片狼藉，地上散落著沾滿污漬的發票。", bubbleType: "cap", bubblePosition: [5, 5], sound: "嘩啦⋯", soundPosition: [64, 10], tilt: -1.6 });
+      panel({ photo: INTRO_PHOTOS[0], bubble: "犯罪現場一片狼藉，地上散落著沾滿污漬的發票。", bubbleType: "cap", bubblePosition: [5, 5], sound: "嘩啦⋯", soundPosition: [64, 8], tilt: -1.6 });
       navigator.vibrate?.([60, 50, 60]);
     });
     after(4.8, () => {
       gasp();
-      panel({ art: ART.receipt, bubble: "重要資訊被污漬遮住了——先推理出消費品項或地點。", bubbleType: "cap", bubblePosition: [5, 5], tilt: 1.3 });
+      panel({ photo: INTRO_PHOTOS[1], bubble: "重要資訊被污漬遮住了——先推理出「消費的地點」。", bubbleType: "cap", bubblePosition: [5, 5], tilt: 1.3 });
     });
     after(8.4, () => {
       $("#stageCap").textContent = "STEP 02 · 框出嫌疑人";
-      panel({ art: ART.mapPins, bubble: "發票供出了嫌疑人當天的出沒地點與行動軌跡。", bubbleType: "cap", bubblePosition: [5, 5], tilt: -1.1 });
+      panel({ photo: INTRO_PHOTOS[2], bubble: "發票供出了嫌疑人當天的出沒地點與行動軌跡。", bubbleType: "cap", bubblePosition: [5, 5], tilt: -1.1 });
     });
     after(12, () => {
       gasp();
-      panel({ art: ART.trio, bubble: "三人一組接受偵訊——其中一人在說謊，他就是嫌疑人。", bubbleType: "cap", bubblePosition: [4, 4], tilt: 1.2 });
+      panel({ photo: INTRO_PHOTOS[3], bubble: "找來去過那些地點的人，三人一組盤問——其中一人在說謊，他就是嫌疑人。", bubbleType: "cap", bubblePosition: [4, 4], tilt: 1.2 });
     });
     after(15.8, () => {
       $("#stageCap").textContent = "STEP 03 · 找出犯人";
       gem();
-      panel({ art: ART.board, bubble: "警探列出了四位嫌疑人的完整消費軌跡。", bubbleType: "cap", bubblePosition: [5, 5], tilt: -1.2 });
+      panel({ photo: INTRO_PHOTOS[4], bubble: "警探列出了完整消費軌跡。", bubbleType: "cap", bubblePosition: [5, 5], tilt: -1.2 });
     });
     after(18.8, () => {
       hit();
-      panel({ art: ART.suspects, bubble: "四位說謊的嫌疑人——誰才是犯人！", bubbleType: "shout", bubblePosition: [8, 5], sound: "！？", soundPosition: [76, 64], tilt: 2, background: "#1c0d0b", lineColor: "#ff594b38", dense: 56 });
+      panel({ photo: INTRO_PHOTOS[5], bubble: "四位說謊的嫌疑人——誰才是犯人！", bubbleType: "shout", bubblePosition: [8, 5], sound: "！？", soundPosition: [76, 64], tilt: 2, background: "#1c0d0b", lineColor: "#ff594b45", dense: 56 });
       flash();
       navigator.vibrate?.(80);
     });

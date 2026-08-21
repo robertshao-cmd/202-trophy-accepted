@@ -120,8 +120,8 @@
   letter-spacing: .24em;
 }
 
-/* 漫畫分鏡開場 */
-.comicStage { position: relative; z-index: 2; display: none; width: min(430px, 94vw); }
+/* 漫畫分鏡開場：Rebecca GitLab 完整攝影版 */
+.comicStage { position: relative; z-index: 2; display: none; width: min(430px, 94vw); padding-bottom: 92px; }
 .stageIntro .cpanel {
   position: relative;
   aspect-ratio: 4 / 3;
@@ -147,6 +147,7 @@
 
 .stageIntro .plines { position: absolute; inset: 0; width: 100%; height: 100%; }
 .stageIntro .part { position: absolute; left: 50%; top: 55%; width: 76%; height: 72%; transform: translate(-50%, -50%); }
+.stageIntro .pimg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .stageIntro .sfxWord {
   position: absolute;
   z-index: 3;
@@ -199,6 +200,37 @@
   font: 700 13px "Special Elite", "Noto Sans TC", monospace;
 }
 
+.stageIntro .noteTaker {
+  position: absolute;
+  right: -10px;
+  bottom: -8px;
+  z-index: 6;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  animation: intro-note-bob 2.4s ease-in-out infinite;
+}
+
+.stageIntro .noteTaker img {
+  width: 132px;
+  height: auto;
+  filter: drop-shadow(4px 7px 9px #000d);
+}
+
+.stageIntro .noteDots {
+  margin-bottom: 10px;
+  padding: 6px 8px;
+  border: 1px solid #39402f;
+  border-radius: 3px;
+  color: #c1c5b7;
+  background: #14170f;
+  white-space: nowrap;
+  font: 700 10px "Special Elite", monospace;
+  letter-spacing: .12em;
+}
+
+.stageIntro .noteDots i { font-style: normal; animation: intro-dots-blink 1s steps(1) infinite; }
+
 .introFlash {
   position: fixed;
   inset: 0;
@@ -214,15 +246,20 @@
 @keyframes intro-quake { 20% { transform: translateX(-8px); } 40% { transform: translateX(7px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(3px); } }
 @keyframes intro-slam { 0% { opacity: 0; transform: rotate(7deg) scale(3.4); } 60% { opacity: 1; transform: rotate(7deg) scale(.94); } 80% { transform: rotate(7deg) scale(1.07); } 100% { transform: rotate(7deg) scale(1); } }
 @keyframes intro-flash-fade { 0% { opacity: .7; } 100% { opacity: 0; } }
+@keyframes intro-note-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes intro-dots-blink { 0%, 100% { opacity: .25; } 50% { opacity: 1; } }
 
 @media (max-width: 620px) {
   .stageIntro { padding: 22px 12px; }
   .stageCredit { top: auto; bottom: calc(12px + env(safe-area-inset-bottom)); }
   .stageCap { margin-bottom: 14px; }
   .stageIntro .bubble { font-size: 14px; }
+  .stageIntro .noteTaker { right: -2px; }
+  .stageIntro .noteTaker img { width: 112px; }
+  .stageIntro .noteDots { font-size: 9px; }
   .stageTitle .tsub { max-width: 310px; line-height: 1.7; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .stageIntro, .stageIntro .cpanel, .stageTitle .tbox, .introFlash.on { animation: none !important; transition: none !important; }
+  .stageIntro, .stageIntro .cpanel, .stageIntro .noteTaker, .stageIntro .noteDots i, .stageTitle .tbox, .introFlash.on { animation: none !important; transition: none !important; }
 }

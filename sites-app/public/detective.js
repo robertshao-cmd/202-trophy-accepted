@@ -5,9 +5,12 @@ const headerStatus = document.querySelector("#header-status");
 const search = new URLSearchParams(location.search);
 const initialCode = (search.get("room") ?? "").replace(/\D/g, "").slice(0, 4);
 const demoMode = search.get("demo") === "1";
-const introMode = search.get("intro") === "1" && !initialCode && !search.get("preview");
-const hostedNoMotion = !["localhost", "127.0.0.1"].includes(location.hostname);
-let testMode = search.get("test") === "1" || search.get("motion") === "off" || (!introMode && (hostedNoMotion || demoMode));
+const introMode = !initialCode
+  && !search.get("preview")
+  && search.get("intro") !== "0"
+  && search.get("test") !== "1"
+  && search.get("motion") !== "off";
+let testMode = search.get("test") === "1" || search.get("motion") === "off" || (!introMode && demoMode);
 document.documentElement.dataset.testMode = testMode ? "true" : "false";
 
 const state = {
@@ -23,14 +26,18 @@ const state = {
 
 const errorMessages = {
   case_not_found: "æ‰¾ä¸åˆ°é€™å€‹æ¡ˆä»¶ã€‚è«‹ç¢ºèªæ¡ˆä»¶ç·¨è™Ÿã€‚",
-  case_full: "æœ¬æ¡ˆåµæ¢å·²æ»¿ï¼Œè«‹ç­‰å¾…ä¸‹ä¸€å±€ã€‚",
+  case_full: "æœ¬æ¡ˆåµæ¢å·²æ»¿ï¼ˆä¸Šé™ 36 ä½ï¼‰ï¼Œè«‹ç­‰å¾…ä¸‹ä¸€å±€ã€‚",
   case_already_started: "æ¡ˆä»¶å·²ç¶“é–‹è¾¦ï¼Œç¾åœ¨ç„¡æ³•åŠ å…¥ã€‚",
   nickname_too_short: "åµæ¢ä»£è™Ÿè‡³å°‘éœ€è¦å…©å€‹å­—ã€‚",
   nickname_taken: "é€™å€‹åµæ¢ä»£è™Ÿå·²æœ‰äººä½¿ç”¨ã€‚",
+  identity_taken: "é€™å€‹èº«åˆ†å·²è¢«èªé ˜ï¼Œè«‹é¸åˆ¥çš„ã€‚",
+  identity_unknown: "é€™å€‹èº«åˆ†ä¸åœ¨æœ¬æ¡ˆåå–®è£¡ã€‚",
   need_four_detectives: "è‡³å°‘éœ€è¦ 4 ä½åµæ¢æ‰èƒ½é–‹å§‹è¾¦æ¡ˆã€‚",
   answer_locked: "è­‰è©å·²å°å­˜ï¼Œä¸èƒ½åæ‚”ã€‚",
-  answering_closed: "æœ¬é¡Œå·²ç¶“é–‹ç‰Œã€‚",
+  answering_closed: "æ™‚é–“åˆ°æˆ–å·²é–‹ç‰Œï¼Œè­‰è©ä¸å†å—ç†ã€‚",
+  on_stage_locked: "ä½ åœ¨å°ä¸Šå—å¯©ï¼Œé€™ä¸€è¼ªä¸èƒ½æŠ•ç¥¨ã€‚",
   host_required: "åªæœ‰é–‹å±€è€…èƒ½åŸ·è¡Œé€™å€‹å‹•ä½œã€‚",
+  case_unknown: "æ²’æœ‰é€™å€‹æ¡ˆä»¶å¯é¸ã€‚",
 };
 
 function escapeHtml(value) {
@@ -40,6 +47,10 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
+}
+
+function emphasize(text) {
+  return escapeHtml(text).replace(/\*\*(.+?)\*\*/g, `<strong class="hl">$1</strong>`);
 }
 
 function notify(message) {
@@ -84,7 +95,7 @@ function setRoute(code, view) {
 
 function updateHeader() {
   if (!state.room) {
-    headerStatus.textContent = "202 TROPHY CASE Â· çœŸå¯¦å½™ç¸½ï¼è™›æ§‹æ¡ˆä»¶";
+    headerStatus.textContent = "èª°æ˜¯çŠ¯äºº Â· çœŸå¯¦ç™¼ç¥¨ï¼è™›æ§‹æ¡ˆä»¶";
     return;
   }
   const labels = {
@@ -98,17 +109,19 @@ function updateHeader() {
 }
 
 function demoCue(room) {
-  const index = room.questionIndex;
-  if (index < 0) return "0:00â€“0:30ï½œä¸€å¥è©±ï¼šç™¼ç¥¨ä¸åªè¨˜å¸³ï¼Œé‚„èƒ½è®Šæˆè¾¦å…¬å®¤ç¤¾äº¤éŠæˆ²ã€‚";
-  if (index <= 2) return "0:30â€“1:20ï½œåªè¬›ï¼šå…ˆå¾©åŸç™¼ç¥¨ï¼Œä¸å…ˆçŒœäººã€‚";
-  if (index <= 6) return "1:20â€“3:20ï½œåªè¬›ï¼šä¸‰äººä¸€çµ„ï¼Œå”¯ä¸€èªªè¬Šè€…é€²å«Œç–‘å€ã€‚";
-  if (index <= 8) return "3:20â€“4:15ï½œåªè¬›ï¼šå››æ¢å®Œæ•´æ¶ˆè²»è¡Œå‹•ç·šï¼Œæ‰æœ‰è³‡æ ¼å®šæ¡ˆã€‚";
-  return "4:15â€“5:00ï½œæ”¶å°¾ï¼šç™¼ç¥¨ä¸å¯æ›¿ä»£ã€30 ç§’æœ‰ç­”æ¡ˆã€çµæœå€¼å¾—äº’ç›¸æ¯”ã€‚";
+  const act = room.act ?? "";
+  if (room.phase === "lobby") return "é–‹å ´ä¸€å¥è©±ï¼šç™¼ç¥¨ä¸åªè¨˜å¸³ï¼Œé‚„èƒ½è®Šæˆè¾¦å…¬å®¤æ¨ç†éŠæˆ²ã€‚";
+  if (act.includes("ç¬¬ä¸€å¹•")) return "ç¬¬ä¸€å¹•ï¼šæ±¡æ¼¬ç™¼ç¥¨æ¨åœ°é»â€”â€”å…ˆå¾©åŸè­‰æ“šï¼Œä¸å…ˆçŒœäººã€‚";
+  if (act.includes("ç¬¬äºŒå¹•")) return "ç¬¬äºŒå¹•ï¼šä¸‰äººä¸Šå°å”¸å£ä¾›ã€å…©çœŸä¸€å‡ï¼Œå°ä¸‹æŠ•ç¥¨æŠ“èªªè¬Šè€…ã€‚";
+  if (act.includes("ç¬¬ä¸‰å¹•")) return "ç¬¬ä¸‰å¹•ï¼šè¡Œå‹•ç·šå›æ”¾ â†’ å…©è¼ªä¸‹æ³¨ â†’ é–‹ç‰ŒçœŸå…‡ã€‚";
+  return "æ”¶å°¾ï¼šç™¼ç¥¨ä¸å¯æ›¿ä»£ã€æ¯å±€ 13 åˆ†é˜å…§ã€çµæœå€¼å¾—äº’ç›¸æ¯”ã€‚";
 }
 
 function portraitMarkup(person, className = "") {
   const label = person?.name ?? person?.label ?? "å«Œç–‘äºº";
-  if (!person?.avatarUrl) return `<span class="portrait-fallback ${className}" aria-hidden="true">?</span>`;
+  if (!person?.avatarUrl) {
+    return `<span class="portrait-fallback ${className}" aria-hidden="true">${escapeHtml(String(label).slice(0, 1))}</span>`;
+  }
   return `<span class="portrait-wrap ${className}"><img src="${escapeHtml(person.avatarUrl)}" alt="${escapeHtml(label)}çš„ Jira é ­åƒ" /><small>JIRA</small></span>`;
 }
 
@@ -119,40 +132,19 @@ function actClass(question) {
 }
 
 function renderStageProp(question) {
-  if (question.type === "merchant" || question.type === "item" || question.type === "invoice") {
-    return `<div class="crime-receipt" aria-hidden="true"><span class="receipt-stain stain-one"></span><span class="receipt-stain stain-two"></span><b>é›»å­ç™¼ç¥¨è­‰æ˜è¯</b><i>20â–ˆâ–ˆ/06/15ã€€NT$ 1,687</i><em>${question.type === "merchant" ? "å…¨è¯å¯¦æ¥­â€¦â–ˆâ–ˆåˆ†å…¬å¸" : question.type === "item" ? "é™¤èŒãƒ»å™´éœ§ãƒ»NT$ â–ˆâ–ˆ" : "æ—¥æœŸ â†’ å•†å®¶ â†’ å“é …"}</em><small>ç·šç´¢æ­£åœ¨å°ç„¦â€¦</small></div>`;
+  if (question.kind === "quiz") {
+    return `<div class="crime-receipt" aria-hidden="true"><span class="receipt-stain stain-one"></span><span class="receipt-stain stain-two"></span><b>é›»å­ç™¼ç¥¨è­‰æ˜è¯</b><i>${escapeHtml(question.prop?.date ?? "20â–ˆâ–ˆ")} Â· NT$ ${escapeHtml(String(question.prop?.amt ?? "â–ˆâ–ˆ"))}</i><em>${escapeHtml(question.prop?.time ?? "â–ˆâ–ˆ:â–ˆâ–ˆ")} Â· åº—åï¼šâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆâ–ˆ</em><small>ç·šç´¢æ­£åœ¨å°ç„¦â€¦</small></div>`;
   }
-  if (question.type === "lie") {
+  if (question.kind === "vote") {
     return `<div class="interrogation-lamp" aria-hidden="true"><span></span><b>èª°åœ¨èªªè¬Šï¼Ÿ</b></div>`;
   }
-  return `<div class="timeline-radar" aria-hidden="true"><span></span><b>å››æ¢è¡Œå‹•ç·šåŒæ­¥å±•é–‹</b></div>`;
-}
-
-function renderSuspects(suspects = []) {
-  return suspects.map((suspect) => `
-    <div class="suspect-line">
-      ${portraitMarkup(suspect, "suspect-avatar")}
-      <span><strong>${escapeHtml(suspect.name)}</strong><small>${escapeHtml(suspect.alias)}</small></span>
-      <span class="suspect-status" aria-hidden="true">å·²æ¡†å‡º</span>
-    </div>
-  `).join("");
+  return `<div class="timeline-radar" aria-hidden="true"><span></span><b>çµ‚å±€æŒ‡èªé€²è¡Œä¸­</b></div>`;
 }
 
 function renderCaseProgress(room) {
-  return `<div class="case-progress" aria-label="ç›®å‰ç¬¬ ${room.questionIndex + 1} é¡Œï¼Œå…± ${room.questionCount} é¡Œ">
-    ${Array.from({ length: room.questionCount }, (_, index) => `<span class="${index < room.questionIndex ? "done" : index === room.questionIndex ? "active" : ""}">${index + 1}</span>`).join("")}
+  return `<div class="case-progress" aria-label="ç›®å‰ç¬¬ ${room.stepIndex + 1} æ­¥ï¼Œå…± ${room.stepCount} æ­¥">
+    ${Array.from({ length: room.stepCount }, (_, index) => `<span class="${index < room.stepIndex ? "done" : index === room.stepIndex ? "active" : ""}">${index + 1}</span>`).join("")}
   </div>`;
-}
-
-function humanObservation(question) {
-  const observations = {
-    merchant: "å“ç‰Œåã€å…¬å¸åèˆ‡è¨˜æ†¶ä¸­çš„åœ°é»å¸¸å¸¸ä¸ä¸€æ¨£ï¼›ç™¼ç¥¨è®“æˆ‘å€‘æŠŠå°è±¡é‡æ–°å°ç„¦ã€‚",
-    item: "å¹¾å€‹æ®˜ç¼ºå­—å°±æœƒå–šèµ·ä¸åŒæ•…äº‹ï¼Œç›´åˆ°åƒ¹æ ¼èˆ‡å“åä¸€èµ·å‡ºç¾ï¼ŒçŒœæ¸¬æ‰æˆç‚ºè­‰æ“šã€‚",
-    invoice: "å–®ä¸€ç·šç´¢å®¹æ˜“èª¤å°ï¼›æ—¥æœŸã€å•†å®¶ã€å“é …èˆ‡é‡‘é¡äº’ç›¸æ‰£åˆï¼Œæ‰æ˜¯ä¸€å¼µå®Œæ•´ç™¼ç¥¨ã€‚",
-    lie: "äººæœƒæœ¬èƒ½åœ°ç¸®å°é«˜é »ç¿’æ…£ï¼Œå› ç‚ºã€å¶çˆ¾ã€è½èµ·ä¾†æ¯”çœŸå¯¦æ¬¡æ•¸æ›´åƒè‡ªå·±ã€‚",
-    route: "æˆ‘å€‘æœƒæ€¥è‘—ç”¨äººè¨­å®šç½ªï¼Œä½†åªæœ‰å®Œæ•´è¡Œå‹•ç·šæ‰èƒ½æŠŠæ‡·ç–‘è®Šæˆç­”æ¡ˆã€‚",
-  };
-  return observations[question.type] ?? "ç™¼ç¥¨è¨˜éŒ„è¡Œç‚ºï¼›ç•¶äº‹äººçš„è§£é‡‹ï¼Œæ‰è£œä¸Šè¡Œç‚ºèƒŒå¾Œçš„äººã€‚";
 }
 
 function renderHome() {
@@ -160,37 +152,35 @@ function renderHome() {
     <section class="scene hero-grid">
       <div class="hero-copy">
         <div class="issue-strip"><span>ISSUE #0821</span><strong>è¾¦å…¬å®¤é™å®šå…¬æ¼”</strong></div>
-        <p class="eyebrow">KAHOOT Ã— DETECTIVE Ã— INVOICE</p>
+        <p class="eyebrow">KID Â· KAHOOT INVOICE DETECTIVE</p>
         <h1>èª°æ˜¯<em>çŠ¯äººï¼Ÿ</em></h1>
         <div class="hero-burst" aria-hidden="true"><strong>ç™¼ç¥¨ä¸æœƒ</strong><span>èªªè¬Šï¼</span></div>
-        <p class="hero-lead">202 çç›ƒæ†‘ç©ºæ¶ˆå¤±ã€‚çŠ¯ç½ªç¾å ´åªå‰©æ²¾æ»¿æ±¡æ¼¬çš„ç™¼ç¥¨ï¼›ä½ æœ‰ 9 é¡Œæ™‚é–“ç ´è§£ç·šç´¢ã€å¯©å•å››çµ„åŒäº‹ï¼Œå†å¾å››åå«Œç–‘äººä¸­æªå‡ºçŠ¯äººã€‚</p>
+        <p class="hero-lead">æœ‰äººçš„ä¸€å¤©è¢«åšæˆäº†æ¡ˆä»¶ã€‚ä¸‰å¹•æµç¨‹ï¼šå…ˆæ“¦æ‰ç™¼ç¥¨ä¸Šçš„æ±¡æ¼¬æ¨ç†æ¶ˆè²»åœ°é»ï¼Œå†çœ‹ä¸‰ä½åŒäº‹ä¸Šå°å”¸å£ä¾›ã€æŠ•ç¥¨æŠ“èªªè¬Šè€…ï¼Œæœ€å¾Œæ²¿è¡Œå‹•ç·šä¸‹æ³¨æŒ‡èªçœŸå…‡ã€‚</p>
         <div class="button-row">
           <button class="primary-button" data-action="create-case">ç«‹æ¡ˆï¼Œæˆç‚ºä¸»æŒäºº</button>
           <button class="ghost-button" data-action="focus-join">æˆ‘æœ‰æ¡ˆä»¶ç·¨è™Ÿ</button>
-          <a class="ghost-button test-mode-link intro-launch-link" href="/detective.html?intro=1${demoMode ? "&demo=1" : ""}">æ’­æ”¾ Rebecca é–‹å ´</a>
-          ${testMode ? `<span class="test-mode-badge">${demoMode ? "5-MIN DEMO" : "TEST MODE"} Â· éŠæˆ²å‹•ç•«å·²é—œé–‰</span>` : `<a class="ghost-button test-mode-link" href="/detective.html?test=1">ç„¡å‹•ç•«æ¸¬è©¦</a><a class="ghost-button test-mode-link" href="/detective.html?demo=1&intro=1">äº”åˆ†é˜ç°¡å ±ï¼‹é–‹å ´</a>`}
+          ${testMode ? `<span class="test-mode-badge">${demoMode ? "5-MIN DEMO" : "TEST MODE"} Â· å‹•ç•«å·²é—œé–‰</span>` : `<a class="ghost-button test-mode-link" href="/detective.html?test=1">ç„¡å‹•ç•«æ¸¬è©¦</a><a class="ghost-button test-mode-link" href="/detective.html?demo=1">äº”åˆ†é˜ç°¡å ±</a>`}
         </div>
         <div class="hero-proof">
-          <span class="proof-chip">9 é¡Œä¸‰å¹•ç ´æ¡ˆ</span>
-          <span class="proof-chip">4â€“8 ä½åµæ¢</span>
-          <span class="proof-chip">ç™¼ç¥¨è­‰æ“šé–‹ç‰Œ</span>
+          <span class="proof-chip">ä¸‰å¹•ç ´æ¡ˆ</span>
+          <span class="proof-chip">4â€“36 ä½åµæ¢</span>
+          <span class="proof-chip">çœŸå¯¦ç™¼ç¥¨è­‰æ“š</span>
           <span class="proof-chip">ä¸éœ€è¨»å†Š</span>
         </div>
-        <div class="case-loop" aria-label="ä¸€å±€çš„ä¸‰å€‹æ­¥é©Ÿ">
-          <span><b>01</b><strong>è’é›†è³‡è¨Š</strong><small>é«’æ±¡ç™¼ç¥¨é€æ ¼å°ç„¦</small></span>
-          <span><b>02</b><strong>æ¡†å‡ºå«Œç–‘äºº</strong><small>å››çµ„ä¸‰äººã€æ¯çµ„ä¸€è¬Š</small></span>
-          <span><b>03</b><strong>æ‰¾å‡ºçŠ¯äºº</strong><small>å››æ¢è¡Œå‹•ç·šæ­£é¢å°æ±º</small></span>
-        </div>
       </div>
-      <aside class="folder-card" aria-label="æ¡ˆä»¶å«Œç–‘äººåå†Š">
+      <aside class="folder-card" aria-label="æ¡ˆä»¶æª”æ¡ˆè¢‹">
         <span class="paper-clip" aria-hidden="true"></span>
-        <p class="eyebrow">SUSPECT DOSSIER</p>
-        <h2>202 çç›ƒå¤±ç«Šæ¡ˆ</h2>
-        <p>æ¶ˆè²»æ•¸å­—å–è‡ªçœŸå¯¦ç™¼ç¥¨ï¼›å¤±ç«Šã€èªªè¬Šèˆ‡çŠ¯äººè¨­å®šå®Œå…¨æ˜¯éŠæˆ²è™›æ§‹ã€‚åµæ¢åªéœ€ä¸€å€‹ä»£è™Ÿå³å¯åŠ å…¥ã€‚</p>
-        <div class="sealed-dossiers" aria-label="æ¡ˆä»¶è¦æ¨¡">
-          <span><strong>03</strong><small>å¼µé«’æ±¡ç™¼ç¥¨</small></span>
-          <span><strong>04</strong><small>çµ„äº¤å‰å£ä¾›</small></span>
-          <span><strong>04</strong><small>åæœ€çµ‚å«Œç–‘äºº</small></span>
+        <p class="eyebrow">CASE DOSSIER</p>
+        <h2>æ¶ˆè²»è»Œè·¡å¤±ç«Šæ¡ˆ</h2>
+        <figure class="home-detective">
+          <figcaption><small>LEAD DETECTIVE</small><strong>æœ¬æ¡ˆï¼Œç”±æˆ‘æ¥æ‰‹ã€‚</strong></figcaption>
+          <img src="/home-detective.png" alt="202 çç›ƒå¤±ç«Šæ¡ˆä¸»è¾¦è­¦æ¢" />
+        </figure>
+        <p>æ¡ˆä»¶ç”±çœŸå¯¦ç™¼ç¥¨ç·¨è­¯è€Œæˆï¼›çŠ¯äººã€å£ä¾›èˆ‡å®šç½ªçš†ç‚ºéŠæˆ²è™›æ§‹ã€‚æƒç¢¼å…¥å±€ï¼Œé ˜ä¸€å€‹åµæ¢ä»£è™Ÿå°±èƒ½ç©ã€‚</p>
+        <div class="act-briefs" aria-label="ä¸‰å¹•æµç¨‹ç°¡ä»‹">
+          <div class="act-brief"><b>å£¹</b><span><strong>è’é›†è³‡è¨Š</strong><small>çŠ¯ç½ªç¾å ´æ•£è½æ±¡æ¼¬ç™¼ç¥¨ï¼Œ<strong class="hl">æ¨ç†ã€Œæ¶ˆè²»åœ°é»ã€</strong>ï¼Œæ‰¾å‡ºå«Œç–‘äººèˆ‡è¡Œå‹•è»Œè·¡</small></span></div>
+          <div class="act-brief"><b>è²³</b><span><strong>æ¡†å‡ºå«Œç–‘äºº</strong><small>å‚³å–šå»éé‚£äº›åœ°é»çš„äººâ€”â€”<strong class="hl">ä¸‰äººä¸€çµ„å£ä¾›ï¼Œå…¶ä¸­ä¸€äººåœ¨èªªè¬Š</strong></small></span></div>
+          <div class="act-brief"><b>åƒ</b><span><strong>æ‰¾å‡ºçŠ¯äºº</strong><small>æ”¤é–‹å®Œæ•´æ¶ˆè²»è»Œè·¡ï¼Œä¸‹æ³¨æŒ‡èªï¼š<strong class="hl">èªªè¬Šçš„å«Œç–‘äººä¸­èª°æ˜¯çŠ¯äºº</strong></small></span></div>
         </div>
         <form class="join-panel" data-form="enter-code">
           <label class="field-label" for="home-code">è¼¸å…¥ 4 ä½æ¡ˆä»¶ç·¨è™Ÿ</label>
@@ -205,6 +195,8 @@ function renderHome() {
 }
 
 function renderJoin() {
+  const identities = state.room?.identities ?? [];
+  const open = identities.filter((identity) => !identity.claimedBy);
   app.innerHTML = `
     <section class="scene join-scene">
       <div class="join-card">
@@ -212,10 +204,15 @@ function renderJoin() {
         <div class="join-ghost ghost-shape" aria-hidden="true"><i></i></div>
         <p class="eyebrow">CASE #${escapeHtml(state.code)}</p>
         <h1>é ˜å–åµæ¢è­‰</h1>
-        <p>ä¸ç”¨ç¶è¼‰å…·ã€ä¸ç”¨é¸èº«åˆ†ã€‚ä»Šå¤©ä½ åªè² è²¬æ‹†ç©¿å£ä¾›ï¼Œæ‰¾å›æ¶ˆå¤±çš„ 202 çç›ƒã€‚</p>
+        <p>å–ä¸€å€‹åµæ¢ä»£è™Ÿï¼›å¦‚æœä½ æ˜¯æœ¬æ¡ˆé—œä¿‚äººï¼Œèªé ˜è‡ªå·±çš„èº«åˆ†â€”â€”ç¬¬äºŒå¹•æœƒå‚³å–šä½ ä¸Šå°ã€‚</p>
         <form data-form="join-case">
           <label class="field-label" for="detective-name">åµæ¢ä»£è™Ÿ</label>
           <input id="detective-name" class="case-input" name="nickname" maxlength="16" placeholder="ä¾‹å¦‚ï¼šå®µå¤œç›®æ“Šè€…" autocomplete="nickname" autofocus />
+          <label class="field-label" for="detective-identity">æˆ‘çš„èº«åˆ†ï¼ˆæœ¬æ¡ˆé—œä¿‚äººæ‰é¸ï¼‰</label>
+          <select id="detective-identity" class="case-input" name="identity">
+            <option value="">è·¯äººåµæ¢ï¼ˆä¸èªé ˜èº«åˆ†ï¼‰</option>
+            ${open.map((identity) => `<option value="${escapeHtml(identity.name)}">${escapeHtml(identity.name)}</option>`).join("")}
+          </select>
           <button class="primary-button" type="submit">é€²å…¥æ¡ˆä»¶ #${escapeHtml(state.code)}</button>
         </form>
       </div>
@@ -239,7 +236,7 @@ function renderDetectiveList(players) {
   return players.map((player, index) => `
     <div class="detective-card">
       <span class="badge">${index + 1}</span>
-      <span><strong>${escapeHtml(player.nickname)}</strong><small>${player.isBot ? "ç¤ºç¯„ç·šæ°‘" : "å·²å®Œæˆå ±åˆ°"}</small></span>
+      <span><strong>${escapeHtml(player.nickname)}</strong><small>${player.identity ? `èº«åˆ†ï¼š${escapeHtml(player.identity)}` : player.isBot ? "ç¤ºç¯„ç·šæ°‘" : "è·¯äººåµæ¢"}</small></span>
     </div>
   `).join("");
 }
@@ -248,6 +245,7 @@ function renderLobby() {
   const room = state.room;
   if (state.view === "host") {
     const canStart = room.players.length >= 4 && room.isHost;
+    const meta = room.caseMeta;
     app.innerHTML = `
       <section class="scene scene-wide">
         <div class="case-topline">
@@ -265,22 +263,34 @@ function renderLobby() {
               <button class="ghost-button small-button" data-action="copy-link">è¤‡è£½é‚€è«‹é€£çµ</button>
               <a class="ghost-button small-button" href="${escapeHtml(caseUrl(room.code))}" target="_blank" rel="noreferrer">é–‹å•Ÿç©å®¶é </a>
             </div>
+            ${room.caseOptions ? `
+              <div class="case-brief" style="margin-top:18px">
+                <strong>é¸æ“‡æ¡ˆä»¶</strong>
+                <select class="case-input" data-select="case-index">
+                  ${room.caseOptions.map((option) => `<option value="${option.index}" ${option.index === room.caseIndex ? "selected" : ""}>æ¡ˆä»¶ ${String.fromCharCode(65 + option.index)}ï½œ${escapeHtml(option.date)}ï½œ${option.invoiceCount} å¼µç™¼ç¥¨ï½œ${option.roundCount} è¼ªå£ä¾›ï½œæ··æ·†åº¦ ${option.confusable}</option>`).join("")}
+                </select>
+                <small>é–‹å±€å‰è«‹å…ˆäººå·¥éä¸€éæ¡ˆä»¶è…³æœ¬ï¼ˆéš±ç§è¦å‰‡è¦‹ docs/handoff.md Â§8ï¼‰ã€‚</small>
+              </div>` : ""}
           </section>
           <section class="panel">
-            <p class="eyebrow">${room.players.length} / 8 DETECTIVES</p>
+            <p class="eyebrow">${room.players.length} / 36 DETECTIVES</p>
             <h2>å ±åˆ°åå–®</h2>
             <div class="live-ticker"><span>ç¾å ´å¿«å ±</span><strong>${room.players.length >= 4 ? "å·²é”é–‹æ¡ˆé–€æª»ï¼Œéš¨æ™‚å¯ä»¥æ’•å°æ¢ï¼" : `å† ${4 - room.players.length} ä½åµæ¢å³å¯é–‹æ¡ˆ`}</strong></div>
-            <p class="panel-note">æ»¿ 4 äººå³å¯é–‹æ¡ˆï¼›Demo æ™‚å¯è£œå…¥ç¤ºç¯„ç·šæ°‘ï¼Œå–®äººä¹Ÿèƒ½é †è·‘å®Œæ•´ä¸€å±€ã€‚</p>
-            ${demoMode ? `<div class="demo-cue"><span>5-MIN RUN OF SHOW</span><strong>${escapeHtml(demoCue(room))}</strong><small>æ¯é¡Œæœ€å¤š 10 ç§’ï¼›ç­”æ¡ˆä¸€å‡ºå°±æŒ‰ã€ŒDemo å¿«è½‰ã€ï¼Œä¸ç­‰å¾…æ’è¡Œæ¦œå‹•ç•«ã€‚</small></div>` : ""}
+            <p class="panel-note">æ»¿ 4 äººé–‹æ¡ˆã€å–®å±€æœ€å¤š 36 ä½åµæ¢ã€‚Demo å¯è£œç¤ºç¯„ç·šæ°‘ï¼ˆæœƒè‡ªå‹•èªé ˜ç©ºèº«åˆ†ï¼‰ï¼Œå–®äººä¹Ÿèƒ½é †è·‘å®Œæ•´ä¸€å±€ã€‚</p>
+            ${demoMode ? `<div class="demo-cue"><span>5-MIN RUN OF SHOW</span><strong>${escapeHtml(demoCue(room))}</strong><small>ç­”æ¡ˆä¸€å‡ºå°±æŒ‰ã€Œå¿«è½‰ã€ï¼Œä¸ç­‰å¾…å‹•ç•«ã€‚</small></div>` : ""}
             <div class="case-brief">
               <strong>æ¡ˆæƒ…æ‘˜è¦</strong>
-              <p>å±•ç¤ºæ«ƒæ–·é›»å¾Œï¼Œ202 çç›ƒæ¶ˆå¤±ã€‚å…ˆå¾©åŸä¸‰å¼µé«’æ±¡ç™¼ç¥¨ï¼Œå†å¯©å•å››çµ„ã€æ¯çµ„ä¸‰ä½åŒäº‹ï¼›å››åèªªè¬Šè€…æœƒé€²å…¥æœ€çµ‚è¡Œå‹•ç·šæ¯”å°ã€‚</p>
-              <small>æ¶ˆè²»ç´€éŒ„ç‚ºçœŸå¯¦å½™ç¸½ï¼›å¤±ç«Šã€å£ä¾›èˆ‡çŠ¯äººçš†ç‚ºè™›æ§‹ã€‚</small>
+              <p>${escapeHtml(meta.date)} é€™ä¸€å¤©ï¼Œæœ‰äººçš„æ¶ˆè²»è»Œè·¡è¢«åšæˆäº†æ¡ˆä»¶ï¼š${meta.invoiceCount} å¼µæ±¡æ¼¬ç™¼ç¥¨ã€${meta.roundCount} è¼ªå£ä¾›å¯©è¨Šã€è¡Œå‹•ç·šå›æ”¾èˆ‡å…©è¼ªä¸‹æ³¨ã€‚çœŸå…‡å°±è—åœ¨ ${meta.castCount} åé—œä¿‚äººä¹‹ä¸­ã€‚</p>
+              <small>æ¶ˆè²»ç´€éŒ„ç‚ºçœŸå¯¦ç™¼ç¥¨ï¼›æ¡ˆä»¶ã€å£ä¾›èˆ‡å®šç½ªçš†ç‚ºè™›æ§‹ã€‚</small>
+            </div>
+            <div class="case-brief">
+              <strong>èº«åˆ†èªé ˜ï¼ˆ${(room.identities ?? []).filter((identity) => identity.claimedBy).length} / ${(room.identities ?? []).length}ï¼‰</strong>
+              <p>${(room.identities ?? []).map((identity) => identity.claimedBy ? `<b>${escapeHtml(identity.name)}</b>ï¼ˆ${escapeHtml(identity.claimedBy)}ï¼‰` : escapeHtml(identity.name)).join("ã€")}</p>
             </div>
             <div class="detective-list">${renderDetectiveList(room.players)}</div>
             <div class="button-row">
               <button class="ghost-button" data-action="fill-demo" ${room.isHost ? "" : "disabled"}>è£œæ»¿ 6 ä½ç¤ºç¯„åµæ¢</button>
-              <button class="primary-button" data-action="start-case" ${canStart ? "" : "disabled"}>é–‹å§‹è¾¦æ¡ˆ Â· 9 é¡Œ</button>
+              <button class="primary-button" data-action="start-case" ${canStart ? "" : "disabled"}>é–‹å§‹è¾¦æ¡ˆ Â· ä¸‰å¹•</button>
             </div>
           </section>
         </div>
@@ -289,13 +299,570 @@ function renderLobby() {
     return;
   }
 
-  app.innÛMµ¶‰Ëkºwµçx‘í•Í…Á•!Ñµ°¡±…‰•°¥ôğ½ÍÁ…¸øñÍÑÉ½¹œø‘í•Í…Á•!Ñµ°¡Ù…±Õ”¥ôğ½ÍÑÉ½¹œøğ½‘¥Øù€¤(€€€€¹©½¥¸ ˆˆ¤ì)ô()™Õ¹Ñ¥½¸É•¹‘•ÉI•Ù•…° ¤ì(€½¹ÍĞÉ½½´€ôÍÑ…Ñ”¹É½½´ì(€½¹ÍĞÅÕ•ÍÑ¥½¸€ôÉ½½´¹ÅÕ•ÍÑ¥½¸ì(€½¹ÍĞ½ÉÉ•Ñ¡½¥”€ôÅÕ•ÍÑ¥½¸¹¡½¥•Ì¹™¥¹ ¡¡½¥”¤€ôø¡½¥”¹¥€ôôôÅÕ•ÍÑ¥½¸¹½ÉÉ•Ñ¡½¥”¤ì(€½¹ÍĞ½ÉÉ•Ñ1…‰•°€ô½ÉÉ•Ñ¡½¥”ü¹¹…µ”€üü½ÉÉ•Ñ¡½¥”ü¹±…‰•°€üü€‹rnàˆì(€½¹ÍĞ•Ù¥‘•¹”€ôÅÕ•ÍÑ¥½¸¹•Ù¥‘•¹”ì(€…ÁÀ¹¥¹¹•É!Q50€ô€(€€€€ñÍ•Ñ¥½¸±…ÍÌô‰Í•¹”Í•¹”µİ¥‘”€‘í…Ñ±…ÍÌ¡ÅÕ•ÍÑ¥½¸¥ôÉ•Ù•…°µÍ•¹”ˆø(€€€€€€ñ‘¥Ø±…ÍÌô‰•Ù¥‘•¹”µ±…å½ÕĞˆø(€€€€€€€€ñ…ÉÑ¥±”±…ÍÌô‰É•Ù•…°µ…Éˆø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰É•Ù•…°µ¥µÁ…Ğˆ…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆøñÍÑÉ½¹œû–V«¾òğ½ÍÑÉ½¹œøñÍÁ…¸û–ÂšŠwšJW¦Z,ğ½ÍÁ…¸øğ½‘¥Øø(€€€€€€€€€€ñÍÁ…¸±…ÍÌô‰É•Ù•…°µÍÑ…µÀˆû¢¶'šNkš"C®,ğ½ÍÁ…¸ø(€€€€€€€€€€ñÀ±…ÍÌô‰½µ¥Œµ…ÁÑ¥½¸ˆø‘í•Í…Á•!Ñµ°¡ÅÕ•ÍÑ¥½¸¹…Ğ¥ôƒ
-Üƒš&šr'’êëj–6Ã¢Æ‡¾ò3>û–r£š:—–>_fó–£–¾§–"“ğ½Àø(€€€€€€€€€€ñ Ä±…ÍÌô‰ÑÉÕÑ µÉ•Ù•…°ˆûrnãšb¼€ñÍÁ…¸ø‘í•Í…Á•!Ñµ°¡½ÉÉ•Ñ1…‰•°¥ôğ½ÍÁ…¸øğ½ Äø(€€€€€€€€€€‘íÅÕ•ÍÑ¥½¸¹ÑåÁ”€ôôô€‰±¥”ˆ€˜˜½ÉÉ•Ñ¡½¥”€ü€ñ‘¥Ø±…ÍÌô‰ÍÕÍÁ•Ğµ™É…µ”ˆøñÍÁ…¸±…ÍÌô‰ÍÁ½Ñ±¥¡Ğˆ…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆøğ½ÍÁ…¸ø‘íÁ½ÉÑÉ…¥Ñ5…É­ÕÀ¡½ÉÉ•Ñ¡½¥”°€‰ÍÕÍÁ•ĞµÉ•Ù•…°µÁ½ÉÑÉ…¥Ğˆ¥ôñ‘¥ØøñÍµ…±°ù1=-MUMAPğ½Íµ…±°øñÍÑÉ½¹œû–®3ZG’êè€‘í5…Ñ ¹µ…à Ä°É½½´¹ÅÕ•ÍÑ¥½¹%¹‘•à€´€È¥ô€¼€Ğğ½ÍÑÉ½¹œøñÍÁ…¸û¢ª«¢²(ƒŠ&€ƒ–ºkö«¾ò3–#š†¢Öß’ú–7š~—¢†3–.WŞkğ½ÍÁ…¸øğ½‘¥Øøñˆ±…ÍÌô‰ÍÕÍÁ•ĞµÍÑ…µÀˆû–®3ZG’êèğ½ˆøğ½‘¥Øù€€è€ˆ‰ô(€€€€€€€€€€ñÀø‘í•Í…Á•!Ñµ°¡•Ù¥‘•¹”¹™¥¹‘¥¹œ¥ôğ½Àø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰¡Õµ…¹¥Ñäµ¹½Ñ”ˆø(€€€€€€€€€€€€ñÍÁ…¸ù!U59%Qd€¼ƒ’êëšŸ¢–¾|ğ½ÍÁ…¸ø(€€€€€€€€€€€€ñÍÑÉ½¹œø‘í•Í…Á•!Ñµ°¡¡Õµ…¹=‰Í•ÉÙ…Ñ¥½¸¡ÅÕ•ÍÑ¥½¸¤¥ôğ½ÍÑÉ½¹œø(€€€€€€€€€€€€ñÍµ…±°û¢®/VÛ’ê/’êëR €ÄÀƒK¢s–º3šV’ê/¾òk¦g¶šÚ#¢ÊïVÛšf–"Ã–êWfóR’ê’î¦êó¾ò|ğ½Íµ…±°ø(€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€‘í‘•µ½5½‘”€ü€ñ‘¥Ø±…ÍÌô‰‘•µ¼µÕ”½µÁ…ĞˆøñÍÁ…¸ùAIM9QHUğ½ÍÁ…¸øñÍÑÉ½¹œø‘í•Í…Á•!Ñµ°¡‘•µ½Õ”¡É½½´¤¥ôğ½ÍÑÉ½¹œøğ½‘¥Øù€€è€ˆ‰ô(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰½ÁÑ¥½¸µÉ¥ˆø‘íÉ•¹‘•É=ÁÑ¥½¹Ì¡ÅÕ•ÍÑ¥½¸°ìÍ•±•Ñ•èÉ½½´¹Ù¥•İ•É¡½¥”°É•Ù•…°èÑÉÕ”ô¥ôğ½‘¥Øø(€€€€€€€€€€‘íÍÑ…Ñ”¹Ù¥•Ü€ôôô€‰¡½ÍĞˆ€ü€ñ‘¥Ø±…ÍÌô‰‘¥ÍÑÉ¥‰ÕÑ¥½¸ˆø‘íÉ•¹‘•É¥ÍÑÉ¥‰ÕÑ¥½¸¡ÅÕ•ÍÑ¥½¸°É½½´¹…¹Íİ•É•‘½Õ¹Ğ¥ôğ½‘¥Øù€€è€ˆ‰ô(€€€€€€€€€€‘íÉ½½´¹¥Í!½ÍĞ€ü€ñ‘¥Ø±…ÍÌô‰‰ÕÑÑ½¸µÉ½ÜˆÍÑå±”ô‰µ…É¥¸µÑ½ÀèÈÑÁàˆøñ‰ÕÑÑ½¸±…ÍÌô‰¡½ÍĞµ‰ÕÑÑ½¸Íµ…±°µ‰ÕÑÑ½¸ˆ‘…Ñ„µ…Ñ¥½¸ô‰…‘Ù…¹”ˆù•µ¼ƒ–ş¯¢ö'š:K¢†3ššpğ½‰ÕÑÑ½¸øğ½‘¥Øù€€è€ˆ‰ô(€€€€€€€€ğ½…ÉÑ¥±”ø(€€€€€€€€ñ…Í¥‘”±…ÍÌô‰É••¥ÁĞˆ…É¥„µ±…‰•°ô‹fó–£¢¶'šNk–6„ˆø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰•Ù¥‘•¹”µÑ…Á”ˆ…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆùY%9€¼ƒ¢®/–.ÿï–.Tğ½‘¥Øø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰É••¥ÁĞµ¡•…ˆøñÍµ…±°ø‘í•Í…Á•!Ñµ°¡•Ù¥‘•¹”¹•å•‰É½Ü€üü€‰%9Y=%Y%9ˆ¥ôğ½Íµ…±°øñÍÑÉ½¹œûfó–£¢¶'šNk–6„ğ½ÍÑÉ½¹œøğ½‘¥Øø(€€€€€€€€€€‘íÉ•¹‘•ÉÙ¥‘•¹•I½İÌ¡•Ù¥‘•¹”¥ô(€€€€€€€€€€ñÀ±…ÍÌô‰É••¥ÁĞµ™¥¹‘¥¹œˆø‘í•Í…Á•!Ñµ°¡•Ù¥‘•¹”¹™¥¹‘¥¹œ¥ôğ½Àø(€€€€€€€€ğ½…Í¥‘”ø(€€€€€€ğ½‘¥Øø(€€€€ğ½Í•Ñ¥½¸ø(€€ì)ô()™Õ¹Ñ¥½¸É•¹‘•É1•…‘•É‰½…É ¤ì(€½¹ÍĞÉ½½´€ôÍÑ…Ñ”¹É½½´ì(€…ÁÀ¹¥¹¹•É!Q50€ô€(€€€€ñÍ•Ñ¥½¸±…ÍÌô‰Í•¹”ˆø(€€€€€€ñ…ÉÑ¥±”±…ÍÌô‰±•…‘•É‰½…Éµ…Éˆø(€€€€€€€€ñ‘¥Ø±…ÍÌô‰¹•İÍÁ…Á•Èµ™±…œˆ…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆùaQI„aQI„ğ½‘¥Øø(€€€€€€€€ñÀ±…ÍÌô‰•å•‰É½ÜˆùMI9-%9ƒ
-Ü€‘íÉ½½´¹ÅÕ•ÍÑ¥½¹%¹‘•à€¬€Åô¼‘íÉ½½´¹ÅÕ•ÍÑ¥½¹½Õ¹Ñôğ½Àø(€€€€€€€€ñ Äû¢ªÃšršrñ‰È€¼øñÍÁ…¸û¢º–B3’ê/¾ò|ğ½ÍÁ…¸øğ½ Äø(€€€€€€€€ñÀû¦–ê›šr'–*ƒ–"¾ò3’ê2sšÊKšr'–Kš&–&7’â'–B7šj¯šf–>[–ú_šBsš~—’î“ğ½Àø(€€€€€€€€ñ‘¥Ø±…ÍÌô‰É…¹¬µ±¥ÍĞˆø(€€€€€€€€€€‘íÉ½½´¹±•…‘•É‰½…É¹Í±¥” À°€Ø¤¹µ…À ¡Á±…å•È°¥¹‘•à¤€ôø€(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰É…¹¬µÉ½Üˆø(€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÌô‰É…¹¬µ¹Õµ‰•Èˆø‘íl‹Â~FDˆ°€‹Â~– ˆ°€‹Â~–$‰um¥¹‘•át€üü€Œ‘í¥¹‘•à€¬€Åõôğ½ÍÁ…¸ø(€€€€€€€€€€€€€€ñÍÑÉ½¹œø‘í•Í…Á•!Ñµ°¡Á±…å•È¹¹¥­¹…µ”¥ôğ½ÍÑÉ½¹œø(€€€€€€€€€€€€€€ñÍÁ…¸±…ÍÌô‰É…¹¬µÍ½É”ˆø‘íÁ±…å•È¹Í½É•ôÁÑÌğ½ÍÁ…¸ø(€€€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€¤¹©½¥¸ ˆˆ¥ô(€€€€€€€€ğ½‘¥Øø(€€€€€€€€‘íÉ½½´¹¥Í!½ÍĞ€ü€ñ‘¥Ø±…ÍÌô‰‰ÕÑÑ½¸µÉ½ÜˆÍÑå±”ô‰©ÕÍÑ¥™äµ½¹Ñ•¹Ğé•¹Ñ•Èíµ…É¥¸µÑ½ÀèÈÑÁàˆøñ‰ÕÑÑ½¸±…ÍÌô‰¡½ÍĞµ‰ÕÑÑ½¸Íµ…±°µ‰ÕÑÑ½¸ˆ‘…Ñ„µ…Ñ¥½¸ô‰…‘Ù…¹”ˆù•µ¼ƒ–ş¯¢ö'’â/’â¦†0ğ½‰ÕÑÑ½¸øğ½‘¥Øù€€è€ˆ‰ô(€€€€€€ğ½…ÉÑ¥±”ø(€€€€ğ½Í•Ñ¥½¸ø(€€ì)ô()™Õ¹Ñ¥½¸É•¹‘•ÉI•ÍÕ±ÑÌ ¤ì(€½¹ÍĞÉ½½´€ôÍÑ…Ñ”¹É½½´ì(€½¹ÍĞÉ•ÍÕ±ÑÌ€ôÉ½½´¹É•ÍÕ±ÑÌì(€½¹ÍĞ¡…µÁ¥½¸€ôÉ•ÍÕ±ÑÌ¹¡…µÁ¥½¸€üüì¹¥­¹…µ”è€‹‡’êë‚Óš† ˆ°Í½É”è€Àôì(€…ÁÀ¹¥¹¹•É!Q50€ô€(€€€€ñÍ•Ñ¥½¸±…ÍÌô‰Í•¹”Í•¹”µİ¥‘”ˆø(€€€€€€ñ‘¥Ø±…ÍÌô‰…Í”µÑ½Á±¥¹”ˆøñ‘¥ØøñÀ±…ÍÌô‰•å•‰É½ÜˆùM1=Mğ½Àøñ Äû*¿’êë–ŞË¦:[–ºhğ½ Äøğ½‘¥ØøñÍÁ…¸±…ÍÌô‰…Í”µ¹Õµ‰•Èˆûš†#’îØ€Œ‘í•Í…Á•!Ñµ°¡É½½´¹½‘”¥ôğ½ÍÁ…¸øğ½‘¥Øø(€€€€€€ñ‘¥Ø±…ÍÌô‰É•ÍÕ±ĞµÉ¥ˆø(€€€€€€€€ñ…ÉÑ¥±”±…ÍÌô‰É•ÍÕ±Ğµ…Éˆ¥ô‰Í¡…É”µ…Éˆø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰É•ÍÕ±Ğµ‰ÕÉÍĞˆ…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆû‚Óš†#¾òğ½‘¥Øø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰½¹™•ÑÑ¤µ™¥•±ˆ…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆûŠr›Š^?ŠZËŠr›ŠZƒŠ^<ğ½‘¥Øø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰É••¥ÁĞµ‰±…ÍÑ•Èˆ…É¥„µ¡¥‘‘•¸ô‰ÑÉÕ”ˆøñÍÁ…¸±…ÍÌô‰‰±…ÍÑ•Èµ‰½‘äˆûfó– ğ½ÍÁ…¸øñÍÁ…¸±…ÍÌô‰‰±…ÍÑ•Èµ‰…ÉÉ•°ˆøğ½ÍÁ…¸øñˆù	9„ğ½ˆø‘íÉÉ…ä¹™É½´¡ì±•¹Ñ è€äô°€¡|°¥¹‘•à¤€ôø€ñ¤ÍÑå±”ôˆ´µÍ¡½Ğè‘í¥¹‘•áôˆûÂ~øğ½¤ù€¤¹©½¥¸ ˆˆ¥ôğ½‘¥Øø(€€€€€€€€€€ñÀ±…ÍÌô‰•å•‰É½ÜˆÍÑå±”ô‰½±½ÈèŒáÈÄÅˆù%Q%=90U1AI%Pğ½Àø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Õ±ÁÉ¥Ğµ±½­ÕÀˆø‘íÁ½ÉÑÉ…¥Ñ5…É­ÕÀ¡ì¹…µ”èÉ•ÍÕ±ÑÌ¹Õ±ÁÉ¥Ğ°…Ù…Ñ…ÉUÉ°èÉ•ÍÕ±ÑÌ¹Õ±ÁÉ¥ÑA½ÉÑÉ…¥Ğô°€‰Õ±ÁÉ¥ĞµÁ½ÉÑÉ…¥Ğˆ¥ôñÍÁ…¸û¢¶'šNk–F÷’â´ğ½ÍÁ…¸øğ½‘¥Øø(€€€€€€€€€€ñ ÄøñÍÁ…¸±…ÍÌô‰¡…µÁ¥½¸µ¹…µ”ˆø‘í•Í…Á•!Ñµ°¡É•ÍÕ±ÑÌ¹Õ±ÁÉ¥Ğ¥ôğ½ÍÁ…¸øñ‰È€¼û¢ªÃšb¿*¿’êèğ½ Äø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰•Ù¥‘•¹”µ¡…¥¸ˆ…É¥„µ±…‰•°ô‹–º3šVÓ¢¶'šNk¦> ˆø(€€€€€€€€€€€€‘íÉ•ÍÕ±ÑÌ¹•Ù¥‘•¹•¡…¥¸¹µ…À ¡¥Ñ•´°¥¹‘•à¤€ôø€ñÍÁ…¸øñˆø‘í¥¹‘•à€¬€Åôğ½ˆø‘í•Í…Á•!Ñµ°¡¥Ñ•´¥ôğ½ÍÁ…¸ù€¤¹©½¥¸ ˆˆ¥ô(€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰É•ÍÕ±Ğµµ•ÑÉ¥Ìˆø(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰É•ÍÕ±Ğµµ•ÑÉ¥ŒˆøñÍÑÉ½¹œø‘í•Í…Á•!Ñµ°¡¡…µÁ¥½¸¹¹¥­¹…µ”¥ôğ½ÍÑÉ½¹œøñÍµ…±°û¢ú›š†#–ƒ¢î4ƒ
-Ü€‘í¡…µÁ¥½¸¹Í½É•ôÁÑÌğ½Íµ…±°øğ½‘¥Øø(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰É•ÍÕ±Ğµµ•ÑÉ¥ŒˆøñÍÑÉ½¹œø‘íÉ•ÍÕ±ÑÌ¹…ÕÉ…åô”ğ½ÍÑÉ½¹œøñÍµ…±°û–£–Æ¶S–Â7:ğ½Íµ…±°øğ½‘¥Øø(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰É•ÍÕ±Ğµµ•ÑÉ¥ŒˆøñÍÑÉ½¹œø‘íÉ½½´¹Á±…å•ÉÌ¹±•¹Ñ¡ôğ½ÍÑÉ½¹œøñÍµ…±°û–—–Æ–×š:ˆğ½Íµ…±°øğ½‘¥Øø(€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€ñÀ±…ÍÌô‰…Í”µ™¥¹‘¥¹œˆø‘í•Í…Á•!Ñµ°¡É•ÍÕ±ÑÌ¹…Í•¥¹‘¥¹œ¥ôğ½Àø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰¡Õµ…¹¥Ñäµ¹½Ñ”É•ÍÕ±Ğµ¡Õµ…¹¥ÑäˆøñÍÁ…¸ù!U59%Qd€¼ƒ’êëšŸ¢–¾|ğ½ÍÁ…¸øñÍÑÉ½¹œûfó–£–>«¢÷–n{¶S3–k’ê’î¦êó7¾òoVÛ’ê/’êëj€ÄÀƒK¢«f÷¾ò3š&7–n{¶S3
-ë’î¦êó7ğ½ÍÑÉ½¹œøğ½‘¥Øø(€€€€€€€€€€‘í‘•µ½5½‘”€ü€ñ‘¥Ø±…ÍÌô‰‘•µ¼µÕ”™¥¹…°µÕ”ˆøñÍÁ…¸øĞèÄ×ŠLÔèÀÀƒ
-Ü%901%9ğ½ÍÁ…¸øñÍÑÉ½¹œû3š.ÿš:'fó–£¾ò3¦g–/¦+š"Ë–ÂÇ’â7–¶c–r£¾òor/–º3ÖCšzs¾ò3š¾?–/’êë¦÷šršÏš¾S¢ò’â/’â’ö7–B3’ê/4ğ½ÍÑÉ½¹œøğ½‘¥Øù€€è€ˆ‰ô(€€€€€€€€€€ñÍ•Ñ¥½¸±…ÍÌô‰¹••‘ÌµÍ•Ñ¥½¸ˆ…É¥„µ±…‰•°ô‹’êS–’Ÿ¦ršÆ–Æ“š²‡–Â7œˆø(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰¹••‘Ìµ¡•…‘¥¹œˆøñÍÁ…¸ù]!dA=A1Iğ½ÍÁ…¸øñÍÑÉ½¹œû¦g’â7–>«šb¿–r£2s’êë¾òk’êS–Æ“’êëšŸ–ç–ó¦÷šr'–n{–‚Äğ½ÍÑÉ½¹œøğ½‘¥Øø(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰¹••‘ÌµÁåÉ…µ¥ˆø‘íÉ•ÍÕ±ÑÌ¹¹••‘AåÉ…µ¥¹µ…À ¡¹••°¥¹‘•à¤€ôø€ñ‘¥Ø±…ÍÌô‰¹••µÑ¥•È¹••´‘í¥¹‘•à€¬€ÅôˆøñÍÑÉ½¹œø‘í•Í…Á•!Ñµ°¡¹••¹±•Ù•°¥ôğ½ÍÑÉ½¹œøñÍÁ…¸ø‘í•Í…Á•!Ñµ°¡¹••¹Ù…±Õ”¥ôğ½ÍÁ…¸øğ½‘¥Øù€¤¹©½¥¸ ˆˆ¥ôğ½‘¥Øø(€€€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰É•™±•Ñ¥½¸µ…ÉˆøñÍÁ…¸ùM1µQU1%iQ%=8ğ½ÍÁ…¸øñÍÑÉ½¹œûš"G’î—
-ë¢«–ŞÇ¾òÿ¾òÿ¾òofó–£¦†¿’ë¾òÿ¾òÿ¾òoš:—’â/’úš"GšÏšRç¾òÿ¾òÿğ½ÍÑÉ½¹œøğ½‘¥Øø(€€€€€€€€€€ğ½Í•Ñ¥½¸ø(€€€€€€€€ğ½…ÉÑ¥±”ø(€€€€€€€€ñ…Í¥‘”±…ÍÌô‰Á…¹•°ˆø(€€€€€€€€€€ñÀ±…ÍÌô‰•å•‰É½Üˆù9aPMğ½Àø(€€€€€€€€€€ñ Èû’öƒrj’ê¢–B3’ê/–^;¾ò|ğ½ Èø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰Í¡…É”µ¡½½¬ˆøñÍÑÉ½¹œû’â/’â–Æj¢ªc¦’0ğ½ÍÑÉ½¹œøñÍÁ…¸û3’öƒr/–"Ãjšb¿’êë¢¢·¾ò3fó–£¢¢c–ú_jšb¿š^—–âã4ğ½ÍÁ…¸øğ½‘¥Øø(€€€€€€€€€€ñÀ±…ÍÌô‰Á…¹•°µ¹½Ñ”ˆû–"’ê¯j’â7šb¿¢ªÃ¢Š¯–³¦Z/¢fW–"G¾ò3¢3šb¿šVÓ¦ZO¢ú›–³–º“–Â7–B3’â–/’êëj–6Ã¢Æ‡¾ò3–š’öW¢Š¯’â–ò×–ò×fó–£şï¢ö'ğ½Àø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰™¥¹…°µÍÕÍÁ•Ğµ±¥ÍĞˆøñÍÑÉ½¹œû–no–B7šrÖ–®3ZG’êèğ½ÍÑÉ½¹œø‘íÉ•¹‘•ÉMÕÍÁ•ÑÌ¡É•ÍÕ±ÑÌ¹™¥¹…±MÕÍÁ•ÑÌ¥ôğ½‘¥Øø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰‰ÕÑÑ½¸µÉ½Üˆø(€€€€€€€€€€€€‘íÉ½½´¹¥Í!½ÍĞ€ü€ñ‰ÕÑÑ½¸±…ÍÌô‰ÁÉ¥µ…Éäµ‰ÕÑÑ½¸ˆ‘…Ñ„µ…Ñ¥½¸ô‰É•Í•Ğµ…Í”ˆû¦Z/šZÃš†#’îØğ½‰ÕÑÑ½¸ù€€è€ˆ‰ô(€€€€€€€€€€€€ñ‰ÕÑÑ½¸±…ÍÌô‰Í•½¹‘…Éäµ‰ÕÑÑ½¸ˆ‘…Ñ„µ…Ñ¥½¸ô‰Í¡…É”µÉ•ÍÕ±Ğˆû–"’ê¯š"Ãâøğ½‰ÕÑÑ½¸ø(€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€€€ñ‘¥Ø±…ÍÌô‰É…¹¬µ±¥ÍĞˆÍÑå±”ô‰µ…É¥¸µÑ½ÀèÈÙÁàˆø(€€€€€€€€€€€€‘íÉ½½´¹±•…‘•É‰½…É¹Í±¥” À°€Ô¤¹µ…À ¡Á±…å•È°¥¹‘•à¤€ôø€ñ‘¥Ø±…ÍÌô‰É…¹¬µÉ½ÜˆøñÍÁ…¸±…ÍÌô‰É…¹¬µ¹Õµ‰•ÈˆøŒ‘í¥¹‘•à€¬€Åôğ½ÍÁ…¸øñÍÑÉ½¹œø‘í•Í…Á•!Ñµ°¡Á±…å•È¹¹¥­¹…µ”¥ôğ½ÍÑÉ½¹œøñÍÁ…¸±…ÍÌô‰É…¹¬µÍ½É”ˆø‘íÁ±…å•È¹Í½É•ôğ½ÍÁ…¸øğ½‘¥Øù€¤¹©½¥¸ ˆˆ¥ô(€€€€€€€€€€ğ½‘¥Øø(€€€€€€€€ğ½…Í¥‘”ø(€€€€€€ğ½‘¥Øø(€€€€ğ½Í•Ñ¥½¸ø(€€ì)ô()™Õ¹Ñ¥½¸É•¹‘•ÉÉÉ½È ¤ì(€…ÁÀ¹¥¹¹•É!Q50€ô€(€€€€ñÍ•Ñ¥½¸±…ÍÌô‰Í•¹”ˆøñ‘¥Ø±…ÍÌô‰•ÉÉ½Èµ…ÉˆøñÀ±…ÍÌô‰•å•‰É½ÜˆùMII=Hğ½Àøñ Äû¦g–/š†#’îÛšZßŞk’êğ½ ÄøñÀø‘í•Í…Á•!Ñµ°¡ÍÑ…Ñ”¹•ÉÉ½È€üü€‹¢®/–n{–"Ã¦š[¦‚¦7šZÃ®/š†#ˆ¥ôğ½Àøñ„±…ÍÌô‰ÁÉ¥µ…Éäµ‰ÕÑÑ½¸ˆÍÑå±”ô‰‘¥ÍÁ±…äé¥¹±¥¹”µÉ¥íÁ±…”µ¥Ñ•µÌé•¹Ñ•ÈíÑ•áĞµ‘•½É…Ñ¥½¸é¹½¹”ˆ¡É•˜ôˆ½‘•Ñ•Ñ¥Ù”¹¡Ñµ°ˆû–n{–"Ã¢ªÃšb¿*¿’êèğ½„øğ½‘¥Øøğ½Í•Ñ¥½¸ø(€€ì)ô()™Õ¹Ñ¥½¸É•¹‘•È ¤ì(€ÕÁ‘…Ñ•!•…‘•È ¤ì(€‘½Õµ•¹Ğ¹‰½‘ä¹‘…Ñ…Í•Ğ¹Á¡…Í”€ôÍÑ…Ñ”¹É½½´ü¹Á¡…Í”€üü€¡ÍÑ…Ñ”¹Ù¥•Ü€ôôô€‰©½¥¸ˆ€ü€‰©½¥¸ˆ€è€‰¡½µ”ˆ¤ì(€‘½Õµ•¹Ğ¹‰½‘ä¹‘…Ñ…Í•Ğ¹…Ğ€ôÍÑ…Ñ”¹É½½´ü¹ÅÕ•ÍÑ¥½¸€ü…Ñ±…ÍÌ¡ÍÑ…Ñ”¹É½½´¹ÅÕ•ÍÑ¥½¸¤€è€‰¹½¹”ˆì(€¥˜€¡ÍÑ…Ñ”¹•ÉÉ½È¤É•ÑÕÉ¸É•¹‘•ÉÉÉ½È ¤ì(€¥˜€ …ÍÑ…Ñ”¹½‘”ñğÍÑ…Ñ”¹Ù¥•Ü€ôôô€‰¡½µ”ˆ¤É•ÑÕÉ¸É•¹‘•É!½µ” ¤ì(€¥˜€¡ÍÑ…Ñ”¹Ù¥•Ü€ôôô€‰©½¥¸ˆ€˜˜€…ÍÑ…Ñ”¹Á±…å•É-•ä¤É•ÑÕÉ¸É•¹‘•É)½¥¸ ¤ì(€¥˜€ …ÍÑ…Ñ”¹É½½´¤É•ÑÕÉ¸ì(€¥˜€¡ÍÑ…Ñ”¹É½½´¹Á¡…Í”€ôôô€‰±½‰‰äˆ¤É•ÑÕÉ¸É•¹‘•É1½‰‰ä ¤ì(€¥˜€¡ÍÑ…Ñ”¹É½½´¹Á¡…Í”€ôôô€‰ÅÕ•ÍÑ¥½¸ˆ¤É•ÑÕÉ¸É•¹‘•ÉEÕ•ÍÑ¥½¸ ¤ì(€¥˜€¡ÍÑ…Ñ”¹É½½´¹Á¡…Í”€ôôô€‰É•Ù•…°ˆ¤É•ÑÕÉ¸É•¹‘•ÉI•Ù•…° ¤ì(€¥˜€¡ÍÑ…Ñ”¹É½½´¹Á¡…Í”€ôôô€‰±•…‘•É‰½…Éˆ¤É•ÑÕÉ¸É•¹‘•É1•…‘•É‰½…É ¤ì(€¥˜€¡ÍÑ…Ñ”¹É½½´¹Á¡…Í”€ôôô€‰É•ÍÕ±ÑÌˆ¤É•ÑÕÉ¸É•¹‘•ÉI•ÍÕ±ÑÌ ¤ì)ô()…Íå¹Œ™Õ¹Ñ¥½¸Íå¹I½½´¡ìÅÕ¥•Ğ€ô™…±Í”ô€ôíô¤ì(€¥˜€ …ÍÑ…Ñ”¹½‘”¤É•ÑÕÉ¸ì(€½¹ÍĞÅÕ•Éä€ô¹•ÜUI1M•…É¡A…É…µÌ ¤ì(€¥˜€¡ÍÑ…Ñ”¹Á±…å•É-•ä¤ÅÕ•Éä¹Í•Ğ ‰Á±…å•Èˆ°ÍÑ…Ñ”¹Á±…å•É-•ä¤ì(€¥˜€¡ÍÑ…Ñ”¹¡½ÍÑ-•ä¤ÅÕ•Éä¹Í•Ğ ‰¡½ÍĞˆ°ÍÑ…Ñ”¹¡½ÍÑ-•ä¤ì(€ÑÉäì(€€€½¹ÍĞÁÉ•Ù¥½ÕÍI½½´€ôÍÑ…Ñ”¹É½½´€ü)M=8¹ÍÑÉ¥¹¥™ä¡ÍÑ…Ñ”¹É½½´¤€è€ˆˆì(€€€½¹ÍĞ¹•áÑI½½´€ô…İ…¥ĞÉ•ÅÕ•ÍĞ¡€½…Á¤½‘•Ñ•Ñ¥Ù”½É½½µÌ¼‘íÍÑ…Ñ”¹½‘•ôü‘íÅÕ•Éåõ€¤ì(€€€½¹ÍĞÉ½½µ¡…¹•€ôÁÉ•Ù¥½ÕÍI½½´€„ôô)M=8¹ÍÑÉ¥¹¥™ä¡¹•áÑI½½´¤ì(€€€ÍÑ…Ñ”¹É½½´€ô¹•áÑI½½´ì(€€€ÍÑ…Ñ”¹•ÉÉ½È€ô¹Õ±°ì(€€€¥˜€ …ÅÕ¥•ĞñğÉ½½µ¡…¹•¤É•¹‘•È ¤ì(€ô…Ñ €¡•ÉÉ½È¤ì(€€€¥˜€ …ÅÕ¥•Ğñğ•ÉÉ½È¹½‘”€ôôô€‰…Í•}¹½Ñ}™½Õ¹ˆ¤ì(€€€€€ÍÑ…Ñ”¹•ÉÉ½È€ô•ÉÉ½É5•ÍÍ…•Ím•ÉÉ½È¹½‘•t€üü€‹šj¯šf‡šÎW¦’â+š†#’îÛˆì(€€€€€É•¹‘•È ¤ì(€€€ô(€ô)ô()™Õ¹Ñ¥½¸ÕÁ‘…Ñ•EÕ•ÍÑ¥½¹±½¬ ¤ì(€¥˜€¡ÍÑ…Ñ”¹É½½´ü¹Á¡…Í”€„ôô€‰ÅÕ•ÍÑ¥½¸ˆ¤É•ÑÕÉ¸ì(€½¹ÍĞÉ•µ…¥¹¥¹œ€ôÍ•½¹‘Í1•™Ğ¡ÍÑ…Ñ”¹É½½´¤ì(€½¹ÍĞÁÉ½É•ÍÌ€ô5…Ñ ¹µ…à À°5…Ñ ¹µ¥¸ ÄÀÀ°€¡É•µ…¥¹¥¹œ€¼€ÄÀ¤€¨€ÄÀÀ¤¤ì(€½¹ÍĞÑ¥µ•ÉY…±Õ”€ô‘½Õµ•¹Ğ¹ÅÕ•ÉåM•±•Ñ½È ˆ¹Ñ¥µ•ÈµÙ…±Õ”ˆ¤ì(€½¹ÍĞÑ¥µ•ÉI¥¹œ€ô‘½Õµ•¹Ğ¹ÅÕ•ÉåM•±•Ñ½È ˆ¹Ñ¥µ•ÈµÉ¥¹œˆ¤ì(€½¹ÍĞÁ±…å•ÉMÑ…ÑÕÌ€ô‘½Õµ•¹Ğ¹ÅÕ•ÉåM•±•Ñ½È ˆ¹Á±…å•ÈµÍÑ…ÑÕÌé¹½Ğ ¹±½­•¤ˆ¤ì(€¥˜€¡Ñ¥µ•ÉY…±Õ”¤Ñ¥µ•ÉY…±Õ”¹Ñ•áÑ½¹Ñ•¹Ğ€ôÉ•µ…¥¹¥¹œì(€¥˜€¡Ñ¥µ•ÉI¥¹œ¤Ñ¥µ•ÉI¥¹œ¹ÍÑå±”¹Í•ÑAÉ½Á•ÉÑä ˆ´µÁÉ½É•ÍÌˆ°€‘íÁÉ½É•ÍÍô•€¤ì(€¥˜€¡Á±…å•ÉMÑ…ÑÕÌ¤Á±…å•ÉMÑ…ÑÕÌ¹Ñ•áÑ½¹Ñ•¹Ğ€ôƒ–&§¦’`€‘íÉ•µ…¥¹¥¹ôƒHƒ
-Üƒ¦ã’â’î÷–>’úm€ì)ô()…Íå¹Œ™Õ¹Ñ¥½¸É•…Ñ•…Í” ¤ì(€¥˜€¡ÍÑ…Ñ”¹‰ÕÍä¤É•ÑÕÉ¸ì(€ÍÑ…Ñ”¹‰ÕÍä€ôÑÉÕ”ì(€ÑÉäì(€€€½¹ÍĞ‘…Ñ„€ô…İ…¥ĞÉ•ÅÕ•ÍĞ ˆ½…Á¤½‘•Ñ•Ñ¥Ù”½É½½µÌˆ°ìµ•Ñ¡½è€‰A=MPˆ°‰½‘äè€‰íôˆô¤ì(€€€ÍÑ…Ñ”¹¡½ÍÑ-•ä€ô‘…Ñ„¹¡½ÍÑ-•äì(€€€ÍÑ…Ñ”¹É½½´€ô‘…Ñ„¹É½½´ì(€€€±½…±MÑ½É…”¹Í•Ñ%Ñ•´¡¡½ÍÑMÑ½É…•-•ä¡‘…Ñ„¹É½½´¹½‘”¤°‘…Ñ„¹¡½ÍÑ-•ä¤ì(€€€Í•ÑI½ÕÑ”¡‘…Ñ„¹É½½´¹½‘”°€‰¡½ÍĞˆ¤ì(€€€É•¹‘•È ¤ì(€ô…Ñ ì(€€€¹½Ñ¥™ä ‹®/š†#–’ÇšV_¾ò3¢®/–7¢¦›’âš²‡ˆ¤ì(€ô™¥¹…±±äì(€€€ÍÑ…Ñ”¹‰ÕÍä€ô™…±Í”ì(€ô)ô()…Íå¹Œ™Õ¹Ñ¥½¸¡½ÍÑÑ¥½¸¡…Ñ¥½¸¤ì(€¥˜€ …ÍÑ…Ñ”¹¡½ÍÑ-•äñğÍÑ…Ñ”¹‰ÕÍä¤É•ÑÕÉ¸ì(€ÍÑ…Ñ”¹‰ÕÍä€ôÑÉÕ”ì(€ÑÉäì(€€€ÍÑ…Ñ”¹É½½´€ô…İ…¥ĞÉ•ÅÕ•ÍĞ¡€½…Á¤½‘•Ñ•Ñ¥Ù”½É½½µÌ¼‘íÍÑ…Ñ”¹½‘•ô¼‘í…Ñ¥½¹õ€°ì(€€€€€µ•Ñ¡½è€‰A=MPˆ°(€€€€€‰½‘äè)M=8¹ÍÑÉ¥¹¥™ä¡ì¡½ÍÑ-•äèÍÑ…Ñ”¹¡½ÍÑ-•äô¤°(€€€ô¤ì(€€€É•¹‘•È ¤ì(€ô…Ñ €¡•ÉÉ½È¤ì(€€€¹½Ñ¥™ä¡•ÉÉ½É5•ÍÍ…•Ím•ÉÉ½È¹½‘•t€üü€‹šN7’ös–’ÇšV_¾ò3¢®/–7¢¦›’âš²‡ˆ¤ì(€ô™¥¹…±±äì(€€€ÍÑ…Ñ”¹‰ÕÍä€ô™…±Í”ì(€ô)ô()…Íå¹Œ™Õ¹Ñ¥½¸©½¥¹…Í”¡¹¥­¹…µ”¤ì(€¥˜€¡ÍÑ…Ñ”¹‰ÕÍä¤É•ÑÕÉ¸ì(€ÍÑ…Ñ”¹‰ÕÍä€ôÑÉÕ”ì(€ÑÉäì(€€€½¹ÍĞ‘…Ñ„€ô…İ…¥ĞÉ•ÅÕ•ÍĞ¡€½…Á¤½‘•Ñ•Ñ¥Ù”½É½½µÌ¼‘íÍÑ…Ñ”¹½‘•ô½©½¥¹€°ì(€€€€€µ•Ñ¡½è€‰A=MPˆ°(€€€€€‰½‘äè)M=8¹ÍÑÉ¥¹¥™ä¡ì¹¥­¹…µ”ô¤°(€€€ô¤ì(€€€ÍÑ…Ñ”¹Á±…å•É-•ä€ô‘…Ñ„¹Á±…å•É-•äì(€€€ÍÑ…Ñ”¹Á±…å•É9…µ”€ô¹¥­¹…µ”¹ÑÉ¥´ ¤ì(€€€ÍÑ…Ñ”¹É½½´€ô‘…Ñ„¹É½½´ì(€€€±½…±MÑ½É…”¹Í•Ñ%Ñ•´¡Á±…å•ÉMÑ½É…•-•ä¡ÍÑ…Ñ”¹½‘”¤°‘…Ñ„¹Á±…å•É-•ä¤ì(€€€±½…±MÑ½É…”¹Í•Ñ%Ñ•´¡‘•Ñ•Ñ¥Ù”µÁ±…å•Èµ¹…µ”´‘íÍÑ…Ñ”¹½‘•õ€°ÍÑ…Ñ”¹Á±…å•É9…µ”¤ì(€€€ÍÑ…Ñ”¹Ù¥•Ü€ô€‰Á±…äˆì(€€€±½…Ñ¥½¸¹¡…Í €ô€‰Á±…äˆì(€€€É•¹‘•È ¤ì(€ô…Ñ €¡•ÉÉ½È¤ì(€€€¹½Ñ¥™ä¡•ÉÉ½É5•ÍÍ…•Ím•ÉÉ½È¹½‘•t€üü€‹–*ƒ–—š†#’îÛ–’ÇšV_ˆ¤ì(€ô™¥¹…±±äì(€€€ÍÑ…Ñ”¹‰ÕÍä€ô™…±Í”ì(€ô)ô()…Íå¹Œ™Õ¹Ñ¥½¸…¹Íİ•ÉEÕ•ÍÑ¥½¸¡¡½¥”¤ì(€¥˜€ …ÍÑ…Ñ”¹Á±…å•É-•äñğÍÑ…Ñ”¹É½½´ü¹Ù¥•İ•É¹Íİ•É•ñğÍÑ…Ñ”¹‰ÕÍä¤É•ÑÕÉ¸ì(€ÍÑ…Ñ”¹‰ÕÍä€ôÑÉÕ”ì(€ÑÉäì(€€€ÍÑ…Ñ”¹É½½´€ô…İ…¥ĞÉ•ÅÕ•ÍĞ¡€½…Á¤½‘•Ñ•Ñ¥Ù”½É½½µÌ¼‘íÍÑ…Ñ”¹½‘•ô½…¹Íİ•É€°ì(€€€€€µ•Ñ¡½è€‰A=MPˆ°(€€€€€‰½‘äè)M=8¹ÍÑÉ¥¹¥™ä¡ìÁ±…å•É-•äèÍÑ…Ñ”¹Á±…å•É-•ä°¡½¥”ô¤°(€€€ô¤ì(€€€É•¹‘•È ¤ì(€ô…Ñ €¡•ÉÉ½È¤ì(€€€¹½Ñ¥™ä¡•ÉÉ½É5•ÍÍ…•Ím•ÉÉ½È¹½‘•t€üü€‹¢¶'¢¦{¦–ë–’ÇšV_ˆ¤ì(€ô™¥¹…±±äì(€€€ÍÑ…Ñ”¹‰ÕÍä€ô™…±Í”ì(€ô)ô()…Íå¹Œ™Õ¹Ñ¥½¸½ÁåQ•áĞ¡Ñ•áĞ°µ•ÍÍ…”¤ì(€ÑÉäì(€€€…İ…¥Ğ¹…Ù¥…Ñ½È¹±¥Á‰½…É¹İÉ¥Ñ•Q•áĞ¡Ñ•áĞ¤ì(€€€¹½Ñ¥™ä¡µ•ÍÍ…”¤ì(€ô…Ñ ì(€€€¹½Ñ¥™ä ‹¢®/¦Vßš2'ÚË–vš&/–.W¢’¢÷ˆ¤ì(€ô)ô()…Íå¹Œ™Õ¹Ñ¥½¸Í¡…É•I•ÍÕ±Ğ ¤ì(€½¹ÍĞ¡…µÁ¥½¸€ôÍÑ…Ñ”¹É½½´ü¹É•ÍÕ±ÑÌü¹¡…µÁ¥½¸ü¹¹¥­¹…µ”€üü€‹¦š[–â·–×š:ˆˆì(€½¹ÍĞÑ•áĞ€ôƒš†#’îØ€Œ‘íÍÑ…Ñ”¹½‘•ôƒ–ŞËÖCš†#¾òh‘í¡…µÁ¥½¹ôƒš"C
-ë¢ú›š†#–ƒ¢î7’öƒr/–"Ãjšb¿’êë¢¢·¾ò3fó–£¢¢c–ú_jšb¿š^—–âã	€ì(€¥˜€¡¹…Ù¥…Ñ½È¹Í¡…É”¤ì(€€€ÑÉäì…İ…¥Ğ¹…Ù¥…Ñ½È¹Í¡…É”¡ìÑ¥Ñ±”è€‰-!==Pƒ\QQ%Yƒ\%9Y=%¾ös¢ªÃšb¿*¿’êë¾ò|ˆ°Ñ•áĞ°ÕÉ°è…Í•UÉ°¡ÍÑ…Ñ”¹½‘”¤ô¤ìÉ•ÑÕÉ¸ìô…Ñ ì€¼¨ÕÍ•È…¹•±±•€¨¼ô(€ô(€…İ…¥Ğ½ÁåQ•áĞ¡€‘íÑ•áÑô€‘í…Í•UÉ°¡ÍÑ…Ñ”¹½‘”¥õ€°€‹š"ÃâûšZš†#–ŞË¢’¢ôˆ¤ì)ô()‘½Õµ•¹Ğ¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ‰ÍÕ‰µ¥Ğˆ°€¡•Ù•¹Ğ¤€ôøì(€½¹ÍĞ™½É´€ô•Ù•¹Ğ¹Ñ…É•Ğ¹±½Í•ÍĞ ‰™½É´ˆ¤ì(€¥˜€ …™½É´¤É•ÑÕÉ¸ì(€•Ù•¹Ğ¹ÁÉ•Ù•¹Ñ•™…Õ±Ğ ¤ì(€½¹ÍĞ‘…Ñ„€ô¹•Ü½Éµ…Ñ„¡™½É´¤ì(€¥˜€¡™½É´¹‘…Ñ…Í•Ğ¹™½É´€ôôô€‰•¹Ñ•Èµ½‘”ˆ¤ì(€€€½¹ÍĞ½‘”€ôMÑÉ¥¹œ¡‘…Ñ„¹•Ğ ‰½‘”ˆ¤€üü€ˆˆ¤¹É•Á±…” ½q½œ°€ˆˆ¤¹Í±¥” À°€Ğ¤ì(€€€¥˜€¡½‘”¹±•¹Ñ €„ôô€Ğ¤É•ÑÕÉ¸¹½Ñ¥™ä ‹¢®/¢òã–”€Ğƒ’ö7š†#’îÛŞ£¢fˆ¤ì(€€€±½…Ñ¥½¸¹¡É•˜€ô…Í•UÉ°¡½‘”°€‰©½¥¸ˆ¤ì(€ô(€¥˜€¡™½É´¹‘…Ñ…Í•Ğ¹™½É´€ôôô€‰©½¥¸µ…Í”ˆ¤©½¥¹…Í”¡MÑÉ¥¹œ¡‘…Ñ„¹•Ğ ‰¹¥­¹…µ”ˆ¤€üü€ˆˆ¤¤ì)ô¤ì()‘½Õµ•¹Ğ¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ‰±¥¬ˆ°€¡•Ù•¹Ğ¤€ôøì(€½¹ÍĞÑ…É•Ğ€ô•Ù•¹Ğ¹Ñ…É•Ğ¹±½Í•ÍĞ ‰m‘…Ñ„µ…Ñ¥½¹t±m‘…Ñ„µ…¹Íİ•Étˆ¤ì(€¥˜€ …Ñ…É•Ğ¤É•ÑÕÉ¸ì(€¥˜€¡Ñ…É•Ğ¹‘…Ñ…Í•Ğ¹…¹Íİ•È¤É•ÑÕÉ¸…¹Íİ•ÉEÕ•ÍÑ¥½¸¡Ñ…É•Ğ¹‘…Ñ…Í•Ğ¹…¹Íİ•È¤ì(€½¹ÍĞ…Ñ¥½¹Ì€ôì(€€€€‰É•…Ñ”µ…Í”ˆèÉ•…Ñ•…Í”°(€€€€‰™½ÕÌµ©½¥¸ˆè€ ¤€ôø‘½Õµ•¹Ğ¹ÅÕ•ÉåM•±•Ñ½È ˆ¡½µ”µ½‘”ˆ¤ü¹™½ÕÌ ¤°(€€€€‰½Áäµ±¥¹¬ˆè€ ¤€ôø½ÁåQ•áĞ¡…Í•UÉ°¡ÍÑ…Ñ”¹½‘”¤°€‹¦
-¢®/¦ÖC–ŞË¢’¢ôˆ¤°(€€€€‰™¥±°µ‘•µ¼ˆè€ ¤€ôø¡½ÍÑÑ¥½¸ ‰™¥±°ˆ¤°(€€€€‰ÍÑ…ÉĞµ…Í”ˆè€ ¤€ôø¡½ÍÑÑ¥½¸ ‰ÍÑ…ÉĞˆ¤°(€€€€‰…‘Ù…¹”ˆè€ ¤€ôø¡½ÍÑÑ¥½¸ ‰…‘Ù…¹”ˆ¤°(€€€€‰É•Í•Ğµ…Í”ˆè€ ¤€ôø¡½ÍÑÑ¥½¸ ‰É•Í•Ğˆ¤°(€€€€‰Í¡…É”µÉ•ÍÕ±ĞˆèÍ¡…É•I•ÍÕ±Ğ°(€ôì(€…Ñ¥½¹ÍmÑ…É•Ğ¹‘…Ñ…Í•Ğ¹…Ñ¥½¹tü¸ ¤ì)ô¤ì()İ¥¹‘½Ü¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ‰¡…Í¡¡…¹”ˆ°€ ¤€ôøì(€ÍÑ…Ñ”¹Ù¥•Ü€ô±½…Ñ¥½¸¹¡…Í ¹É•Á±…” ˆŒˆ°€ˆˆ¤ñğ€¡ÍÑ…Ñ”¹½‘”€ü€‰©½¥¸ˆ€è€‰¡½µ”ˆ¤ì(€É•¹‘•È ¤ì)ô¤ì()İ¥¹‘½Ü¹…‘‘Ù•¹Ñ1¥ÍÑ•¹•È ‰¥¹Ù½¥”µ¥¹ÑÉ¼µ•¹‘•ˆ°€ ¤€ôøì(€¥˜€ …¡½ÍÑ•‘9½5½Ñ¥½¸€˜˜€…‘•µ½5½‘”¤É•ÑÕÉ¸ì(€Ñ•ÍÑ5½‘”€ôÑÉÕ”ì(€‘½Õµ•¹Ğ¹‘½Õµ•¹Ñ±•µ•¹Ğ¹‘…Ñ…Í•Ğ¹Ñ•ÍÑ5½‘”€ô€‰ÑÉÕ”ˆì(€É•¹‘•È ¤ì)ô¤ì()É•¹‘•È ¤ì)¥˜€¡ÍÑ…Ñ”¹½‘”¤Íå¹I½½´ ¤ì)Í•Ñ%¹Ñ•ÉÙ…°  ¤€ôøÍå¹I½½´¡ìÅÕ¥•ĞèÑÉÕ”ô¤°€äÀÀ¤ì)Í•Ñ%¹Ñ•ÉÙ…°¡ÕÁ‘…Ñ•EÕ•ÍÑ¥½¹±½¬°€ÈÔÀ¤ì(
+  app.innerHTML = `
+    <section class="scene join-scene">
+      <div class="join-card">
+        <div class="waiting-illustration" aria-hidden="true">âŒ•</div>
+        <div class="waiting-tape" aria-hidden="true">EVIDENCE SEALED Â· è­‰ç‰©å°å­˜ä¸­</div>
+        <p class="eyebrow">CASE #${escapeHtml(state.code)}</p>
+        <h1>${escapeHtml(state.playerName ?? "åµæ¢")}ï¼Œå ±åˆ°å®Œæˆ</h1>
+        <p>${state.room?.viewerIdentity ? `ä½ ä»¥ã€Œ${escapeHtml(state.room.viewerIdentity)}ã€çš„èº«åˆ†æ‡‰è¨Šâ€”â€”ç¬¬äºŒå¹•è‹¥è¢«å‚³å–šï¼Œè«‹ç…§è¢å¹•å”¸å‡ºå£ä¾›ã€‚` : "æ¡ˆä»¶è³‡æ–™æ­£åœ¨å°å­˜ã€‚ç­‰ä¸»æŒäººæŒ‰ä¸‹ã€Œé–‹å§‹è¾¦æ¡ˆã€ï¼Œç¬¬ä¸€å¼µæ±¡æ¼¬ç™¼ç¥¨å°±æœƒå‡ºç¾ã€‚"}</p>
+        <div class="waiting-list">${(state.room?.players ?? []).map((player) => `<span class="waiting-chip">${escapeHtml(player.nickname)}</span>`).join("")}</div>
+        <p><strong>${state.room?.players?.length ?? 0} / 36</strong> ä½åµæ¢å·²å…¥å±€</p>
+      </div>
+    </section>
+  `;
+}
+
+function secondsLeft(room) {
+  if (!room.phaseEndsAt) return 0;
+  return Math.max(0, Math.ceil((room.phaseEndsAt - Date.now()) / 1000));
+}
+
+function phaseProgress(room) {
+  if (!room.phaseEndsAt || !room.phaseStartedAt) return 0;
+  const total = room.phaseEndsAt - room.phaseStartedAt;
+  const left = Math.max(0, room.phaseEndsAt - Date.now());
+  return total > 0 ? Math.max(0, Math.min(100, (left / total) * 100)) : 0;
+}
+
+function renderOptions(question, { interactive = false, selected = null, reveal = false } = {}) {
+  return question.choices.map((choice, index) => {
+    const correct = reveal && choice.id === question.correctChoice;
+    const wrong = reveal && choice.id !== question.correctChoice;
+    const classes = [selected === choice.id ? "selected" : "", correct ? "correct" : "", wrong ? "wrong" : ""].filter(Boolean).join(" ");
+    return `
+      <button class="option-button ${classes} ${choice.name ? "has-portrait" : ""}" data-letter="${String.fromCharCode(65 + index)}" ${interactive ? `data-answer="${escapeHtml(choice.id)}"` : "disabled"}>
+        ${choice.name ? portraitMarkup(choice, "option-portrait") : ""}
+        <span class="option-copy">${choice.name ? `<strong>${escapeHtml(choice.name)}</strong>` : ""}<span>${escapeHtml(choice.label)}</span>${choice.suspect ? `<small class="suspect-tag">å«Œç–‘åå–®</small>` : ""}</span>
+      </button>
+    `;
+  }).join("");
+}
+
+function renderPrompt(question) {
+  if (!question.parts?.lines?.length) return `<h1>${escapeHtml(question.parts?.ask ?? question.prompt)}</h1>`;
+  return `
+    <div class="prompt-block">
+      ${question.parts.lines.map((line) => `<div class="clue-line"><small>${escapeHtml(line.label)}</small><strong>${escapeHtml(line.value)}</strong></div>`).join("")}
+      <p class="prompt-ask">${escapeHtml(question.parts.ask)}</p>
+    </div>
+  `;
+}
+
+function renderTimelineStops(question) {
+  return `<div class="timeline-route" aria-label="æ¡ˆç™¼æ—¥è¡Œå‹•ç·š">
+    ${question.stops.map((stop, index) => `
+      <div class="route-stop" style="--stop:${index}">
+        <b>${escapeHtml(stop.time)}</b>
+        <strong>${escapeHtml(stop.brand)}</strong>
+        <span>NT$ ${escapeHtml(String(stop.amt))}</span>
+      </div>
+    `).join("")}
+  </div>`;
+}
+
+function renderShowcase(question, room) {
+  if (question.kind === "intro") {
+    app.innerHTML = `
+      <section class="scene scene-wide ${actClass(question)}">
+        <div class="question-card showcase-card intro-card">
+          <p class="eyebrow">ACT ${question.actNumber} / 3</p>
+          <div class="intro-act-number" aria-hidden="true">${["å£¹", "è²³", "åƒ"][question.actNumber - 1]}</div>
+          <h1>${escapeHtml(question.label)}</h1>
+          <p class="intro-body">${emphasize(question.prompt)}</p>
+          ${room.isHost ? `<div class="button-row" style="margin-top:24px"><button class="primary-button" data-action="advance">é–‹å§‹${["ç¬¬ä¸€å¹•", "ç¬¬äºŒå¹•", "ç¬¬ä¸‰å¹•"][question.actNumber - 1]}</button></div>` : `<p class="panel-note">ç­‰ä¸»æŒäººé–‹å§‹${["ç¬¬ä¸€å¹•", "ç¬¬äºŒå¹•", "ç¬¬ä¸‰å¹•"][question.actNumber - 1]}â€¦</p>`}
+        </div>
+      </section>
+    `;
+    return;
+  }
+  const isClue = question.kind === "clue";
+  app.innerHTML = `
+    <section class="scene scene-wide ${actClass(question)}">
+      <div class="question-card showcase-card">
+        <div class="question-progress"><span class="question-label">${escapeHtml(question.label)}</span><span>${escapeHtml(question.act)}</span></div>
+        ${renderCaseProgress(room)}
+        ${isClue ? `
+          <div class="clue-card">
+            <span class="reveal-stamp">æ©Ÿå¯†</span>
+            <p class="eyebrow">FINAL CLUE</p>
+            <h1>${escapeHtml(question.prompt)}</h1>
+            <p>ä¸‹ä¸€è¼ªæ˜¯æœ€å¾Œä¸‹æ³¨ã€‚ç·šç´¢å·²äº®ï¼Œè³ ç‡ä¸‹é™ï¼šæŠ¼ä¸­ 150 åˆ†ã€‚</p>
+          </div>` : `
+          <h1>${escapeHtml(question.prompt)}</h1>
+          ${renderTimelineStops(question)}
+          <p class="panel-note">è¡Œå‹•ç·šæ’­å®Œè‡ªå‹•é–‹ç›¤ï¼šé¦–è¼ªä¸‹æ³¨ï¼ŒæŠ¼ä¸­çœŸå…‡ 400 åˆ†ã€‚</p>`}
+        ${room.isHost ? `<div class="button-row" style="margin-top:20px"><button class="primary-button" data-action="advance">${isClue ? "é€²å…¥æœ«è¼ªä¸‹æ³¨" : "è¡Œå‹•ç·šçœ‹å®Œï¼Œé–‹ç›¤ä¸‹æ³¨"}</button></div>` : ""}
+      </div>
+    </section>
+  `;
+}
+
+function renderVoteStage(question) {
+  const distribution = question.liveDistribution ?? {};
+  const totalVotes = Object.values(distribution).reduce((sum, count) => sum + count, 0);
+  app.innerHTML = `
+    <section class="scene join-scene player-question ${actClass(question)}">
+      <div class="question-card">
+        <span class="question-sfx" aria-hidden="true">ç›¯â€”â€”</span>
+        <div class="question-progress"><span class="question-label">${escapeHtml(question.label)}</span><span>${escapeHtml(question.act)}</span></div>
+        <div class="interrogation-lamp" aria-hidden="true"><span></span><b>ä½ åœ¨å°ä¸Š</b></div>
+        <h1>ä½ è¢«å‚³å–šä¸Šå°ã€‚è«‹ç…§è‘—å”¸ä½ çš„å£ä¾›ï¼Œé€™ä¸€è¼ªä¸èƒ½æŠ•ç¥¨ã€‚</h1>
+        <div class="narration-strip">${escapeHtml(question.narration)}</div>
+        <div class="option-grid">${renderOptions(question)}</div>
+        <div class="onstage-meter">
+          <p class="eyebrow">å¤§å®¶æ€éº¼çœ‹ä½ </p>
+          ${question.choices.map((choice) => {
+            const count = distribution[choice.id] ?? 0;
+            const percent = totalVotes ? Math.round((count / totalVotes) * 100) : 0;
+            return `<div class="distribution-row"><span>${escapeHtml(choice.name)}</span><span class="distribution-bar"><span style="width:${percent}%"></span></span><strong>${count}</strong></div>`;
+          }).join("")}
+        </div>
+      </div>
+    </section>
+    <div class="player-status locked">å°ä¸Šå—å¯©ä¸­ Â· ç›®å‰ ${totalVotes} ç¥¨</div>
+  `;
+}
+
+function renderQuestion() {
+  const room = state.room;
+  const question = room.question;
+  if (question.kind === "intro" || question.kind === "timeline" || question.kind === "clue") return renderShowcase(question, room);
+  if (question.kind === "vote" && question.viewerOnStage && state.view !== "host") return renderVoteStage(question);
+
+  const remaining = secondsLeft(room);
+  const progress = phaseProgress(room);
+  const progressText = `ç¬¬ ${room.stepIndex + 1} / ${room.stepCount} æ­¥`;
+  const eligibleCount = room.eligibleCount || room.players.length;
+  const answerPercent = eligibleCount ? Math.round((room.answeredCount / eligibleCount) * 100) : 0;
+  const statusText = question.kind === "bet" ? "å£“ä¸Šä½ çš„åˆ¤æ–· Â· ä¸‹æ³¨ä¸å€’æ‰£" : question.kind === "vote" ? "å°ä¸‹æŠ•ç¥¨ Â· èª°åœ¨èªªè¬Šï¼Ÿ" : "é¸ä¸€å€‹æ¶ˆè²»åœ°é»";
+  const narration = question.kind === "vote" ? `<div class="narration-strip">${escapeHtml(question.narration)}</div>` : "";
+
+  if (state.view !== "host") {
+    app.innerHTML = `
+      <section class="scene join-scene player-question ${actClass(question)}">
+        <div class="question-card">
+          <span class="question-sfx" aria-hidden="true">ç›¯â€”â€”</span>
+          <div class="question-progress"><span class="question-label">${escapeHtml(question.label)}</span><span>${escapeHtml(question.act)} Â· ${progressText}</span></div>
+          ${renderCaseProgress(room)}
+          ${renderStageProp(question)}
+          ${narration}
+          ${renderPrompt(question)}
+          <div class="option-grid ${question.kind === "bet" ? "bet-grid" : ""}">${renderOptions(question, { interactive: !room.viewerAnswered, selected: room.viewerChoice })}</div>
+        </div>
+      </section>
+      <div class="player-status ${room.viewerAnswered ? "locked" : ""}">${room.viewerAnswered ? "âœ“ è­‰è©å·²è“‹ç« ãƒ»ä¸èƒ½åæ‚”" : remaining > 0 ? `å‰©é¤˜ ${remaining} ç§’ Â· ${statusText}` : "åŠ æ™‚ä¸­ Â· é–‹ç‰Œå‰éƒ½èƒ½ä½œç­”ï¼ˆé€Ÿåº¦åŠ åˆ†å·²æ­¸é›¶ï¼‰"}</div>
+    `;
+    return;
+  }
+
+  app.innerHTML = `
+    <section class="scene scene-wide ${actClass(question)}">
+      <div class="question-shell">
+        <article class="question-card">
+          <span class="question-sfx" aria-hidden="true">ç›¯â€”â€”</span>
+          <div class="question-progress"><span class="question-label">${escapeHtml(question.label)}</span><span>${escapeHtml(question.act)} Â· ${progressText}</span></div>
+          ${renderCaseProgress(room)}
+          ${renderStageProp(question)}
+          ${narration}
+          ${renderPrompt(question)}
+          <div class="option-grid ${question.kind === "bet" ? "bet-grid" : ""}">${renderOptions(question)}</div>
+          <p class="panel-note" style="margin:14px 0 0">æŠ•å½±ç•«é¢åƒ…ä¾›è§€çœ‹ Â· ä½œç­”è«‹ç”¨æ‰‹æ©Ÿé–‹ç©å®¶é </p>
+        </article>
+        <aside class="panel timer-panel">
+          <div class="timer-ring" style="--progress:${progress}%"><span class="timer-value">${remaining}</span></div>
+          <div class="answer-meter">
+            <p class="eyebrow">LIVE TESTIMONY</p>
+            <h2>${room.answeredCount} / ${eligibleCount} å·²${question.kind === "bet" ? "ä¸‹æ³¨" : "ä½œç­”"}</h2>
+            <div class="meter-line"><span style="width:${answerPercent}%"></span></div>
+            ${question.kind === "vote" ? `<p class="panel-note">å°ä¸Š ${Math.max(0, room.players.length - eligibleCount)} äººå—å¯©ä¸­ï¼Œä¸èƒ½æŠ•ç¥¨ã€‚</p>` : ""}
+            <p class="panel-note">ä¸»æŒç•«é¢ä¸ä½œç­”ï¼Œç©å®¶åœ¨è‡ªå·±æ‰‹æ©Ÿä¸Šé¸ã€‚å€’æ•¸åªå½±éŸ¿é€Ÿåº¦åŠ åˆ†ï¼›æŒ‰ã€Œé–‹ç‰Œã€æ‰æ­æ›‰ä¸¦é–å®šè­‰è©ã€‚</p>
+            ${demoMode ? `<div class="demo-cue compact"><span>PRESENTER CUE</span><strong>${escapeHtml(demoCue(room))}</strong></div>` : ""}
+            ${room.isHost ? `<button class="primary-button" data-action="advance">é–‹ç‰Œ</button>` : ""}
+          </div>
+        </aside>
+      </div>
+    </section>
+  `;
+}
+
+function renderDistribution(question, total) {
+  return question.choices.map((choice) => {
+    const count = question.distribution?.[choice.id] ?? 0;
+    const percent = total ? Math.round((count / total) * 100) : 0;
+    return `
+      <div class="distribution-row">
+        <span>${escapeHtml(choice.name ?? choice.label)}</span>
+        <span class="distribution-bar"><span style="width:${percent}%"></span></span>
+        <strong>${count}</strong>
+      </div>
+    `;
+  }).join("");
+}
+
+function renderEvidenceRows(evidence) {
+  return (evidence.rows ?? [])
+    .filter(([, value]) => value !== undefined && value !== null && value !== "")
+    .map(([label, value]) => `<div class="receipt-row"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`)
+    .join("");
+}
+
+function renderVerdictReveal(question, room) {
+  const verdict = question.verdict;
+  app.innerHTML = `
+    <section class="scene scene-wide act-timeline reveal-scene">
+      <div class="evidence-layout">
+        <article class="reveal-card">
+          ${state.playerKey && state.view !== "host" && room.viewerChoice != null ? (room.viewerChoice === verdict.owner ? `<div class="verdict-banner hit">ğŸ¯ æŠ¼ä¸­çœŸå…‡ +150</div>` : `<div class="verdict-banner wrong">âœ— æŠ¼éŒ¯äººäº†</div>`) : ""}
+          <div class="reveal-impact" aria-hidden="true"><strong>å•ªï¼</strong><span>é–‹ç‰Œ</span></div>
+          <span class="reveal-stamp">çœŸå…‡é–å®š</span>
+          <p class="comic-caption">ç¬¬ä¸‰å¹•ï½œçµ‚å±€æŒ‡èª Â· æ‰€æœ‰ä¸‹æ³¨å°å­˜å®Œç•¢ï¼Œé–‹ç‰Œã€‚</p>
+          <h1 class="truth-reveal">çœŸå…‡æ˜¯ <span>${escapeHtml(verdict.owner)}</span></h1>
+          ${verdict.ownerNickname ? `<p>ç”±ã€Œ${escapeHtml(verdict.ownerNickname)}ã€é£¾æ¼”ã€‚æ½›é€ƒæˆç¸¾ï¼šå£ä¾›æœªè¢«éåŠè­˜ç ´ +${verdict.escapeAct2}ã€é¦–è¼ªæœªè¢«éåŠæŠ¼ä¸­ +${verdict.escapeBet1}ã€‚</p>` : `<p>æœ¬å±€ç„¡äººèªé ˜çœŸå…‡èº«åˆ†ï¼›æ½›é€ƒåˆ†å¾ç¼ºã€‚</p>`}
+          ${verdict.culpritLie ? `
+            <div class="humanity-note">
+              <span>æ‰“è‡‰ç¾å ´</span>
+              <strong>ä»–åœ¨ã€Œ${escapeHtml(verdict.culpritLie.theme)}ã€é‚£è¼ªèªªï¼šã€Œ${escapeHtml(verdict.culpritLie.stmt)}ã€</strong>
+              <small>ç™¼ç¥¨é–‹ç‰Œï¼š${escapeHtml(verdict.culpritLie.note)}</small>
+            </div>` : ""}
+          ${room.isHost ? `<div class="button-row" style="margin-top:24px"><button class="primary-button" data-action="advance">å‰å¾€çµæ¡ˆé </button></div>` : ""}
+        </article>
+        <aside class="receipt" aria-label="æŠ¼æ³¨å›æ”¾">
+          <div class="evidence-tape" aria-hidden="true">BETTING LEDGER</div>
+          <div class="receipt-head"><small>BET HISTORY</small><strong>æŠ¼æ³¨å›æ”¾</strong></div>
+          ${verdict.betHistory.map((entry) => `<div class="receipt-row"><span>${escapeHtml(entry.nickname)}</span><strong>${escapeHtml(entry.bet1 ?? "â€”")} â†’ ${escapeHtml(entry.bet2 ?? "â€”")}</strong></div>`).join("")}
+          <p class="receipt-finding">é¦–è¼ªæŠ¼ä¸­ 400ã€æœ«è¼ªæŠ¼ä¸­ 150ï¼›æŠ¼éŒ¯ä¸å€’æ‰£ã€‚</p>
+        </aside>
+      </div>
+    </section>
+  `;
+}
+
+function viewerVerdictBanner(room, question) {
+  if (!state.playerKey || state.view === "host") return "";
+  if (question.kind === "vote" && question.viewerOnStage) return `<div class="verdict-banner miss">ä½ åœ¨å°ä¸Šå—å¯©ï¼Œæœ¬è¼ªä¸æŠ•ç¥¨</div>`;
+  if (room.viewerChoice == null) return `<div class="verdict-banner wrong">âœ— æœªä½œç­” Â· æœ¬é¡Œ 0 åˆ†</div>`;
+  if (question.correctChoice != null && String(room.viewerChoice) === String(question.correctChoice)) {
+    return `<div class="verdict-banner hit">${question.kind === "vote" ? "ğŸ¯ æŠ•ä¸­èªªè¬Šè€… +100" : "ğŸ¯ ç­”å°ï¼"}</div>`;
+  }
+  return `<div class="verdict-banner wrong">âœ— ç­”éŒ¯äº†ï¼Œä¸‹ä¸€é¡Œæ‰³å›ä¾†</div>`;
+}
+
+function renderReveal() {
+  const room = state.room;
+  const question = room.question;
+  if (question.kind === "bet" && question.verdict) return renderVerdictReveal(question, room);
+  const correctChoice = question.choices.find((choice) => choice.id === question.correctChoice);
+  const correctLabel = correctChoice?.name ?? correctChoice?.label ?? "çœŸç›¸";
+  const evidence = question.evidence;
+  app.innerHTML = `
+    <section class="scene scene-wide ${actClass(question)} reveal-scene">
+      <div class="evidence-layout">
+        <article class="reveal-card">
+          ${viewerVerdictBanner(room, question)}
+          <div class="reveal-impact" aria-hidden="true"><strong>å•ªï¼</strong><span>å°æ¢æ’•é–‹</span></div>
+          <span class="reveal-stamp">è­‰æ“šæˆç«‹</span>
+          <p class="comic-caption">${escapeHtml(question.act)} Â· æ‰€æœ‰äººçš„å°è±¡ï¼Œç¾åœ¨æ¥å—ç™¼ç¥¨å¯©åˆ¤ã€‚</p>
+          <h1 class="truth-reveal">${question.kind === "vote" ? "èªªè¬Šçš„æ˜¯" : "çœŸç›¸æ˜¯"} <span>${escapeHtml(correctLabel)}</span></h1>
+          ${question.kind === "vote" && correctChoice ? `<div class="suspect-frame"><span class="spotlight" aria-hidden="true"></span>${portraitMarkup(correctChoice, "suspect-reveal-portrait")}<div><small>SUSPECT LISTED</small><strong>å«Œç–‘åå–® ${room.suspects.length} äºº</strong><span>èªªè¬Š â‰  å®šç½ªï¼Œå…ˆæ¡†èµ·ä¾†ï¼Œç­‰ç¬¬ä¸‰å¹•è¡Œå‹•ç·šã€‚</span></div><b class="suspect-stamp">å«Œç–‘äºº</b></div>` : ""}
+          <p>${escapeHtml(evidence.finding)}</p>
+          ${demoMode ? `<div class="demo-cue compact"><span>PRESENTER CUE</span><strong>${escapeHtml(demoCue(room))}</strong></div>` : ""}
+          <div class="option-grid">${renderOptions(question, { selected: room.viewerChoice, reveal: true })}</div>
+          ${state.view === "host" ? `<div class="distribution">${renderDistribution(question, room.answeredCount)}</div>` : ""}
+          ${room.isHost ? `<div class="button-row" style="margin-top:24px"><button class="primary-button" data-action="advance">çœ‹æ’è¡Œæ¦œ</button></div>` : ""}
+        </article>
+        <aside class="receipt" aria-label="ç™¼ç¥¨è­‰æ“šå¡">
+          <div class="evidence-tape" aria-hidden="true">EVIDENCE / è«‹å‹¿ç§»å‹•</div>
+          <div class="receipt-head"><small>${escapeHtml(evidence.eyebrow ?? "INVOICE EVIDENCE")}</small><strong>${escapeHtml(evidence.title ?? "è­‰ç‰©")}</strong></div>
+          ${renderEvidenceRows(evidence)}
+          <p class="receipt-finding">${escapeHtml(evidence.finding)}</p>
+        </aside>
+      </div>
+    </section>
+  `;
+}
+
+function renderLeaderboard() {
+  const room = state.room;
+  const board = room.leaderboard;
+  const viewerIndex = state.playerKey ? board.findIndex((player) => player.id === state.playerKey) : -1;
+  const shown = board.slice(0, 5);
+  const viewerOutside = viewerIndex >= 5 ? board[viewerIndex] : null;
+  app.innerHTML = `
+    <section class="scene">
+      <article class="leaderboard-card">
+        <div class="newspaper-flag" aria-hidden="true">EXTRA! EXTRA!</div>
+        <p class="eyebrow">CASE RANKING Â· ${room.stepIndex + 1}/${room.stepCount}</p>
+        <h1>èª°é›¢çœŸç›¸<br /><span>æœ€è¿‘ï¼Ÿ</span></h1>
+        <p>ç­”é¡Œæœ‰é€Ÿåº¦åŠ åˆ†ã€æŠ•ç¥¨å‘½ä¸­ +100ã€ä¸‹æ³¨æŠ¼ä¸­å¤§é¡å…¥å¸³ï¼›äº‚çŒœæ²’æœ‰å€’æ‰£ã€‚</p>
+        <div class="rank-list">
+          ${shown.map((player, index) => `
+            <div class="rank-row ${player.id === state.playerKey ? "self" : ""}">
+              <span class="rank-number">${["ğŸ‘‘", "ğŸ¥ˆ", "ğŸ¥‰"][index] ?? `#${index + 1}`}</span>
+              <strong>${escapeHtml(player.nickname)}</strong>
+              <span class="rank-score">${player.score} pts</span>
+            </div>
+          `).join("")}
+          ${viewerOutside ? `<div class="rank-row self"><span class="rank-number">#${viewerIndex + 1}</span><strong>${escapeHtml(viewerOutside.nickname)}</strong><span class="rank-score">${viewerOutside.score} pts</span></div>` : ""}
+        </div>
+        ${room.isHost ? `<div class="button-row" style="justify-content:center;margin-top:24px"><button class="primary-button" data-action="advance">ä¸‹ä¸€æ­¥</button></div>` : ""}
+      </article>
+    </section>
+  `;
+}
+
+function renderResults() {
+  const room = state.room;
+  const results = room.results;
+  const champion = results.champion ?? { nickname: "ç„¡äººç ´æ¡ˆ", score: 0 };
+  app.innerHTML = `
+    <section class="scene scene-wide">
+      <div class="case-topline"><div><p class="eyebrow">CASE CLOSED</p><h1>çµæ¡ˆ</h1></div><span class="case-number">æ¡ˆä»¶ #${escapeHtml(room.code)}</span></div>
+      <div class="result-grid">
+        <article class="result-card" id="share-card">
+          <div class="result-burst" aria-hidden="true">ç ´æ¡ˆï¼</div>
+          <div class="confetti-field" aria-hidden="true">âœ¦ â— â–² âœ¦ â–  â—</div>
+          <p class="eyebrow" style="color:#8d211d">FICTIONAL CULPRIT</p>
+          <div class="culprit-lockup">${portraitMarkup({ name: results.culprit, avatarUrl: results.culpritAvatar }, "culprit-portrait")}<span>è­‰æ“šå‘½ä¸­</span></div>
+          <h1><span class="champion-name">${escapeHtml(results.culprit)}</span><br />å°±æ˜¯çœŸå…‡</h1>
+          ${results.culpritLie ? `<div class="humanity-note"><span>è¬Šè¨€ Ã— æ‰“è‡‰ç™¼ç¥¨</span><strong>ã€Œ${escapeHtml(results.culpritLie.stmt)}ã€</strong><small>${escapeHtml(results.culpritLie.note)}ï¼ˆä¸»é¡Œï¼š${escapeHtml(results.culpritLie.theme)}ï¼‰</small></div>` : ""}
+          <div class="evidence-chain" aria-label="æ¡ˆç™¼æ—¥è¡Œå‹•ç·š">
+            ${results.timeline.map((stop, index) => `<span><b>${index + 1}</b>${escapeHtml(stop.time)} ${escapeHtml(stop.brand)}</span>`).join("")}
+          </div>
+          <div class="result-metrics">
+            <div class="result-metric"><strong>${escapeHtml(champion.nickname)}</strong><small>å† è»åµæ¢ Â· ${champion.score} pts</small></div>
+            <div class="result-metric"><strong>${results.escapeTotal}</strong><small>çœŸå…‡æ½›é€ƒåˆ†${results.culpritNickname ? ` Â· ${escapeHtml(results.culpritNickname)}` : ""}</small></div>
+            <div class="result-metric"><strong>${results.accuracy}%</strong><small>å…¨å±€ç­”å°ç‡</small></div>
+          </div>
+          <div class="result-metrics">
+            <div class="result-metric"><strong>NT$ ${results.aggregate.invoiceTotal.toLocaleString("zh-TW")}</strong><small>æœ¬æ¡ˆ ${results.aggregate.invoiceCount} å¼µè­‰æ“šç™¼ç¥¨åˆè¨ˆ</small></div>
+            <div class="result-metric"><strong>${escapeHtml(results.aggregate.clue.replace(/^æ±ºå®šæ€§ç·šç´¢:/, ""))}</strong><small>æœ¬å±€æœ€é©šäººçš„ä¸€æ¢ç´€éŒ„</small></div>
+          </div>
+          <p class="case-finding">${escapeHtml(results.caseFinding)}</p>
+        </article>
+        <aside class="panel">
+          <p class="eyebrow">NEXT CASE</p>
+          <h2>é–‹æ–°æ¡ˆä»¶ï¼Œè€ƒä½ çš„æœ‹å‹</h2>
+          <div class="share-hook"><strong>ä¸‹ä¸€å±€çš„èª˜é¤Œ</strong><span>ã€Œä½ çœ‹åˆ°çš„æ˜¯äººè¨­ï¼Œç™¼ç¥¨è¨˜å¾—çš„æ˜¯æ—¥å¸¸ã€‚ã€</span></div>
+          <p class="panel-note">åˆ†äº«çš„ä¸æ˜¯èª°è¢«å…¬é–‹è™•åˆ‘ï¼Œè€Œæ˜¯æ•´é–“è¾¦å…¬å®¤å°åŒä¸€å€‹äººçš„å°è±¡ï¼Œå¦‚ä½•è¢«ä¸€å¼µå¼µç™¼ç¥¨ç¿»è½‰ã€‚</p>
+          <div class="rank-list" style="margin-top:8px">
+            ${results.leaderboard.slice(0, 5).map((player, index) => `<div class="rank-row"><span class="rank-number">#${index + 1}</span><strong>${escapeHtml(player.nickname)}</strong><span class="rank-score">${player.score}</span></div>`).join("")}
+          </div>
+          <div class="final-suspect-list" style="margin-top:18px"><strong>æŠ¼æ³¨å›æ”¾</strong>${results.betHistory.map((entry) => `<div class="suspect-line"><span><strong>${escapeHtml(entry.nickname)}</strong><small>${escapeHtml(entry.bet1 ?? "â€”")} â†’ ${escapeHtml(entry.bet2 ?? "â€”")}</small></span><span class="suspect-status">${entry.bet2 === results.culprit ? "æŠ¼ä¸­" : "è½ç©º"}</span></div>`).join("")}</div>
+          <div class="button-row">
+            ${room.isHost ? `<button class="primary-button" data-action="reset-case">é–‹æ–°æ¡ˆä»¶</button>` : ""}
+            <button class="secondary-button" data-action="share-result">åˆ†äº«æˆ°ç¸¾</button>
+          </div>
+        </aside>
+      </div>
+    </section>
+  `;
+}
+
+function renderError() {
+  app.innerHTML = `
+    <section class="scene"><div class="error-card"><p class="eyebrow">CASE ERROR</p><h1>é€™å€‹æ¡ˆä»¶æ–·ç·šäº†</h1><p>${escapeHtml(state.error ?? "è«‹å›åˆ°é¦–é é‡æ–°ç«‹æ¡ˆã€‚")}</p><a class="primary-button" style="display:inline-grid;place-items:center;text-decoration:none" href="/detective.html">å›åˆ°èª°æ˜¯çŠ¯äºº</a></div></section>
+  `;
+}
+
+function render() {
+  updateHeader();
+  document.body.dataset.phase = state.room?.phase ?? (state.view === "join" ? "join" : "home");
+  document.body.dataset.act = state.room?.question ? actClass(state.room.question) : "none";
+  if (state.error) return renderError();
+  if (!state.code || state.view === "home") return renderHome();
+  if (state.view === "join" && !state.playerKey) return renderJoin();
+  if (!state.room) return;
+  if (state.room.phase === "lobby") return renderLobby();
+  if (state.room.phase === "question") return renderQuestion();
+  if (state.room.phase === "reveal") return renderReveal();
+  if (state.room.phase === "leaderboard") return renderLeaderboard();
+  if (state.room.phase === "results") return renderResults();
+}
+
+async function syncRoom({ quiet = false } = {}) {
+  if (!state.code) return;
+  const query = new URLSearchParams();
+  if (state.playerKey) query.set("player", state.playerKey);
+  if (state.hostKey) query.set("host", state.hostKey);
+  try {
+    const previousRoom = state.room ? JSON.stringify(state.room) : "";
+    const nextRoom = await request(`/api/detective/rooms/${state.code}?${query}`);
+    const roomChanged = previousRoom !== JSON.stringify(nextRoom);
+    state.room = nextRoom;
+    state.error = null;
+    if (!quiet || roomChanged) render();
+  } catch (error) {
+    if (!quiet || error.code === "case_not_found") {
+      state.error = errorMessages[error.code] ?? "æš«æ™‚ç„¡æ³•é€£ä¸Šæ¡ˆä»¶ã€‚";
+      render();
+    }
+  }
+}
+
+function updateQuestionClock() {
+  if (state.room?.phase !== "question") return;
+  const remaining = secondsLeft(state.room);
+  const progress = phaseProgress(state.room);
+  const timerValue = document.querySelector(".timer-value");
+  const timerRing = document.querySelector(".timer-ring");
+  const playerStatus = document.querySelector(".player-status:not(.locked)");
+  if (timerValue) timerValue.textContent = remaining;
+  if (timerRing) timerRing.style.setProperty("--progress", `${progress}%`);
+  if (playerStatus) {
+    if (remaining > 0) playerStatus.textContent = playerStatus.textContent.replace(/å‰©é¤˜ \d+ ç§’/, `å‰©é¤˜ ${remaining} ç§’`);
+    else if (/å‰©é¤˜ \d+ ç§’/.test(playerStatus.textContent)) playerStatus.textContent = "åŠ æ™‚ä¸­ Â· é–‹ç‰Œå‰éƒ½èƒ½ä½œç­”ï¼ˆé€Ÿåº¦åŠ åˆ†å·²æ­¸é›¶ï¼‰";
+  }
+}
+
+async function createCase() {
+  if (state.busy) return;
+  state.busy = true;
+  try {
+    const data = await request("/api/detective/rooms", { method: "POST", body: "{}" });
+    state.hostKey = data.hostKey;
+    state.room = data.room;
+    localStorage.setItem(hostStorageKey(data.room.code), data.hostKey);
+    setRoute(data.room.code, "host");
+    render();
+  } catch {
+    notify("ç«‹æ¡ˆå¤±æ•—ï¼Œè«‹å†è©¦ä¸€æ¬¡ã€‚");
+  } finally {
+    state.busy = false;
+  }
+}
+
+async function hostAction(action, extra = {}) {
+  if (!state.hostKey || state.busy) return;
+  state.busy = true;
+  try {
+    state.room = await request(`/api/detective/rooms/${state.code}/${action}`, {
+      method: "POST",
+      body: JSON.stringify({ hostKey: state.hostKey, ...extra }),
+    });
+    render();
+  } catch (error) {
+    notify(errorMessages[error.code] ?? "æ“ä½œå¤±æ•—ï¼Œè«‹å†è©¦ä¸€æ¬¡ã€‚");
+  } finally {
+    state.busy = false;
+  }
+}
+
+async function joinCase(nickname, identity) {
+  if (state.busy) return;
+  state.busy = true;
+  try {
+    const data = await request(`/api/detective/rooms/${state.code}/join`, {
+      method: "POST",
+      body: JSON.stringify({ nickname, identity }),
+    });
+    state.playerKey = data.playerKey;
+    state.playerName = nickname.trim();
+    state.room = data.room;
+    localStorage.setItem(playerStorageKey(state.code), data.playerKey);
+    localStorage.setItem(`detective-player-name-${state.code}`, state.playerName);
+    state.view = "play";
+    location.hash = "play";
+    render();
+  } catch (error) {
+    notify(errorMessages[error.code] ?? "åŠ å…¥æ¡ˆä»¶å¤±æ•—ã€‚");
+  } finally {
+    state.busy = false;
+  }
+}
+
+async function answerQuestion(choice) {
+  if (!state.playerKey) {
+    notify("ä½ é‚„æ²’å…¥å±€â€”â€”å…ˆé ˜åµæ¢è­‰æ‰èƒ½ä½œç­”ã€‚");
+    state.view = "join";
+    location.hash = "join";
+    render();
+    return;
+  }
+  if (state.room?.viewerAnswered || state.busy) return;
+  state.busy = true;
+  try {
+    state.room = await request(`/api/detective/rooms/${state.code}/answer`, {
+      method: "POST",
+      body: JSON.stringify({ playerKey: state.playerKey, choice }),
+    });
+    render();
+  } catch (error) {
+    notify(errorMessages[error.code] ?? "è­‰è©é€å‡ºå¤±æ•—ã€‚");
+  } finally {
+    state.busy = false;
+  }
+}
+
+async function copyText(text, message) {
+  try {
+    await navigator.clipboard.writeText(text);
+    notify(message);
+  } catch {
+    notify("è«‹é•·æŒ‰ç¶²å€æ‰‹å‹•è¤‡è£½ã€‚");
+  }
+}
+
+async function shareResult() {
+  const results = state.room?.results;
+  const champion = results?.champion?.nickname ?? "é¦–å¸­åµæ¢";
+  const text = `æ¡ˆä»¶ #${state.code} å·²çµæ¡ˆï¼š${champion} æˆç‚ºå† è»åµæ¢ï¼ŒçœŸå…‡æ˜¯ ${results?.culprit ?? "ï¼Ÿï¼Ÿ"}ã€‚ä½ çœ‹åˆ°çš„æ˜¯äººè¨­ï¼Œç™¼ç¥¨è¨˜å¾—çš„æ˜¯æ—¥å¸¸ã€‚`;
+  if (navigator.share) {
+    try { await navigator.share({ title: "èª°æ˜¯çŠ¯äººï½œKID", text, url: caseUrl(state.code) }); return; } catch { /* user cancelled */ }
+  }
+  await copyText(`${text} ${caseUrl(state.code)}`, "æˆ°ç¸¾æ–‡æ¡ˆå·²è¤‡è£½");
+}
+
+document.addEventListener("submit", (event) => {
+  const form = event.target.closest("form");
+  if (!form) return;
+  event.preventDefault();
+  const data = new FormData(form);
+  if (form.dataset.form === "enter-code") {
+    const code = String(data.get("code") ?? "").replace(/\D/g, "").slice(0, 4);
+    if (code.length !== 4) return notify("è«‹è¼¸å…¥ 4 ä½æ¡ˆä»¶ç·¨è™Ÿã€‚");
+    location.href = caseUrl(code, "join");
+  }
+  if (form.dataset.form === "join-case") joinCase(String(data.get("nickname") ?? ""), String(data.get("identity") ?? ""));
+});
+
+document.addEventListener("change", (event) => {
+  const select = event.target.closest("[data-select='case-index']");
+  if (!select) return;
+  hostAction("case", { caseIndex: Number(select.value) });
+});
+
+document.addEventListener("click", (event) => {
+  const target = event.target.closest("[data-action],[data-answer]");
+  if (!target) return;
+  if (target.dataset.answer) return answerQuestion(target.dataset.answer);
+  const actions = {
+    "create-case": createCase,
+    "focus-join": () => document.querySelector("#home-code")?.focus(),
+    "copy-link": () => copyText(caseUrl(state.code), "é‚€è«‹é€£çµå·²è¤‡è£½"),
+    "fill-demo": () => hostAction("fill"),
+    "start-case": () => hostAction("start"),
+    "advance": () => hostAction("advance"),
+    "reset-case": () => hostAction("reset"),
+    "share-result": shareResult,
+  };
+  actions[target.dataset.action]?.();
+});
+
+window.addEventListener("hashchange", () => {
+  state.view = location.hash.replace("#", "") || (state.code ? "join" : "home");
+  render();
+});
+
+window.addEventListener("invoice-intro-ended", () => {
+  if (!demoMode) return;
+  testMode = true;
+  document.documentElement.dataset.testMode = "true";
+  render();
+});
+
+render();
+if (state.code) syncRoom();
+setInterval(() => syncRoom({ quiet: true }), 900);
+setInterval(updateQuestionClock, 250);
