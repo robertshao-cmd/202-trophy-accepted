@@ -183,16 +183,9 @@ function botAnswers(room: Room) {
 }
 
 function sync(room: Room) {
-  const now = Date.now();
-  // 只有答題倒數會自動結算；開牌／排行榜／展示頁都等主持人前進
-  if (room.phase === "question") {
-    botAnswers(room);
-    const step = stepOf(room)!;
-    const answers = room.answers[room.stepIndex] ?? {};
-    const voters = eligible(room, step);
-    const everyoneAnswered = voters.length > 0 && voters.every((player) => answers[player.id]);
-    if ((room.phaseEndsAt && now >= room.phaseEndsAt) || (step.kind !== "timeline" && step.kind !== "clue" && everyoneAnswered)) settleStep(room);
-  }
+  // 完全不自動翻頁：倒數歸零只停止收證詞（answerRoom 會擋），
+  // 開牌／排行榜／下一步全部由主持人 advance 觸發
+  if (room.phase === "question") botAnswers(room);
 }
 
 export function createRoom() {

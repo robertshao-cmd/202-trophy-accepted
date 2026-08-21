@@ -102,8 +102,6 @@ test("a full three-act case runs to results and never leaks owner/is_lie/answer 
             assert.ok([200, 409].includes(answered.status), `answer failed with ${answered.status}`);
           }
         }
-        // 全員作答會自動開牌；先回去重新讀狀態，才不會跳過開牌畫面
-        continue;
       }
     }
     if (room.phase === "reveal" && room.question?.kind === "bet" && room.question?.verdict) {

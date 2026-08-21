@@ -30,7 +30,7 @@ const errorMessages = {
   identity_unknown: "這個身分不在本案名單裡。",
   need_four_detectives: "至少需要 4 位偵探才能開始辦案。",
   answer_locked: "證詞已封存，不能反悔。",
-  answering_closed: "本題已經開牌。",
+  answering_closed: "時間到或已開牌，證詞不再受理。",
   on_stage_locked: "你在台上受審，這一輪不能投票。",
   host_required: "只有開局者能執行這個動作。",
   case_unknown: "沒有這個案件可選。",
@@ -432,7 +432,7 @@ function renderQuestion() {
           <div class="option-grid ${question.kind === "bet" ? "bet-grid" : ""}">${renderOptions(question, { interactive: !room.viewerAnswered, selected: room.viewerChoice })}</div>
         </div>
       </section>
-      <div class="player-status ${room.viewerAnswered ? "locked" : ""}">${room.viewerAnswered ? "✓ 證詞已蓋章・不能反悔" : `剩餘 ${remaining} 秒 · ${statusText}`}</div>
+      <div class="player-status ${room.viewerAnswered ? "locked" : ""}">${room.viewerAnswered ? "✓ 證詞已蓋章・不能反悔" : remaining > 0 ? `剩餘 ${remaining} 秒 · ${statusText}` : "加時中 · 開牌前都能作答（速度加分已歸零）"}</div>
     `;
     return;
   }
@@ -456,9 +456,9 @@ function renderQuestion() {
             <h2>${room.answeredCount} / ${eligibleCount} 已${question.kind === "bet" ? "下注" : "作答"}</h2>
             <div class="meter-line"><span style="width:${answerPercent}%"></span></div>
             ${question.kind === "vote" ? `<p class="panel-note">台上 ${Math.max(0, room.players.length - eligibleCount)} 人受審中，不能投票。</p>` : ""}
-            <p class="panel-note">全員作答會提前開牌；逾時視為未作答，局不會停。</p>
+            <p class="panel-note">主持畫面不作答，玩家在自己手機上選。倒數只影響速度加分；按「開牌」才揭曉並鎖定證詞。</p>
             ${demoMode ? `<div class="demo-cue compact"><span>PRESENTER CUE</span><strong>${escapeHtml(demoCue(room))}</strong></div>` : ""}
-            ${room.isHost ? `<button class="ghost-button small-button" data-action="advance">直接開牌</button>` : ""}
+            ${room.isHost ? `<button class="primary-button" data-action="advance">開牌</button>` : ""}
           </div>
         </aside>
       </div>
@@ -682,7 +682,10 @@ function updateQuestionClock() {
   const playerStatus = document.querySelector(".player-status:not(.locked)");
   if (timerValue) timerValue.textContent = remaining;
   if (timerRing) timerRing.style.setProperty("--progress", `${progress}%`);
-  if (playerStatus) playerStatus.textContent = playerStatus.textContent.replace(/剩餘 \d+ 秒/, `剩餘 ${remaining} 秒`);
+  if (playerStatus) {
+    if (remaining > 0) playerStatus.textContent = playerStatus.textContent.replace(/剩餘 \d+ 秒/, `剩餘 ${remaining} 秒`);
+    else if (/剩餘 \d+ 秒/.test(playerStatus.textContent)) playerStatus.textContent = "加時中 · 開牌前都能作答（速度加分已歸零）";
+  }
 }
 
 async function createCase() {
