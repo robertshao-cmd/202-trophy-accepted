@@ -4,8 +4,8 @@ export async function POST(request: Request, context: { params: Promise<{ code: 
   try {
     const { code, action } = await context.params;
     const body = await request.json() as Record<string, string>;
-    if (action === "answer") return Response.json(answerRoom(code, body));
-    const result = roomAction(code, action, body);
+    if (action === "answer") return Response.json(await answerRoom(code, body));
+    const result = await roomAction(code, action, body);
     return Response.json(result.body, { status: result.status });
   } catch (error) {
     const failure = error as Error & { status?: number };

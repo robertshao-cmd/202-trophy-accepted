@@ -3,6 +3,7 @@
 KAHOOT × DETECTIVE × INVOICE 的正式 Cloudflare Worker 專案，包含多人房間 API、Michelle 的案件包三幕流程、Rebecca 的攝影片頭與漫畫偵探 UI。
 
 - 正式網址：<https://202-trophy-accepted.robert-shao.workers.dev/detective.html>
+- 主持人與玩家可使用不同 Wi-Fi／4G／5G；房間狀態由 Cloudflare D1 共享並持久化。
 - 正式首頁預設播放 Rebecca 的 23 秒完整攝影片頭；房號加入不會重播。
 - 自測時使用 `?test=1` 或 `?motion=off` 關閉動畫；使用 `?intro=0` 只略過片頭。
 
@@ -23,7 +24,10 @@ npm run dev
 
 ```powershell
 npm test
+npm run test:shared
 ```
+
+正式 Cloudflare 發布使用 `wrangler.production.jsonc`，確保既有網址綁定共用 D1 房間資料庫。
 
 ## Architecture
 
@@ -32,6 +36,8 @@ npm test
 - `public/home-detective.png`：首頁主辦警探真人主視覺。
 - `app/api/detective/rooms/**`：房間建立、加入、作答與主持控制。
 - `lib/cases.json`：由真實發票編譯而成的案件包（敏感資訊依展示規則遮蔽）。
-- `lib/game.ts`：三幕流程、Jira 卡司頭像、計分與 edge-memory 房間狀態。
+- `lib/game.ts`：三幕流程、Jira 卡司頭像、計分與具版本鎖的 D1 共享房間狀態。
+- `db/schema.ts` 與 `drizzle/*`：跨網路房間資料表與正式 migration。
 - `worker/index.ts`：Cloudflare Worker 入口。
 - `tests/rendered-html.test.mjs`：正式 build、三幕 API、資料防洩漏與視覺資產驗證。
+- `tests/shared-room-smoke.mjs`：36 位玩家同時加入、同時作答及跨程序持久化前置驗證。

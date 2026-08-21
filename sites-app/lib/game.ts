@@ -61,6 +61,103 @@ function avatarOf(name: string) { return AVATAR_BY_NAME[name] ?? null; }
 
 const root = globalThis as typeof globalThis & { __invoiceDetectiveRooms?: Map<string, Room> };
 const rooms = root.__invoiceDetectiveRooms ??= new Map<string, Room>();
+const ROOM_TTL_MS = 12 * 60 * 60 * 1000;
+const MAX_ROOM_WRITE_RETRIES = 64;
+
+type StoredRoomRow = {
+  version: number;
+  room_json: string;
+  expires_at: number;
+};
+
+let roomSchemaReady: Promise<void> | null = null;
+
+async function roomDatabase(): Promise<D1Database | null> {
+  try {
+    const { env: workersEnv } = await import("cloudflare:workers");
+    return (workersEnv as { DB?: D1Database }).DB ?? null;
+  } catch {
+    return null;
+  }
+}
+
+async function ensureRoomSchema(db: D1Database) {
+  if (!roomSchemaReady) {
+    roomSchemaReady = db.batch([
+      db.prepare(`CREATE TABLE IF NOT EXISTS detective_rooms (
+        code TEXT PRIMARY KEY NOT NULL,
+        version INTEGER NOT NULL DEFAULT 0,
+        room_json TEXT NOT NULL,
+        created_at INTEGER NOT NULL,
+        updated_at INTEGER NOT NULL,
+        expires_at INTEGER NOT NULL
+      )`),
+      db.prepare("CREATE INDEX IF NOT EXISTS idx_detective_rooms_expires_at ON detective_rooms(expires_at)"),
+    ]).then(() => undefined).catch((error) => {
+      roomSchemaReady = null;
+      throw error;
+    });
+  }
+  await roomSchemaReady;
+}
+
+function roomFailure(message: string, status: number) {
+  return Object.assign(new Error(message), { status });
+}
+
+function randomRoomCode() {
+  return String(Math.floor(1000 + Math.random() * 9000));
+}
+
+function makeRoom(roomCode: string): Room {
+  return {
+    code: roomCode,
+    hostKey: crypto.randomUUID(),
+    phase: "lobby",
+    caseIndex: 0,
+    steps: [],
+    stepIndex: -1,
+    phaseStartedAt: null,
+    phaseEndsAt: null,
+    players: [],
+    answers: {},
+    settledSteps: [],
+    suspects: [],
+    verdict: null,
+  };
+}
+
+async function mutateStoredRoom<T>(db: D1Database, roomCode: string, operation: (room: Room) => T): Promise<T> {
+  await ensureRoomSchema(db);
+  for (let attempt = 0; attempt < MAX_ROOM_WRITE_RETRIES; attempt += 1) {
+    const row = await db.prepare(
+      "SELECT version, room_json, expires_at FROM detective_rooms WHERE code = ?",
+    ).bind(roomCode).first<StoredRoomRow>();
+    const now = Date.now();
+    if (!row || row.expires_at <= now) {
+      if (row) {
+        await db.prepare("DELETE FROM detective_rooms WHERE code = ? AND version = ?")
+          .bind(roomCode, row.version).run();
+      }
+      throw roomFailure("case_not_found", 404);
+    }
+
+    const room = JSON.parse(row.room_json) as Room;
+    const before = JSON.stringify(room);
+    const result = operation(room);
+    const after = JSON.stringify(room);
+    if (before === after) return result;
+
+    const updated = await db.prepare(
+      `UPDATE detective_rooms
+       SET room_json = ?, version = version + 1, updated_at = ?, expires_at = ?
+       WHERE code = ? AND version = ?`,
+    ).bind(after, now, now + ROOM_TTL_MS, roomCode, row.version).run();
+    if (updated.success && updated.meta.changes === 1) return result;
+    await new Promise((resolve) => setTimeout(resolve, Math.min(50, 4 + attempt * 2) + Math.random() * 10));
+  }
+  throw roomFailure("room_busy_retry", 409);
+}
 
 function caseOf(room: Room) { return cases[room.caseIndex]; }
 function stepOf(room: Room): Step | null { return room.stepIndex >= 0 ? room.steps[room.stepIndex] ?? null : null; }
@@ -109,7 +206,7 @@ function addScore(player: Player, track: "answerScore" | "betScore" | "escapeSco
   player.score = player.answerScore + player.betScore + player.escapeScore;
 }
 
-function code() { for (let i = 0; i < 100; i += 1) { const value = String(Math.floor(1000 + Math.random() * 9000)); if (!rooms.has(value)) return value; } return String(Date.now()).slice(-4); }
+function memoryCode() { for (let i = 0; i < 100; i += 1) { const value = randomRoomCode(); if (!rooms.has(value)) return value; } return String(Date.now()).slice(-4); }
 function ranks(room: Room) { return room.players.map(({ id, nickname, identity, score, isBot }) => ({ id, nickname, identity, score, isBot })).sort((a, b) => b.score - a.score || a.nickname.localeCompare(b.nickname, "zh-Hant")); }
 
 function beginStep(room: Room, index: number) {
@@ -216,12 +313,38 @@ function sync(room: Room) {
   if (room.phase === "question") botAnswers(room);
 }
 
-export function createRoom() {
-  const room: Room = { code: code(), hostKey: crypto.randomUUID(), phase: "lobby", caseIndex: 0, steps: [], stepIndex: -1, phaseStartedAt: null, phaseEndsAt: null, players: [], answers: {}, settledSteps: [], suspects: [], verdict: null };
+function createMemoryRoom() {
+  const room = makeRoom(memoryCode());
   rooms.set(room.code, room);
   return { room: publicRoom(room, { hostKey: room.hostKey }), hostKey: room.hostKey };
 }
-export function findRoom(roomCode: string) { const room = rooms.get(roomCode); if (!room) throw Object.assign(new Error("case_not_found"), { status: 404 }); sync(room); return room; }
+
+function findMemoryRoom(roomCode: string) {
+  const room = rooms.get(roomCode);
+  if (!room) throw roomFailure("case_not_found", 404);
+  sync(room);
+  return room;
+}
+
+export async function createRoom() {
+  const db = await roomDatabase();
+  if (!db) return createMemoryRoom();
+  await ensureRoomSchema(db);
+  const now = Date.now();
+  await db.prepare("DELETE FROM detective_rooms WHERE expires_at <= ?").bind(now).run();
+  for (let attempt = 0; attempt < 100; attempt += 1) {
+    const room = makeRoom(randomRoomCode());
+    const inserted = await db.prepare(
+      `INSERT OR IGNORE INTO detective_rooms
+       (code, version, room_json, created_at, updated_at, expires_at)
+       VALUES (?, 0, ?, ?, ?, ?)`,
+    ).bind(room.code, JSON.stringify(room), now, now, now + ROOM_TTL_MS).run();
+    if (inserted.success && inserted.meta.changes === 1) {
+      return { room: publicRoom(room, { hostKey: room.hostKey }), hostKey: room.hostKey };
+    }
+  }
+  throw roomFailure("room_code_exhausted", 503);
+}
 
 // ---------- 對外視圖（安全鐵則：owner / is_lie / answer 不進玩家 payload） ----------
 function actLabelOf(step: Step | null) {
@@ -423,10 +546,7 @@ export function publicRoom(room: Room, viewer: { playerKey?: string | null; host
   };
 }
 
-export function roomGet(roomCode: string, viewer: Record<string, string | null>) { return publicRoom(findRoom(roomCode), viewer); }
-
-export function roomAction(roomCode: string, action: string, body: Record<string, string>) {
-  const room = findRoom(roomCode);
+function applyRoomAction(room: Room, action: string, body: Record<string, string>) {
   if (action === "join") {
     // 中途入局允許（結案後不行）：晚到的偵探從當下開始作答
     if (room.phase === "results") throw Object.assign(new Error("case_already_started"), { status: 409 });
@@ -488,8 +608,7 @@ export function roomAction(roomCode: string, action: string, body: Record<string
   return { status: 200, body: publicRoom(room, { hostKey: body.hostKey }) };
 }
 
-export function answerRoom(roomCode: string, body: Record<string, string>) {
-  const room = findRoom(roomCode);
+function applyAnswerRoom(room: Room, body: Record<string, string>) {
   if (room.phase !== "question") throw Object.assign(new Error("answering_closed"), { status: 409 });
   const step = stepOf(room)!;
   if (SHOWCASE_KINDS.includes(step.kind)) throw Object.assign(new Error("answering_closed"), { status: 409 });
@@ -505,4 +624,31 @@ export function answerRoom(roomCode: string, body: Record<string, string>) {
   room.answers[room.stepIndex] = answers;
   sync(room);
   return publicRoom(room, { playerKey: player.id });
+}
+
+export async function roomGet(roomCode: string, viewer: Record<string, string | null>) {
+  const db = await roomDatabase();
+  if (!db) return publicRoom(findMemoryRoom(roomCode), viewer);
+  return mutateStoredRoom(db, roomCode, (room) => {
+    sync(room);
+    return publicRoom(room, viewer);
+  });
+}
+
+export async function roomAction(roomCode: string, action: string, body: Record<string, string>) {
+  const db = await roomDatabase();
+  if (!db) return applyRoomAction(findMemoryRoom(roomCode), action, body);
+  return mutateStoredRoom(db, roomCode, (room) => {
+    sync(room);
+    return applyRoomAction(room, action, body);
+  });
+}
+
+export async function answerRoom(roomCode: string, body: Record<string, string>) {
+  const db = await roomDatabase();
+  if (!db) return applyAnswerRoom(findMemoryRoom(roomCode), body);
+  return mutateStoredRoom(db, roomCode, (room) => {
+    sync(room);
+    return applyAnswerRoom(room, body);
+  });
 }

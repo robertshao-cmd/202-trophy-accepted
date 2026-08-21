@@ -10,6 +10,7 @@
     "build": "vinext build",
     "start": "vinext start",
     "test": "npm run build && node --check public/intro.js && node --test tests/rendered-html.test.mjs",
+    "test:shared": "node tests/shared-room-smoke.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate"
   },

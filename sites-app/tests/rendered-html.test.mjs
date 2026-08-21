@@ -27,13 +27,16 @@ test("hosted worker exposes health and redirects home to the detective", async (
 });
 
 test("hosted source contains Rebecca's complete intro, the full PR #2 game, Jira portraits, and the lead detective", async () => {
-  const [html, css, js, introCss, introJs, game] = await Promise.all([
+  const [html, css, js, introCss, introJs, game, healthRoute, hostingConfig, migration] = await Promise.all([
     readFile(new URL("../public/detective.html", import.meta.url), "utf8"),
     readFile(new URL("../public/detective.css", import.meta.url), "utf8"),
     readFile(new URL("../public/detective.js", import.meta.url), "utf8"),
     readFile(new URL("../public/intro.css", import.meta.url), "utf8"),
     readFile(new URL("../public/intro.js", import.meta.url), "utf8"),
     readFile(new URL("../lib/game.ts", import.meta.url), "utf8"),
+    readFile(new URL("../app/api/health/route.ts", import.meta.url), "utf8"),
+    readFile(new URL("../.openai/hosting.json", import.meta.url), "utf8"),
+    readFile(new URL("../drizzle/0000_violet_eternity.sql", import.meta.url), "utf8"),
   ]);
   assert.match(html, /KAHOOT × DETECTIVE × INVOICE/);
   assert.match(html, /<strong>KID<\/strong>/);
@@ -56,6 +59,11 @@ test("hosted source contains Rebecca's complete intro, the full PR #2 game, Jira
   assert.doesNotMatch(js, />無動畫測試</);
   assert.match(game, /cases\.json/);
   assert.match(game, /escapeScore/);
+  assert.match(game, /MAX_ROOM_WRITE_RETRIES = 64/);
+  assert.match(game, /WHERE code = \? AND version = \?/);
+  assert.match(healthRoute, /cloudflare-d1-shared/);
+  assert.equal(JSON.parse(hostingConfig).d1, "DB");
+  assert.match(migration, /CREATE TABLE `detective_rooms`/);
   for (const portrait of ["robert.png", "michelle.png", "rebecca.png", "xu-ruiyu.png", "he-pinru.png", "huang-junlin.png"]) {
     assert.match(game, new RegExp(`/avatars/${portrait.replace(".", "\\.")}`));
   }
