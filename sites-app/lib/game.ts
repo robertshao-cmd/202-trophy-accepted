@@ -31,7 +31,7 @@ type Room = {
   settledSteps: number[]; suspects: string[]; verdict: Verdict | null;
 };
 
-const timings = { quizMs: 20_000, voteMs: 20_000, betMs: 15_000, clueMs: 8_000, revealMs: 7_000, leaderboardMs: 3_000, verdictMs: 14_000, timelineStopMs: 2_000, botAnswerMs: 2_500 };
+const timings = { quizMs: 20_000, voteMs: 20_000, betMs: 15_000, timelineStopMs: 2_000, botAnswerMs: 2_500 };
 
 const root = globalThis as typeof globalThis & { __invoiceDetectiveRooms?: Map<string, Room> };
 const rooms = root.__invoiceDetectiveRooms ??= new Map<string, Room>();
@@ -62,12 +62,10 @@ function eligible(room: Room, step: Step | null) {
   if (!step || step.kind === "timeline" || step.kind === "clue") return [];
   return room.players.filter((player) => !onStage(room, player, step));
 }
-function stepDuration(room: Room, step: Step) {
+function stepDuration(_room: Room, step: Step) {
   if (step.kind === "quiz") return timings.quizMs;
   if (step.kind === "vote") return timings.voteMs;
-  if (step.kind === "bet") return timings.betMs;
-  if (step.kind === "clue") return timings.clueMs;
-  return caseOf(room).invoices.length * timings.timelineStopMs + 2_500;
+  return timings.betMs;
 }
 function correctChoiceOf(room: Room, step: Step): string | null {
   const c = caseOf(room);
@@ -88,7 +86,9 @@ function beginStep(room: Room, index: number) {
   room.stepIndex = index;
   room.phase = "question";
   room.phaseStartedAt = Date.now();
-  room.phaseEndsAt = room.phaseStartedAt + stepDuration(room, room.steps[index]);
+  const step = room.steps[index];
+  // 展示型步驟（行動線／線索）不倒數，由主持人控場前進
+  room.phaseEndsAt = step.kind === "timeline" || step.kind === "clue" ? null : room.phaseStartedAt + stepDuration(room, step);
   room.answers[index] ??= {};
 }
 function nextStep(room: Room) {
@@ -149,9 +149,10 @@ function settleStep(room: Room) {
     nextStep(room);
     return;
   }
+  // 開牌畫面停留到主持人前進為止（真人控場，不自動翻頁）
   room.phase = "reveal";
   room.phaseStartedAt = Date.now();
-  room.phaseEndsAt = room.phaseStartedAt + (step.kind === "bet" ? timings.verdictMs : timings.revealMs);
+  room.phaseEndsAt = null;
 }
 
 function botAnswers(room: Room) {
@@ -183,6 +184,7 @@ function botAnswers(room: Room) {
 
 function sync(room: Room) {
   const now = Date.now();
+  // 只有答題倒數會自動結算；開牌／排行榜／展示頁都等主持人前進
   if (room.phase === "question") {
     botAnswers(room);
     const step = stepOf(room)!;
@@ -190,12 +192,6 @@ function sync(room: Room) {
     const voters = eligible(room, step);
     const everyoneAnswered = voters.length > 0 && voters.every((player) => answers[player.id]);
     if ((room.phaseEndsAt && now >= room.phaseEndsAt) || (step.kind !== "timeline" && step.kind !== "clue" && everyoneAnswered)) settleStep(room);
-  } else if (room.phase === "reveal" && room.phaseEndsAt && now >= room.phaseEndsAt) {
-    const step = stepOf(room)!;
-    if (step.kind === "bet") { room.phase = "results"; room.phaseEndsAt = null; }
-    else { room.phase = "leaderboard"; room.phaseStartedAt = now; room.phaseEndsAt = now + timings.leaderboardMs; }
-  } else if (room.phase === "leaderboard" && room.phaseEndsAt && now >= room.phaseEndsAt) {
-    nextStep(room);
   }
 }
 
@@ -406,7 +402,7 @@ export function roomAction(roomCode: string, action: string, body: Record<string
     else if (room.phase === "reveal") {
       const step = stepOf(room)!;
       if (step.kind === "bet") { room.phase = "results"; room.phaseEndsAt = null; }
-      else { room.phase = "leaderboard"; room.phaseStartedAt = Date.now(); room.phaseEndsAt = room.phaseStartedAt + timings.leaderboardMs; }
+      else { room.phase = "leaderboard"; room.phaseStartedAt = Date.now(); room.phaseEndsAt = null; }
     } else if (room.phase === "leaderboard") nextStep(room);
   } else if (action === "reset") {
     room.phase = "lobby"; room.stepIndex = -1; room.steps = []; room.phaseStartedAt = null; room.phaseEndsAt = null;

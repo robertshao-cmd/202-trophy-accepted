@@ -33,7 +33,8 @@ test("hosted source contains the three-act game and no-animation test mode", asy
     readFile(new URL("../public/detective.js", import.meta.url), "utf8"),
     readFile(new URL("../lib/game.ts", import.meta.url), "utf8"),
   ]);
-  assert.match(html, /KAHOOT × DETECTIVE × INVOICE/);
+  assert.match(html, /KAHOOT INVOICE DETECTIVE/);
+  assert.match(html, /誰是犯人/);
   assert.match(css, /data-test-mode="true"/);
   assert.match(js, /function demoCue/);
   assert.match(js, /hostedNoMotion/);

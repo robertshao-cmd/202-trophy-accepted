@@ -1222,3 +1222,14 @@ html[data-test-mode="true"] .route-stop { animation: none; opacity: 1; }
 .rank-row.self { outline: 2px solid var(--gold); outline-offset: -2px; }
 
 select.case-input { appearance: auto; }
+
+/* 發票載具風 logo：青綠漸層圓角方塊＋白色「發」 */
+.case-seal.carrier-seal {
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(160deg, #00b8a2 0%, #0aa6c8 70%, #2b9fe0 100%);
+  color: #fffaf0;
+  font-size: 26px;
+  transform: none;
+  box-shadow: 0 4px 14px rgba(10, 166, 200, 0.4);
+}
