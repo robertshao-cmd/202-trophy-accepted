@@ -1,76 +1,49 @@
-# 發票腦洞實驗室
+# KAHOOT × DETECTIVE × INVOICE｜誰是犯人？
 
-一套給單日內部 Hackathon 使用的可操作產品驗證工具。九個發票資料產品共用同一份固定匿名資料、互動 Shell、回饋量表與 Evidence Dashboard；原始排名保留，但不當作已驗證結論。
+「202 獎盃失竊案」多人發票推理遊戲。玩家透過九題三幕，從模糊發票、兩真一假口供與消費行動線中找出虛構案件的犯人。
+
+這個 repository 只保留目前正式開發中的產品；先前的發票腦洞實驗室與其他 Demo 已移除。
+
+## 正式網址
+
+- 正式多人版（預設無動畫）：<https://202-trophy-accepted.robert-shao.workers.dev/detective.html>
+- 五分鐘簡報模式：<https://202-trophy-accepted.robert-shao.workers.dev/detective.html?demo=1>
+- 無動畫測試模式：<https://202-trophy-accepted.robert-shao.workers.dev/detective.html?test=1>
+
+所有非 localhost 的部署環境會自動關閉 animation 與 transition；正式網址不需要額外參數。
 
 ## Team
 
 - **Robert — Team Lead**：整合產品方向、組織工作與最終交付。
-- **Michelle — Process & Logic**：負責使用流程、遊戲邏輯與資料推論結構。
+- **Michelle — Process & Logic**：負責三幕流程、遊戲邏輯與題庫結構。
 - **Rebecca — UI/UX**：負責介面、互動體驗與視覺設計。
 
-## 直接使用
+## 開發
 
-正式多人版：
-
-- 主遊戲：<https://202-trophy-accepted.robert-shao.workers.dev/detective.html>
-- 五分鐘簡報模式：<https://202-trophy-accepted.robert-shao.workers.dev/detective.html?demo=1>
-- 無動畫測試模式：<https://202-trophy-accepted.robert-shao.workers.dev/detective.html?test=1>
-
-本機開發：
-
-- KAHOOT × DETECTIVE × INVOICE｜誰是犯人？多人 Prototype：<http://localhost:4174/detective.html>
-- 無動畫內部測試：<http://localhost:4174/detective.html?test=1>
-- 五分鐘簡報模式：<http://localhost:4174/detective.html?demo=1>
-- Gallery：<http://localhost:4173/#/gallery>
-- Validation Brief：<http://localhost:4173/#/brief>
-- Productization Blueprint：<http://localhost:4173/#/next-stage>
-- Evidence Dashboard：<http://localhost:4173/#/dashboard>
-
-若服務未啟動，在此資料夾執行：
+正式產品位於 `sites-app/`：
 
 ```powershell
-node server.mjs
+cd sites-app
+npm ci
+npm run dev
 ```
 
-若 4173 已由實驗室使用，另開「誰是犯人？」：
+驗證：
 
 ```powershell
-$env:PORT=4174
-node server.mjs
+npm test
 ```
 
-測試：
+## 產品結構
 
-```powershell
-node --test
-```
+- `sites-app/public/detective.html`：遊戲入口。
+- `sites-app/public/detective.js`：主持人／玩家流程與無動畫模式。
+- `sites-app/public/detective.css`：漫畫偵探 UI 與全站 motion control。
+- `sites-app/app/api/detective/rooms/**`：多人房間 API。
+- `sites-app/lib/game.ts`：九題題庫、計分與房間狀態。
+- `sites-app/tests/`：正式 Worker、路由與無動畫來源驗證。
+- `pregame-video/`：Seedance 開場腳本、Prompt 與 UI 參考。
 
-## 九項獨立 Demo URL
+## 資料說明
 
-1. `#/demo/recall` 商品召回雷達
-2. `#/demo/price` 買貴了嗎？價格刺客
-3. `#/demo/stock` 囤貨鬼打牆
-4. `#/demo/detective` KAHOOT × DETECTIVE × INVOICE：用九題三幕找出「誰是犯人？」
-   - 舊網址 `#/demo/truth` 會自動開啟相同合併版。
-6. `#/demo/taste` 味覺 DNA／飲食鬼格
-7. `#/demo/trend` 期間限定跟風雷達
-8. `#/demo/rare` 辦公室發票稀有種
-9. `#/demo/warranty` 保固／退貨救援鬼
-10. `#/demo/fridge` 冰箱今晚救援
-
-## 驗證與資料誠信
-
-- 所有發票、商家、品項、召回事件與 33 人群體值皆為虛構、固定、可重現的 `DEMO-01` 資料。
-- 未串登入、真實載具、付款、推播、外部 API 或 AI 服務。
-- 回饋與事件只存在瀏覽器 localStorage；儀表板可匯出 JSON／CSV。
-- 每個結論都附推論依據、資料缺口與正式化依賴。
-- 至少 5 份回饋且全部決策門檻通過前，不顯示 Build。
-
-## 主要檔案
-
-- `VALIDATION_BRIEF.md`：Problem Brief、Assumption/Risk Map、RICE、Decision Brief、Vertical Slice。
-- `NEXT_STAGE_PRD.md`：九項產品的獨立設計原型、PRD Lite、成功指標、工程切片與進入條件。
-- `public/data/lab-data.json`：九項 Demo 共用固定資料。
-- `public/app.js`：路由、九項狀態機、事件、回饋、儀表板、分享與匯出。
-- `public/styles.css`：發票載具色系、桌機／手機元件與可及性。
-- `QA_REPORT.md`：自動測試與瀏覽器 UAT 結果。
+Jira 真實頭像與發票衍生線索已依團隊授權用於公開 Hackathon Demo。獎盃失竊、口供與犯人身分皆為遊戲虛構；完整發票號碼、地址與付款資訊不會顯示。

@@ -29,6 +29,7 @@ test("hosted source contains the full game, no-animation test mode, and five-min
   assert.match(html, /KAHOOT × DETECTIVE × INVOICE/);
   assert.match(css, /data-test-mode="true"/);
   assert.match(js, /function demoCue/);
+  assert.match(js, /hostedNoMotion/);
   assert.match(js, /五分鐘簡報/);
   assert.equal((game.match(/id:"q\d"/g) ?? []).length, 9);
 });
