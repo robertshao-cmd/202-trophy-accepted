@@ -437,6 +437,7 @@ function renderQuestion() {
           ${narration}
           <h1>${escapeHtml(question.prompt)}</h1>
           <div class="option-grid ${question.kind === "bet" ? "bet-grid" : ""}">${renderOptions(question)}</div>
+          <p class="panel-note" style="margin:14px 0 0">投影畫面僅供觀看 · 作答請用手機開玩家頁</p>
         </article>
         <aside class="panel timer-panel">
           <div class="timer-ring" style="--progress:${progress}%"><span class="timer-value">${remaining}</span></div>
@@ -550,7 +551,7 @@ function renderLeaderboard() {
       <article class="leaderboard-card">
         <div class="newspaper-flag" aria-hidden="true">EXTRA! EXTRA!</div>
         <p class="eyebrow">CASE RANKING · ${room.stepIndex + 1}/${room.stepCount}</p>
-        <h1>誰最會<br /><span>讀同事？</span></h1>
+        <h1>誰離真相<br /><span>最近？</span></h1>
         <p>答題有速度加分、投票命中 +100、下注押中大額入帳；亂猜沒有倒扣。</p>
         <div class="rank-list">
           ${shown.map((player, index) => `
@@ -729,7 +730,14 @@ async function joinCase(nickname, identity) {
 }
 
 async function answerQuestion(choice) {
-  if (!state.playerKey || state.room?.viewerAnswered || state.busy) return;
+  if (!state.playerKey) {
+    notify("你還沒入局——先領偵探證才能作答。");
+    state.view = "join";
+    location.hash = "join";
+    render();
+    return;
+  }
+  if (state.room?.viewerAnswered || state.busy) return;
   state.busy = true;
   try {
     state.room = await request(`/api/detective/rooms/${state.code}/answer`, {
