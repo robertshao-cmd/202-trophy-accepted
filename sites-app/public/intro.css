@@ -1,0 +1,228 @@
+/* Rebecca Chiu's GitLab intro, isolated from Michelle's game-flow layer. */
+.stageIntro {
+  --lime: #d9ff57;
+  --intro-red: #ff594b;
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px;
+  overflow: hidden;
+  color: #f2f3f7;
+  text-align: center;
+  background: radial-gradient(ellipse 62% 46% at 50% 42%, #171c13 0%, #050604 72%);
+  transition: opacity .7s;
+}
+
+.stageIntro[hidden] { display: none; }
+.stageIntro.fade { opacity: 0; pointer-events: none; }
+.stageIntro::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: .11;
+  pointer-events: none;
+  background-image: radial-gradient(circle, #ffffff 1px, transparent 1.4px);
+  background-size: 10px 10px;
+}
+
+.stageSkip {
+  position: absolute;
+  z-index: 4;
+  top: calc(14px + env(safe-area-inset-top));
+  right: 16px;
+  padding: 7px 12px;
+  border: 1px solid #39402f;
+  border-radius: 2px;
+  color: #8d9484;
+  background: #050604a8;
+  font: 700 11px "Special Elite", monospace;
+}
+
+.stageCredit {
+  position: absolute;
+  z-index: 3;
+  top: calc(18px + env(safe-area-inset-top));
+  left: 18px;
+  color: #596052;
+  font: 700 9px "Special Elite", monospace;
+  letter-spacing: .18em;
+}
+
+.stageCap {
+  position: relative;
+  z-index: 2;
+  min-height: 16px;
+  margin-bottom: 20px;
+  color: #9ba18f;
+  font: 700 11px "Special Elite", monospace;
+  letter-spacing: .3em;
+}
+
+.stageLine {
+  max-width: 440px;
+  min-height: 130px;
+  opacity: 0;
+  font-family: "Noto Sans TC", sans-serif;
+  font-size: clamp(29px, 8.5vw, 44px);
+  font-weight: 900;
+  line-height: 1.35;
+}
+
+.stageLine.show { animation: intro-line-in .5s ease both; }
+.stageLine.shout { color: var(--intro-red); }
+.stageLine.shout.show { animation: intro-line-in .35s ease both, intro-quake .4s .35s; }
+.stageLine.whisper { color: #9ba18f; font-size: clamp(21px, 6vw, 30px); }
+
+.stagePlay {
+  position: relative;
+  z-index: 3;
+  padding: 16px 34px;
+  border: 2px solid var(--lime);
+  border-radius: 3px;
+  color: var(--lime);
+  background: transparent;
+  font: 900 17px "Noto Sans TC", sans-serif;
+  letter-spacing: .3em;
+  text-indent: .3em;
+  box-shadow: 7px 7px 0 #000;
+}
+
+.stagePlay:active { background: #1c2416; }
+
+.stageTitle {
+  position: relative;
+  z-index: 3;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+}
+
+.stageTitle .tbox {
+  padding: 18px 26px;
+  border: 5px double var(--lime);
+  color: var(--lime);
+  font-family: "Noto Sans TC", sans-serif;
+  font-size: clamp(38px, 11vw, 54px);
+  font-weight: 900;
+  letter-spacing: .12em;
+  text-indent: .12em;
+  animation: intro-slam .5s both;
+}
+
+.stageTitle .tsub {
+  color: #9ba18f;
+  font: 700 11px "Special Elite", monospace;
+  letter-spacing: .24em;
+}
+
+/* 漫畫分鏡開場 */
+.comicStage { position: relative; z-index: 2; display: none; width: min(430px, 94vw); }
+.stageIntro .cpanel {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  opacity: 0;
+  border: 4px solid #f2f3f7;
+  border-radius: 4px;
+  background: var(--pbg, #0d100b);
+  box-shadow: 10px 12px #000;
+  transform: rotate(var(--tilt, 0deg)) scale(.7);
+  transition: transform .3s cubic-bezier(.2, 1.7, .4, 1), opacity .18s;
+}
+
+.stageIntro .cpanel.in { opacity: 1; transform: rotate(var(--tilt, 0deg)) scale(1); }
+.stageIntro .cpanel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(circle, #ffffff0e 1px, transparent 1.6px);
+  background-size: 9px 9px;
+}
+
+.stageIntro .plines { position: absolute; inset: 0; width: 100%; height: 100%; }
+.stageIntro .part { position: absolute; left: 50%; top: 55%; width: 76%; height: 72%; transform: translate(-50%, -50%); }
+.stageIntro .sfxWord {
+  position: absolute;
+  z-index: 3;
+  color: var(--intro-red);
+  font: 900 46px "Noto Sans TC", sans-serif;
+  text-shadow: 3px 3px 0 #000;
+  -webkit-text-stroke: 1.5px #fff;
+  transform: rotate(-9deg);
+}
+
+.stageIntro .bubble {
+  position: absolute;
+  z-index: 3;
+  max-width: 72%;
+  padding: 9px 13px;
+  border: 3px solid #14170f;
+  border-radius: 14px;
+  color: #14170f;
+  background: #f7f3e8;
+  box-shadow: 3px 3px 0 #000;
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1.45;
+}
+
+.stageIntro .bubble.talk::after {
+  content: "";
+  position: absolute;
+  left: 22px;
+  bottom: -13px;
+  border: 7px solid transparent;
+  border-top: 10px solid #14170f;
+}
+
+.stageIntro .bubble.shout {
+  max-width: 82%;
+  padding: 16px 22px;
+  border: 0;
+  border-radius: 0;
+  font-size: 17px;
+  filter: drop-shadow(2px 2px 0 #000);
+  clip-path: polygon(2% 12%, 8% 2%, 16% 10%, 26% 0%, 33% 9%, 45% 1%, 53% 10%, 64% 2%, 71% 11%, 83% 3%, 90% 12%, 99% 8%, 96% 24%, 100% 36%, 94% 47%, 100% 60%, 93% 70%, 99% 84%, 89% 88%, 93% 99%, 79% 93%, 69% 100%, 61% 92%, 49% 99%, 41% 91%, 29% 98%, 22% 90%, 11% 97%, 8% 85%, 0% 78%, 6% 65%, 0% 52%, 7% 40%, 1% 27%);
+}
+
+.stageIntro .bubble.cap {
+  max-width: 80%;
+  border-radius: 0;
+  background: #efe6cf;
+  box-shadow: 4px 4px 0 #000;
+  font: 700 13px "Special Elite", "Noto Sans TC", monospace;
+}
+
+.introFlash {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  opacity: 0;
+  pointer-events: none;
+  background: #fff;
+}
+
+.introFlash.on { animation: intro-flash-fade .45s; }
+
+@keyframes intro-line-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
+@keyframes intro-quake { 20% { transform: translateX(-8px); } 40% { transform: translateX(7px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(3px); } }
+@keyframes intro-slam { 0% { opacity: 0; transform: rotate(7deg) scale(3.4); } 60% { opacity: 1; transform: rotate(7deg) scale(.94); } 80% { transform: rotate(7deg) scale(1.07); } 100% { transform: rotate(7deg) scale(1); } }
+@keyframes intro-flash-fade { 0% { opacity: .7; } 100% { opacity: 0; } }
+
+@media (max-width: 620px) {
+  .stageIntro { padding: 22px 12px; }
+  .stageCredit { top: auto; bottom: calc(12px + env(safe-area-inset-bottom)); }
+  .stageCap { margin-bottom: 14px; }
+  .stageIntro .bubble { font-size: 14px; }
+  .stageTitle .tsub { max-width: 310px; line-height: 1.7; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stageIntro, .stageIntro .cpanel, .stageTitle .tbox, .introFlash.on { animation: none !important; transition: none !important; }
+}

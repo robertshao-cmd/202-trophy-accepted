@@ -9,12 +9,26 @@
     <meta property="og:description" content="掃碼加入 202 獎盃失竊案，沿著發票證據找出犯人。" />
     <meta property="og:image" content="/og.png" />
     <title>KAHOOT × DETECTIVE × INVOICE｜誰是犯人？</title>
-    <link rel="stylesheet" href="/detective.css?v=2" />
+    <link rel="stylesheet" href="/detective.css?v=3" />
+    <link rel="stylesheet" href="/intro.css?v=1" />
   </head>
   <body>
     <a class="skip-link" href="#detective-app">跳到案件內容</a>
     <div class="noise" aria-hidden="true"></div>
     <div class="comic-dots" aria-hidden="true"></div>
+    <section class="stageIntro" id="stageIntro" role="dialog" aria-modal="true" aria-labelledby="stageIntroTitle" hidden>
+      <button class="stageSkip" id="stageSkip" type="button">跳過 SKIP</button>
+      <div class="stageCredit">INTRO DESIGN · REBECCA</div>
+      <div class="stageCap" id="stageCap">CASE #202 · 案情重建</div>
+      <div class="comicStage" id="comicStage" aria-live="polite"></div>
+      <div class="stageLine" id="stageLine"></div>
+      <button class="stagePlay" id="stagePlay" type="button">▸ 開演</button>
+      <div class="stageTitle" id="stageTitle">
+        <div class="tbox" id="stageIntroTitle">誰是犯人？</div>
+        <div class="tsub">KAHOOT × DETECTIVE × INVOICE · CASE #202</div>
+      </div>
+      <div class="introFlash" id="introFlash" aria-hidden="true"></div>
+    </section>
     <header class="case-header">
       <a class="case-brand" href="/detective.html" aria-label="回到誰是犯人遊戲首頁">
         <span class="case-seal" aria-hidden="true">票</span>
@@ -32,6 +46,7 @@
       </section>
     </main>
     <div id="detective-toast" class="detective-toast" role="status" aria-live="polite"></div>
-    <script type="module" src="/detective.js?v=2"></script>
+    <script src="/intro.js?v=1" defer></script>
+    <script type="module" src="/detective.js?v=3"></script>
   </body>
 </html>

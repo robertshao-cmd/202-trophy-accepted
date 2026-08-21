@@ -4,6 +4,13 @@ KAHOOT × DETECTIVE × INVOICE 的正式 Cloudflare Worker 專案，包含多人
 
 - 正式網址：<https://202-trophy-accepted.robert-shao.workers.dev/detective.html>
 - 正式環境預設無動畫；不需要加 `?test=1`。
+- Rebecca 的 23 秒漫畫開場使用 `?intro=1` 主動播放；房號加入不會觸發。
+
+## Team ownership
+
+- Robert：team lead、整體整合與交付。
+- Michelle：產品流程與遊戲邏輯優化。
+- Rebecca：開場體驗與 UI/UX。
 
 ## Local development
 
@@ -21,6 +28,7 @@ npm test
 ## Architecture
 
 - `public/detective.*`：主持人與玩家介面。
+- `public/intro.*`：Rebecca 開場的隔離式 pre-game layer，不改房間狀態。
 - `app/api/detective/rooms/**`：房間建立、加入、作答與主持控制。
 - `lib/game.ts`：九題題庫、計分與 edge-memory 房間狀態。
 - `worker/index.ts`：Cloudflare Worker 入口。
