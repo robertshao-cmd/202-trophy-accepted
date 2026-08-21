@@ -66,7 +66,7 @@ test("a full three-act case runs to results and never leaks owner/is_lie/answer 
   const started = await workerRequest(`/api/detective/rooms/${code}/start`, post({ hostKey }));
   assert.equal(started.status, 200);
   const startedRoom = await started.json();
-  assert.equal(startedRoom.stepCount, caseData.act1.length + caseData.act2.length + 4);
+  assert.equal(startedRoom.stepCount, caseData.act1.length + caseData.act2.length + 7);
 
   const forbiddenDuringQuestions = ['"is_lie"', '"answer"', '"owner"', '"liar"', '"correctChoice"', '"verdict"', '"betHistory"'];
   let sawOnStageLock = false;

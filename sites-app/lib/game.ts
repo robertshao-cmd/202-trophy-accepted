@@ -11,7 +11,7 @@ type CaseData = { owner: string; date: string; confusable: number; invoices: Inv
 const cases = (casePack as { cases: CaseData[] }).cases;
 
 // ---------- 狀態機 ----------
-type StepKind = "quiz" | "vote" | "timeline" | "bet" | "clue";
+type StepKind = "intro" | "quiz" | "vote" | "timeline" | "bet" | "clue";
 type Step = { kind: StepKind; index: number; betRound?: 1 | 2 };
 type Answer = { choice: string; answeredAt: number; points: number };
 type Player = { id: string; nickname: string; identity: string | null; score: number; answerScore: number; betScore: number; escapeScore: number; isBot: boolean };
@@ -45,8 +45,11 @@ function castOf(c: CaseData) {
 }
 function buildSteps(c: CaseData): Step[] {
   return [
+    { kind: "intro", index: 0 },
     ...c.act1.map((_, index) => ({ kind: "quiz" as const, index })),
+    { kind: "intro", index: 1 },
     ...c.act2.map((_, index) => ({ kind: "vote" as const, index })),
+    { kind: "intro", index: 2 },
     { kind: "timeline", index: 0 },
     { kind: "bet", index: 0, betRound: 1 },
     { kind: "clue", index: 0 },
@@ -58,8 +61,9 @@ function onStage(room: Room, player: Player, step: Step | null) {
   if (!step || step.kind !== "vote" || !player.identity) return false;
   return caseOf(room).act2[step.index].members.includes(player.identity);
 }
+const SHOWCASE_KINDS: StepKind[] = ["intro", "timeline", "clue"];
 function eligible(room: Room, step: Step | null) {
-  if (!step || step.kind === "timeline" || step.kind === "clue") return [];
+  if (!step || SHOWCASE_KINDS.includes(step.kind)) return [];
   return room.players.filter((player) => !onStage(room, player, step));
 }
 function stepDuration(_room: Room, step: Step) {
@@ -87,8 +91,8 @@ function beginStep(room: Room, index: number) {
   room.phase = "question";
   room.phaseStartedAt = Date.now();
   const step = room.steps[index];
-  // 展示型步驟（行動線／線索）不倒數，由主持人控場前進
-  room.phaseEndsAt = step.kind === "timeline" || step.kind === "clue" ? null : room.phaseStartedAt + stepDuration(room, step);
+  // 展示型步驟（幕間介紹／行動線／線索）不倒數，由主持人控場前進
+  room.phaseEndsAt = SHOWCASE_KINDS.includes(step.kind) ? null : room.phaseStartedAt + stepDuration(room, step);
   room.answers[index] ??= {};
 }
 function nextStep(room: Room) {
@@ -198,9 +202,41 @@ export function findRoom(roomCode: string) { const room = rooms.get(roomCode); i
 // ---------- 對外視圖（安全鐵則：owner / is_lie / answer 不進玩家 payload） ----------
 function actLabelOf(step: Step | null) {
   if (!step) return null;
+  if (step.kind === "intro") return ["第一幕｜犯罪現場", "第二幕｜口供審訊", "第三幕｜終局指認"][step.index];
   if (step.kind === "quiz") return "第一幕｜犯罪現場";
   if (step.kind === "vote") return "第二幕｜口供審訊";
   return "第三幕｜終局指認";
+}
+
+// 幕間介紹（Intro）文案
+function introView(step: Step, c: CaseData) {
+  const intros = [
+    {
+      title: "蒐集資訊",
+      body: "犯罪現場一片狼藉，地上散落著沾滿污漬的發票，一些重要資訊被遮住了。推理出「消費的地點」，用來找出嫌疑人與當天的行動軌跡。",
+    },
+    {
+      title: "框出嫌疑人",
+      body: "透過犯罪現場的發票，你知道了嫌疑人當天出沒的地點。你找來去過那些地點的人盤問——三人一組提出口供，其中一人在說謊，他就是嫌疑人。",
+    },
+    {
+      title: "找出犯人",
+      body: `警探列出了完整消費軌跡。${c.act2.length} 位說謊的嫌疑人之中，誰才是犯人？`,
+    },
+  ];
+  const intro = intros[step.index];
+  return { kind: "intro", act: actLabelOf(step), actNumber: step.index + 1, label: intro.title, prompt: intro.body, choices: [] as { id: string; label: string }[] };
+}
+
+// 題目文案精簡：從編譯器產出的長 prompt 抽關鍵資訊重組
+function shortQuizPrompt(q: Act1Question, invoice: Invoice) {
+  const quoted = q.prompt.match(/「(.+?)」/)?.[1];
+  const channel = q.prompt.match(/【(.+?)】/)?.[1];
+  const addr = invoice.addr.slice(0, 6);
+  if (q.type === "品名分類推店家" && quoted) return `只認得出品項分類「${quoted}」。這是哪間店？`;
+  if (q.type === "登記名破解" && quoted) return `登記名「${quoted}」，地址在${addr}。這是哪間店？`;
+  if (q.type === "通路小分類推店家" && channel) return `一張【${channel}】通路的發票，開在${addr}。這是哪間店？`;
+  return q.prompt;
 }
 
 function questionView(room: Room, viewerPlayer: Player | null) {
@@ -212,11 +248,13 @@ function questionView(room: Room, viewerPlayer: Player | null) {
   const distribution = (ids: string[]) => Object.fromEntries(ids.map((id) => [id, Object.values(answers).filter((a) => a.choice === id).length]));
   const act = actLabelOf(step);
 
+  if (step.kind === "intro") return introView(step, c);
+
   if (step.kind === "quiz") {
     const q = c.act1[step.index];
     const invoice = c.invoices[q.invoice_idx];
     return {
-      kind: "quiz", act, label: q.type, prompt: q.prompt,
+      kind: "quiz", act, label: q.type, prompt: shortQuizPrompt(q, invoice),
       prop: { time: invoice.time, amt: invoice.amt, date: c.date },
       choices: q.options.map((option, index) => ({ id: String(index), label: option })),
       ...(reveal ? {
@@ -243,7 +281,7 @@ function questionView(room: Room, viewerPlayer: Player | null) {
     const round = c.act2[step.index];
     const viewerOnStage = viewerPlayer ? onStage(room, viewerPlayer, step) : false;
     return {
-      kind: "vote", act, label: `口供第 ${round.round} 輪`, prompt: `主題：「${round.theme}」——三句口供、兩真一假。台下投票，誰在說謊？`,
+      kind: "vote", act, label: `口供第 ${round.round} 輪`, prompt: `「${round.theme}」——兩真一假，誰在說謊？`,
       theme: round.theme, narration: round["旁白"], round: round.round, roundCount: c.act2.length,
       choices: round.statements.map((s, index) => ({ id: String(index), name: s.player, label: s.stmt })),
       viewerOnStage,
@@ -268,7 +306,7 @@ function questionView(room: Room, viewerPlayer: Player | null) {
 
   if (step.kind === "timeline") {
     return {
-      kind: "timeline", act, label: "行動線回放", prompt: "案發日的完整行動線，按真實時間戳播放。看清楚，等一下要下注。",
+      kind: "timeline", act, label: "行動線回放", prompt: "案發日的完整行動線——看仔細，等等要下注。",
       stops: c.invoices.map((invoice) => ({ time: invoice.time, brand: invoice.brand, amt: invoice.amt })),
       stopMs: timings.timelineStopMs,
       choices: [] as { id: string; label: string }[],
@@ -283,7 +321,7 @@ function questionView(room: Room, viewerPlayer: Player | null) {
   const round = step.betRound ?? 1;
   return {
     kind: "bet", act, label: round === 1 ? "首輪下注" : "末輪下注",
-    prompt: round === 1 ? "行動線播完，開盤。押中真兇：400 分。" : "決定性線索已亮出。最後一次下注：150 分。",
+    prompt: round === 1 ? "誰是犯人？押中 400 分。" : "最後一注：誰是犯人？押中 150 分。",
     betRound: round,
     clue: round === 2 ? c.act3.final_clue : null,
     choices: castOf(c).map((name) => ({ id: name, label: name, suspect: room.suspects.includes(name) })),
@@ -416,7 +454,7 @@ export function answerRoom(roomCode: string, body: Record<string, string>) {
   const room = findRoom(roomCode);
   if (room.phase !== "question") throw Object.assign(new Error("answering_closed"), { status: 409 });
   const step = stepOf(room)!;
-  if (step.kind === "timeline" || step.kind === "clue") throw Object.assign(new Error("answering_closed"), { status: 409 });
+  if (SHOWCASE_KINDS.includes(step.kind)) throw Object.assign(new Error("answering_closed"), { status: 409 });
   const player = room.players.find((candidate) => candidate.id === body.playerKey && !candidate.isBot);
   if (!player) throw Object.assign(new Error("player_required"), { status: 403 });
   if (onStage(room, player, step)) throw Object.assign(new Error("on_stage_locked"), { status: 403 });

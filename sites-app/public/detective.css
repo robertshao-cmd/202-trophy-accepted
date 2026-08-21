@@ -1247,3 +1247,32 @@ select.case-input { appearance: auto; }
   .onstage-meter { padding: 12px; }
   .showcase-card h1 { font-size: 22px; }
 }
+
+/* 幕間介紹卡 */
+.intro-card { text-align: center; padding-top: 44px; }
+.intro-act-number {
+  width: 84px;
+  height: 84px;
+  margin: 14px auto 6px;
+  display: grid;
+  place-items: center;
+  border: 3px solid var(--red);
+  border-radius: 50%;
+  color: var(--red);
+  font-size: 40px;
+  font-weight: 900;
+  transform: rotate(-4deg);
+}
+.intro-card h1 { margin: 12px 0 14px; font-size: clamp(30px, 5vw, 44px); }
+.intro-body {
+  max-width: 560px;
+  margin: 0 auto;
+  color: var(--muted);
+  font-size: 17px;
+  line-height: 1.9;
+}
+.intro-card .button-row { justify-content: center; }
+@media (max-width: 620px) {
+  .intro-act-number { width: 64px; height: 64px; font-size: 30px; }
+  .intro-body { font-size: 15px; }
+}

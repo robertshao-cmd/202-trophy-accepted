@@ -346,6 +346,20 @@ function renderTimelineStops(question) {
 }
 
 function renderShowcase(question, room) {
+  if (question.kind === "intro") {
+    app.innerHTML = `
+      <section class="scene scene-wide ${actClass(question)}">
+        <div class="question-card showcase-card intro-card">
+          <p class="eyebrow">ACT ${question.actNumber} / 3</p>
+          <div class="intro-act-number" aria-hidden="true">${["壹", "貳", "參"][question.actNumber - 1]}</div>
+          <h1>${escapeHtml(question.label)}</h1>
+          <p class="intro-body">${escapeHtml(question.prompt)}</p>
+          ${room.isHost ? `<div class="button-row" style="margin-top:24px"><button class="primary-button" data-action="advance">開始${["第一幕", "第二幕", "第三幕"][question.actNumber - 1]}</button></div>` : `<p class="panel-note">等主持人開始${["第一幕", "第二幕", "第三幕"][question.actNumber - 1]}…</p>`}
+        </div>
+      </section>
+    `;
+    return;
+  }
   const isClue = question.kind === "clue";
   app.innerHTML = `
     <section class="scene scene-wide ${actClass(question)}">
@@ -397,7 +411,7 @@ function renderVoteStage(question) {
 function renderQuestion() {
   const room = state.room;
   const question = room.question;
-  if (question.kind === "timeline" || question.kind === "clue") return renderShowcase(question, room);
+  if (question.kind === "intro" || question.kind === "timeline" || question.kind === "clue") return renderShowcase(question, room);
   if (question.kind === "vote" && question.viewerOnStage && state.view !== "host") return renderVoteStage(question);
 
   const remaining = secondsLeft(room);
