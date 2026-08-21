@@ -61,6 +61,7 @@ test("hosted source contains Rebecca's complete intro, the full PR #2 game, Jira
   assert.match(game, /escapeScore/);
   assert.match(game, /MAX_ROOM_WRITE_RETRIES = 64/);
   assert.match(game, /WHERE code = \? AND version = \?/);
+  assert.match(game, /withSession\("first-primary"\)/);
   assert.match(healthRoute, /cloudflare-d1-shared/);
   assert.equal(JSON.parse(hostingConfig).d1, "DB");
   assert.match(migration, /CREATE TABLE `detective_rooms`/);

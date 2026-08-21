@@ -70,6 +70,8 @@ type StoredRoomRow = {
   expires_at: number;
 };
 
+type RoomDatabase = Pick<D1Database, "prepare" | "batch">;
+
 let roomSchemaReady: Promise<void> | null = null;
 
 async function roomDatabase(): Promise<D1Database | null> {
@@ -81,7 +83,7 @@ async function roomDatabase(): Promise<D1Database | null> {
   }
 }
 
-async function ensureRoomSchema(db: D1Database) {
+async function ensureRoomSchema(db: RoomDatabase) {
   if (!roomSchemaReady) {
     roomSchemaReady = db.batch([
       db.prepare(`CREATE TABLE IF NOT EXISTS detective_rooms (
@@ -127,7 +129,7 @@ function makeRoom(roomCode: string): Room {
   };
 }
 
-async function mutateStoredRoom<T>(db: D1Database, roomCode: string, operation: (room: Room) => T): Promise<T> {
+async function mutateStoredRoom<T>(db: RoomDatabase, roomCode: string, operation: (room: Room) => T): Promise<T> {
   await ensureRoomSchema(db);
   for (let attempt = 0; attempt < MAX_ROOM_WRITE_RETRIES; attempt += 1) {
     const row = await db.prepare(
@@ -329,12 +331,13 @@ function findMemoryRoom(roomCode: string) {
 export async function createRoom() {
   const db = await roomDatabase();
   if (!db) return createMemoryRoom();
-  await ensureRoomSchema(db);
+  const primaryDb = db.withSession("first-primary");
+  await ensureRoomSchema(primaryDb);
   const now = Date.now();
-  await db.prepare("DELETE FROM detective_rooms WHERE expires_at <= ?").bind(now).run();
+  await primaryDb.prepare("DELETE FROM detective_rooms WHERE expires_at <= ?").bind(now).run();
   for (let attempt = 0; attempt < 100; attempt += 1) {
     const room = makeRoom(randomRoomCode());
-    const inserted = await db.prepare(
+    const inserted = await primaryDb.prepare(
       `INSERT OR IGNORE INTO detective_rooms
        (code, version, room_json, created_at, updated_at, expires_at)
        VALUES (?, 0, ?, ?, ?, ?)`,
@@ -629,7 +632,7 @@ function applyAnswerRoom(room: Room, body: Record<string, string>) {
 export async function roomGet(roomCode: string, viewer: Record<string, string | null>) {
   const db = await roomDatabase();
   if (!db) return publicRoom(findMemoryRoom(roomCode), viewer);
-  return mutateStoredRoom(db, roomCode, (room) => {
+  return mutateStoredRoom(db.withSession("first-primary"), roomCode, (room) => {
     sync(room);
     return publicRoom(room, viewer);
   });
@@ -638,7 +641,7 @@ export async function roomGet(roomCode: string, viewer: Record<string, string | 
 export async function roomAction(roomCode: string, action: string, body: Record<string, string>) {
   const db = await roomDatabase();
   if (!db) return applyRoomAction(findMemoryRoom(roomCode), action, body);
-  return mutateStoredRoom(db, roomCode, (room) => {
+  return mutateStoredRoom(db.withSession("first-primary"), roomCode, (room) => {
     sync(room);
     return applyRoomAction(room, action, body);
   });
@@ -647,7 +650,7 @@ export async function roomAction(roomCode: string, action: string, body: Record<
 export async function answerRoom(roomCode: string, body: Record<string, string>) {
   const db = await roomDatabase();
   if (!db) return applyAnswerRoom(findMemoryRoom(roomCode), body);
-  return mutateStoredRoom(db, roomCode, (room) => {
+  return mutateStoredRoom(db.withSession("first-primary"), roomCode, (room) => {
     sync(room);
     return applyAnswerRoom(room, body);
   });
