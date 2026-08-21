@@ -125,7 +125,7 @@ function actClass(question) {
 
 function renderStageProp(question) {
   if (question.kind === "quiz") {
-    return `<div class="crime-receipt" aria-hidden="true"><span class="receipt-stain stain-one"></span><span class="receipt-stain stain-two"></span><b>電子發票證明聯</b><i>${escapeHtml(question.prop?.date ?? "20██")}　NT$ ${escapeHtml(String(question.prop?.amt ?? "██"))}</i><em>${escapeHtml(question.prop?.time ?? "██:██")}　店名：██████</em><small>線索正在對焦…</small></div>`;
+    return `<div class="crime-receipt" aria-hidden="true"><span class="receipt-stain stain-one"></span><span class="receipt-stain stain-two"></span><b>電子發票證明聯</b><i>${escapeHtml(question.prop?.date ?? "20██")} · NT$ ${escapeHtml(String(question.prop?.amt ?? "██"))}</i><em>${escapeHtml(question.prop?.time ?? "██:██")} · 店名：██████</em><small>線索正在對焦…</small></div>`;
   }
   if (question.kind === "vote") {
     return `<div class="interrogation-lamp" aria-hidden="true"><span></span><b>誰在說謊？</b></div>`;
@@ -379,7 +379,7 @@ function renderShowcase(question, room) {
   `;
 }
 
-function renderVoteStage(question, room) {
+function renderVoteStage(question) {
   const distribution = question.liveDistribution ?? {};
   const totalVotes = Object.values(distribution).reduce((sum, count) => sum + count, 0);
   app.innerHTML = `
@@ -409,7 +409,7 @@ function renderQuestion() {
   const room = state.room;
   const question = room.question;
   if (question.kind === "timeline" || question.kind === "clue") return renderShowcase(question, room);
-  if (question.kind === "vote" && question.viewerOnStage && state.view !== "host") return renderVoteStage(question, room);
+  if (question.kind === "vote" && question.viewerOnStage && state.view !== "host") return renderVoteStage(question);
 
   const remaining = secondsLeft(room);
   const progress = phaseProgress(room);
@@ -594,7 +594,7 @@ function renderResults() {
       <div class="result-grid">
         <article class="result-card" id="share-card">
           <div class="result-burst" aria-hidden="true">破案！</div>
-          <div class="confetti-field" aria-hidden="true">✦　●　▲　✦　■　●</div>
+          <div class="confetti-field" aria-hidden="true">✦ ● ▲ ✦ ■ ●</div>
           <p class="eyebrow" style="color:#8d211d">FICTIONAL CULPRIT</p>
           <div class="culprit-lockup">${portraitMarkup({ name: results.culprit }, "culprit-portrait")}<span>證據命中</span></div>
           <h1><span class="champion-name">${escapeHtml(results.culprit)}</span><br />就是真兇</h1>
