@@ -1342,7 +1342,7 @@ select.case-input { appearance: auto; }
   transform: rotate(3deg);
   box-shadow: 2px 2px 0 #000;
 }
-.option-button.wrong { opacity: 0.32; filter: grayscale(0.55); }
+.option-button.wrong { opacity: 0.72; filter: grayscale(0.35); }
 .option-button.wrong.selected {
   opacity: 1;
   filter: none;
