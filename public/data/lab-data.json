@@ -1,0 +1,204 @@
+{
+  "meta": {
+    "dataset": "DEMO-01",
+    "label": "固定匿名示範資料",
+    "generatedAt": "2026-08-20",
+    "notice": "所有商家、品項、事件與群體數值均為虛構，用於內部概念驗證；未串接任何正式 API。"
+  },
+  "demos": [
+    {
+      "id": "recall",
+      "rank": 1,
+      "grade": "S",
+      "title": "商品召回雷達",
+      "icon": "🚨",
+      "tagline": "不用記得買過什麼，發票替你找出可能踩中的召回品。",
+      "problem": "召回資訊分散，消費者往往不知道自己是否買過。",
+      "assumption": "召回通知會讓使用者重新開啟 App，且相信自動比對有高價值。",
+      "dependency": "商品級發票明細＋權威召回事件＋批號資料",
+      "status": "需外部資料",
+      "rice": 1.24,
+      "design": {"pattern":"Safety Operations Console","reference":"Material Design 3","referenceUrl":"https://m3.material.io/","principle":"壓力下先看懂風險，再採取行動","voice":"冷靜、明確、零裝飾誤導"},
+      "nextStage": {"successMetric":"80% 使用者在 30 秒內分清可能命中與確認命中，並選對下一步","gate":"先完成權威召回來源、商品正規化與批號可得性 Spike","slice":"事件通知 → 個人比對 → 批號確認 → 處理狀態閉環"}
+    },
+    {
+      "id": "price",
+      "rank": 2,
+      "grade": "A+",
+      "title": "買貴了嗎？價格刺客",
+      "icon": "🗡️",
+      "tagline": "抓出自己真的買貴的那一筆，而不是看一張通用價目表。",
+      "problem": "包裝與促銷讓人難以記住同商品的真實單位價格。",
+      "assumption": "個人歷史價與單位價比較會改變下一次購買決策。",
+      "dependency": "品名正規化＋規格／數量解析＋個人歷史發票",
+      "status": "Prototype",
+      "rice": 2.33,
+      "design": {"pattern":"Price Intelligence Tape","reference":"Dribbble","referenceUrl":"https://dribbble.com/","principle":"數字是主角，裝飾只幫助比較","voice":"精準、犀利、像交易終端"},
+      "nextStage": {"successMetric":"70% 使用者看完後能說出下次要改變的購買策略","gate":"驗證品名正規化與單位換算準確率 ≥95%","slice":"異常價格 → 同規格歷史 → 單位價解釋 → 下次購買策略"}
+    },
+    {
+      "id": "stock",
+      "rank": 3,
+      "grade": "A+",
+      "title": "囤貨鬼打牆",
+      "icon": "🧻",
+      "tagline": "結帳前先問你：家裡是不是還有三包？",
+      "problem": "生活用品重複購入，回家才發現庫存還很多。",
+      "assumption": "使用者接受系統依購買週期推估家中庫存。",
+      "dependency": "重複品項辨識＋購買週期＋一次使用量假設",
+      "status": "Prototype",
+      "rice": 1.8,
+      "design": {"pattern":"Household Inventory Shelf","reference":"SiteInspire","referenceUrl":"https://www.siteinspire.com/","principle":"把抽象推估變成看得見的家中物件","voice":"溫暖、生活化、可校正"},
+      "nextStage": {"successMetric":"60% 使用者願意校正庫存，且第二次推估準確度提升","gate":"先驗證三種高頻日用品的消耗模型","slice":"重複購買 → 庫存猜測 → 一鍵校正 → 下次補貨提醒"}
+    },
+    {
+      "id": "detective",
+      "rank": 4,
+      "sourceRanks": [4, 5],
+      "grade": "A+",
+      "title": "發票推理局：這是誰？誰在說謊？",
+      "icon": "🕵️",
+      "tagline": "先查商家身分，再抓出自己消費紀錄裡的假話。",
+      "problem": "發票商家登記名難懂、消費統計又缺乏參與感，使用者看不懂也記不住。",
+      "assumption": "把商家辨識與自我認知串成一場推理遊戲，會比兩個獨立工具更容易完成與分享。",
+      "dependency": "商家別名庫＋個人發票明細＋可解釋敘述題庫＋敏感消費排除規則",
+      "status": "Prototype",
+      "rice": 2.2,
+      "design": {"pattern":"Noir Game-show Evidence Board","reference":"Awwwards × CodePen","referenceUrl":"https://www.awwwards.com/","principle":"每題都像案件、每個答案都有發票證據，不靠黑箱猜測","voice":"懸疑、機智、節奏快"},
+      "nextStage": {"successMetric":"五題完成率 ≥80%，結果分享意願 ≥40%，商家辨識理解度 ≥4/5","gate":"同時驗證商家別名模型與敘述題庫不重複、不洩漏敏感消費","slice":"商家身分查驗兩題 → 消費證詞三題 → 綜合偵探力結算與分享"}
+    },
+    {
+      "id": "taste",
+      "rank": 6,
+      "grade": "A+",
+      "title": "味覺 DNA／飲食鬼格",
+      "icon": "🍜",
+      "tagline": "把外食發票翻譯成一個有證據、能分享的飲食人設。",
+      "problem": "品類統計無聊，使用者看完不知道自己是怎樣的人。",
+      "assumption": "人格化洞察比一般統計更容易理解與分享。",
+      "dependency": "餐飲分類＋重複度＋價位；本資料無交易時間",
+      "status": "Prototype",
+      "rice": 1.5,
+      "design": {"pattern":"Food Editorial Personality","reference":"SiteInspire","referenceUrl":"https://www.siteinspire.com/","principle":"像雜誌專題，不像 AI 產生的診斷報告","voice":"有品味、幽默、承認樣本限制"},
+      "nextStage": {"successMetric":"人格結果理解度 ≥4.2/5，分享點擊 ≥30%，信任 ≥3.5/5","gate":"先測人格命名是否有趣但不冒犯，並定義敏感飲食排除規則","slice":"飲食訊號 → 人格封面 → 特徵證據 → 隱私安全分享卡"}
+    },
+    {
+      "id": "trend",
+      "rank": 7,
+      "grade": "A",
+      "title": "期間限定跟風雷達",
+      "icon": "📈",
+      "tagline": "你是第一波先知，還是看到大家買才跟上？",
+      "problem": "使用者不知道自己的消費是領先、同步還是落後流行。",
+      "assumption": "使用者對自己的流行消費傾向有興趣。",
+      "dependency": "期間商品字典＋匿名群體購買曲線",
+      "status": "需群體資料",
+      "rice": 0.5,
+      "design": {"pattern":"Pop-culture Trend Terminal","reference":"Awwwards","referenceUrl":"https://www.awwwards.com/","principle":"讓時間差一眼可見，不用讀分析報告","voice":"即時、潮流、帶一點 Y2K"},
+      "nextStage": {"successMetric":"75% 使用者能正確解釋自己的購買點位與熱潮峰值關係","gate":"確認匿名群體基準、最小樣本與期間商品字典","slice":"選趨勢 → 個人購買點 → 群體曲線 → 跟風類型比較"}
+    },
+    {
+      "id": "rare",
+      "rank": 8,
+      "grade": "A",
+      "title": "辦公室發票稀有種",
+      "icon": "🦄",
+      "tagline": "找出只有你會買的那一筆，安全地變成午休話題。",
+      "problem": "團隊互動缺少低門檻、有個人特色又不尷尬的話題。",
+      "assumption": "匿名的異常消費能形成社交分享動機。",
+      "dependency": "匿名同群基準＋隱私門檻＋品類正規化",
+      "status": "需群體資料",
+      "rice": 0.6,
+      "design": {"pattern":"Natural-history Specimen Card","reference":"Brand New","referenceUrl":"https://www.underconsideration.com/brandnew/","principle":"讓稀有變成收藏感，而不是把同事當笑話","voice":"古怪、珍藏、隱私優先"},
+      "nextStage": {"successMetric":"分享意願 ≥40%，且隱私疑慮提及率 <10%","gate":"定義敏感類別、k-anonymity 門檻與不可回推規則","slice":"篩選稀有度 → 標本卡 → 匿名群體證據 → 安全分享"}
+    },
+    {
+      "id": "warranty",
+      "rank": 9,
+      "grade": "B+",
+      "title": "保固／退貨救援鬼",
+      "icon": "🛟",
+      "tagline": "在能退、能修的最後幾天，把發票和待辦一起找回來。",
+      "problem": "使用者忘記購買日與期限，錯過退換或保固權益。",
+      "assumption": "使用者願意依賴發票提醒處理期限。",
+      "dependency": "購買日＋商品識別＋商家／品牌規則",
+      "status": "需規則資料",
+      "rice": 1.2,
+      "design": {"pattern":"Document Wallet Timeline","reference":"Material Design 3","referenceUrl":"https://m3.material.io/","principle":"把期限、確定性與待辦放在同一條時間線","voice":"可靠、安定、像權益管家"},
+      "nextStage": {"successMetric":"70% 使用者完成一筆狀態標記，通知授權 ≥50%","gate":"完成商家規則來源與法律文案 Review","slice":"即將到期 → 規則確定性 → 狀態標記 → 申請資料清單"}
+    },
+    {
+      "id": "fridge",
+      "rank": 10,
+      "grade": "B+",
+      "title": "冰箱今晚救援",
+      "icon": "🧊",
+      "tagline": "從最近買過的食材開始，不必重新輸入整座冰箱。",
+      "problem": "晚餐不知道煮什麼，也不記得家裡還剩什麼。",
+      "assumption": "近期食品發票足以降低晚餐決策成本。",
+      "dependency": "食品品項＋保存期假設＋使用者一步校正",
+      "status": "Prototype",
+      "rice": 1.1,
+      "design": {"pattern":"Kitchen Mise-en-place","reference":"Dribbble","referenceUrl":"https://dribbble.com/","principle":"先確認手邊食材，再談推薦；不假裝知道冰箱","voice":"新鮮、輕鬆、可立即動手"},
+      "nextStage": {"successMetric":"60% 使用者在 60 秒內選出一道願意做的料理","gate":"驗證食品保存期提示與一步校正是否足夠","slice":"可能食材 → 一步校正 → 三道料理 → 缺料與保存提醒"}
+    }
+  ],
+  "invoices": [
+    {"id":"A01","date":"2026-07-21","merchant":"光點 3C","legalName":"光點數位生活股份有限公司","category":"3C","amount":899,"items":[{"name":"無線滑鼠 M220","qty":1,"unit":"個","price":899}]},
+    {"id":"A02","date":"2026-07-27","merchant":"街角食堂","legalName":"日常餐飲有限公司中正分公司","category":"餐飲","amount":145,"items":[{"name":"泰式打拋豬飯","qty":1,"unit":"份","price":145}]},
+    {"id":"A03","date":"2026-08-03","merchant":"好日超市","legalName":"好日生活事業股份有限公司","category":"生鮮","amount":222,"items":[{"name":"鮮奶 936ml","qty":1,"unit":"瓶","price":99},{"name":"雞蛋 10 入","qty":1,"unit":"盒","price":78},{"name":"洋蔥","qty":1,"unit":"袋","price":45}]},
+    {"id":"A04","date":"2026-08-06","merchant":"日日便利","legalName":"日日商貿股份有限公司第 302 分公司","category":"超商","amount":97,"items":[{"name":"茶葉蛋","qty":1,"unit":"顆","price":13},{"name":"中杯拿鐵","qty":1,"unit":"杯","price":45},{"name":"蜜桃氣泡飲 500ml","qty":1,"unit":"瓶","price":39}]},
+    {"id":"A05","date":"2026-08-09","merchant":"好日超市","legalName":"好日生活事業股份有限公司","category":"日用品","amount":199,"items":[{"name":"柔韌抽取衛生紙 12 包","qty":1,"unit":"串","price":199}]},
+    {"id":"A06","date":"2026-08-12","merchant":"日日便利","legalName":"日日商貿股份有限公司第 118 分公司","category":"超商","amount":39,"items":[{"name":"清涼氣泡水 500ml","qty":1,"unit":"瓶","price":39}]},
+    {"id":"A07","date":"2026-08-14","merchant":"好日超市","legalName":"好日生活事業股份有限公司","category":"日用品","amount":189,"items":[{"name":"柔韌抽取衛生紙 12 包","qty":1,"unit":"串","price":189}]},
+    {"id":"A08","date":"2026-08-15","merchant":"深夜麵屋","legalName":"月見餐飲顧問有限公司","category":"餐飲","amount":220,"items":[{"name":"豚骨拉麵","qty":1,"unit":"碗","price":190},{"name":"溏心蛋","qty":1,"unit":"顆","price":30}]},
+    {"id":"A09","date":"2026-08-18","merchant":"日日便利","legalName":"日日商貿股份有限公司第 302 分公司","category":"超商","amount":39,"items":[{"name":"蜜桃氣泡飲 500ml","qty":1,"unit":"瓶","price":39}]},
+    {"id":"A10","date":"2026-08-19","merchant":"午間咖哩","legalName":"南風香料餐飲有限公司","category":"餐飲","amount":180,"items":[{"name":"雞肉咖哩飯","qty":1,"unit":"份","price":180}]}
+  ],
+  "recallEvent": {
+    "title": "清涼氣泡水 500ml 模擬自主召回",
+    "published":"2026-08-20",
+    "product":"清涼氣泡水 500ml",
+    "batch":"QX0812",
+    "window":["2026-08-10","2026-08-15"],
+    "confidence":86,
+    "reason":"瓶蓋密封檢查未達內部標準（虛構事件）"
+  },
+  "priceHistory": [
+    {"product":"柔韌抽取衛生紙 12 包","date":"2026-08-09","merchant":"好日超市","price":199,"unitPrice":16.58},
+    {"product":"柔韌抽取衛生紙 12 包","date":"2026-08-14","merchant":"好日超市","price":189,"unitPrice":15.75},
+    {"product":"鮮奶 936ml","date":"2026-07-08","merchant":"日日便利","price":105,"unitPrice":0.112},
+    {"product":"鮮奶 936ml","date":"2026-08-03","merchant":"好日超市","price":99,"unitPrice":0.106}
+  ],
+  "detectiveRounds": [
+    {"legal":"日日商貿股份有限公司第 302 分公司","clues":["金額 97 元","茶葉蛋、拿鐵、氣泡飲","超商類型"],"options":["日日便利","好日超市","深夜麵屋"],"answer":0,"why":"同一張示範發票包含典型超商品項，且別名庫把第 302 分公司映射為日日便利。"},
+    {"legal":"月見餐飲顧問有限公司","clues":["金額 220 元","拉麵與溏心蛋","餐飲類型"],"options":["午間咖哩","光點 3C","深夜麵屋"],"answer":2,"why":"品項組合與深夜麵屋的示範菜單吻合；正式版仍需要商家別名資料。"},
+    {"legal":"南風香料餐飲有限公司","clues":["金額 180 元","雞肉咖哩飯","餐飲類型"],"options":["午間咖哩","街角食堂","好日超市"],"answer":0,"why":"品項是單份雞肉咖哩飯，固定別名表對應午間咖哩。"}
+  ],
+  "truthRounds": [
+    {"statements":["你買過兩次蜜桃氣泡飲","你最近買過無線滑鼠","你買過三次衛生紙"],"answer":2,"evidence":"示範資料中蜜桃氣泡飲 2 次、無線滑鼠 1 次、衛生紙 2 次。"},
+    {"statements":["你最近買過泰式料理","你最近買過咖哩","你最近買過披薩"],"answer":2,"evidence":"餐飲明細有打拋豬與咖哩，沒有披薩。"},
+    {"statements":["單筆最高是無線滑鼠","你在好日超市有 4 張發票","你在深夜麵屋花了 220 元"],"answer":1,"evidence":"好日超市只有 8/03、8/09、8/14 共 3 張；單筆最高與深夜麵屋 220 元都是真的。"},
+    {"statements":["你買過雞蛋","你買過洋蔥","你買過香蕉"],"answer":2,"evidence":"8/03 的發票有雞蛋和洋蔥，沒有香蕉。"},
+    {"statements":["你有 10 張示範發票","你買過 3 種餐飲主食","你有 4 張 500 元以上發票"],"answer":2,"evidence":"共有 10 張；主食有打拋豬飯、拉麵、咖哩飯；只有無線滑鼠一張超過 500 元。"}
+  ],
+  "trends": [
+    {"id":"peach","name":"蜜桃氣泡飲","personalDay":2,"peakDay":5,"score":78,"label":"第一波試喝鬼","curve":[9,18,34,61,89,100,73]},
+    {"id":"pudding","name":"焦糖布丁拿鐵","personalDay":6,"peakDay":3,"score":39,"label":"口碑確認派","curve":[12,42,92,100,70,46,22]}
+  ],
+  "rareFinds": [
+    {"id":"mouse","category":"3C","date":"2026-07-21","rarity":96,"title":"午休滑鼠馴獸師","item":"無線滑鼠 M220","peerRate":"33 人中僅 1 人買過","invoice":"A01"},
+    {"id":"ramen","category":"餐飲","date":"2026-08-15","rarity":82,"title":"溏心蛋加點堅持者","item":"豚骨拉麵＋溏心蛋","peerRate":"33 人中僅 3 人有同組合","invoice":"A08"},
+    {"id":"soda","category":"超商","date":"2026-08-18","rarity":68,"title":"蜜桃氣泡回購員","item":"蜜桃氣泡飲 500ml","peerRate":"33 人中 7 人買過","invoice":"A09"}
+  ],
+  "warranties": [
+    {"id":"mouse","item":"無線滑鼠 M220","merchant":"光點 3C","purchase":"2026-07-21","deadline":"2026-08-21","days":1,"rule":"示範估計：購買後 30 天內","certainty":"估計","status":"待處理"},
+    {"id":"milk","item":"鮮奶 936ml","merchant":"好日超市","purchase":"2026-08-03","deadline":"2026-08-03","days":0,"rule":"生鮮退換依商家與商品狀態，Demo 不判定權利","certainty":"未知","status":"保留"}
+  ],
+  "ingredients": ["鮮奶","雞蛋","洋蔥"],
+  "recipes": [
+    {"name":"洋蔥歐姆蛋","needs":["雞蛋","洋蔥","鹽"],"minutes":15},
+    {"name":"奶香炒蛋","needs":["鮮奶","雞蛋","奶油"],"minutes":10},
+    {"name":"洋蔥牛奶濃湯","needs":["鮮奶","洋蔥","高湯"],"minutes":25}
+  ]
+}

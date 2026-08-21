@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#01AFA2" />
+    <meta name="description" content="九個可操作的發票資料應用實驗，用真實行為證據決定下一個值得開發的產品。" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="發票腦洞實驗室" />
+    <meta property="og:description" content="10 個 Demo，找出下一個值得做的發票應用。假設，不是結論。" />
+    <meta property="og:image" content="/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="發票腦洞實驗室" />
+    <meta name="twitter:description" content="10 個 Demo，找出下一個值得做的發票應用。假設，不是結論。" />
+    <meta name="twitter:image" content="/og.png" />
+    <title>發票腦洞實驗室</title>
+    <link rel="stylesheet" href="/styles.css?v=stage-2" />
+  </head>
+  <body>
+    <a class="skip-link" href="#app">跳到主要內容</a>
+    <header class="topbar">
+      <a class="brand" href="#/gallery" aria-label="回到發票腦洞實驗室首頁">
+        <span class="brand-mark" aria-hidden="true">票</span>
+        <span><strong>發票腦洞實驗室</strong><small>Invoice Idea Lab</small></span>
+      </a>
+      <nav class="topnav" aria-label="主要導覽">
+        <a href="#/gallery" data-nav="gallery">九項實驗</a>
+        <a href="#/brief" data-nav="brief">驗證計畫</a>
+        <a href="#/next-stage" data-nav="next-stage">產品化藍圖</a>
+        <a href="#/dashboard" data-nav="dashboard">證據儀表板</a>
+      </nav>
+    </header>
+    <main id="app" tabindex="-1">
+      <div class="loading-state" role="status">
+        <span class="loading-orb" aria-hidden="true"></span>
+        <strong>實驗室開機中</strong>
+      </div>
+    </main>
+    <div id="modal-root"></div>
+    <div id="toast" class="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="/app.js?v=stage-2"></script>
+  </body>
+</html>
