@@ -139,17 +139,6 @@ function renderCaseProgress(room) {
   </div>`;
 }
 
-function humanObservation(question) {
-  const observations = {
-    quiz: "品牌名、登記名與記憶中的地點常常不一樣；發票讓我們把印象重新對焦。",
-    vote: "人會本能地縮小高頻習慣，因為『偶爾』聽起來比真實次數更像自己。",
-    bet: "我們會急著用人設定罪，但只有完整行動線才能把懷疑變成答案。",
-    timeline: "一天的發票連起來，就是一條沒人能否認的行動線。",
-    clue: "決定性線索不是新證據，是舊證據終於排成一直線。",
-  };
-  return observations[question.kind] ?? "發票記錄行為；當事人的解釋，才補上行為背後的人。";
-}
-
 function renderHome() {
   app.innerHTML = `
     <section class="scene hero-grid">
@@ -534,11 +523,6 @@ function renderReveal() {
           <h1 class="truth-reveal">${question.kind === "vote" ? "說謊的是" : "真相是"} <span>${escapeHtml(correctLabel)}</span></h1>
           ${question.kind === "vote" && correctChoice ? `<div class="suspect-frame"><span class="spotlight" aria-hidden="true"></span>${portraitMarkup(correctChoice, "suspect-reveal-portrait")}<div><small>SUSPECT LISTED</small><strong>嫌疑名單 ${room.suspects.length} 人</strong><span>說謊 ≠ 定罪，先框起來，等第三幕行動線。</span></div><b class="suspect-stamp">嫌疑人</b></div>` : ""}
           <p>${escapeHtml(evidence.finding)}</p>
-          <div class="humanity-note">
-            <span>HUMANITY / 人性觀察</span>
-            <strong>${escapeHtml(humanObservation(question))}</strong>
-            <small>請當事人用 10 秒補完故事：這筆消費當時到底發生了什麼？</small>
-          </div>
           ${demoMode ? `<div class="demo-cue compact"><span>PRESENTER CUE</span><strong>${escapeHtml(demoCue(room))}</strong></div>` : ""}
           <div class="option-grid">${renderOptions(question, { selected: room.viewerChoice, reveal: true })}</div>
           ${state.view === "host" ? `<div class="distribution">${renderDistribution(question, room.answeredCount)}</div>` : ""}
