@@ -159,7 +159,7 @@ function renderHome() {
         <div class="button-row">
           <button class="primary-button" data-action="create-case">立案，成為主持人</button>
           <button class="ghost-button" data-action="focus-join">我有案件編號</button>
-          ${testMode ? `<span class="test-mode-badge">${demoMode ? "5-MIN DEMO" : "TEST MODE"} · 動畫已關閉</span>` : `<a class="ghost-button test-mode-link" href="/detective.html?test=1">無動畫測試</a><a class="ghost-button test-mode-link" href="/detective.html?demo=1">五分鐘簡報</a>`}
+          ${testMode ? `<span class="test-mode-badge">${demoMode ? "5-MIN DEMO" : "TEST MODE"} · 動畫已關閉</span>` : `<a class="ghost-button test-mode-link" href="/detective.html?demo=1">五分鐘簡報</a>`}
         </div>
         <div class="hero-proof">
           <span class="proof-chip">三幕破案</span>

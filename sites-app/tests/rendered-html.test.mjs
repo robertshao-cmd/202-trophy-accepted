@@ -36,6 +36,8 @@ test("hosted source contains Rebecca's complete intro, the full PR #2 game, Jira
     readFile(new URL("../lib/game.ts", import.meta.url), "utf8"),
   ]);
   assert.match(html, /KAHOOT × DETECTIVE × INVOICE/);
+  assert.match(html, /<strong>KID<\/strong>/);
+  assert.match(html, /\/kid-logo\.png/);
   assert.match(html, /誰是犯人/);
   assert.match(html, /id="stageIntro"/);
   assert.match(html, /INTRO DESIGN · REBECCA/);
@@ -51,6 +53,7 @@ test("hosted source contains Rebecca's complete intro, the full PR #2 game, Jira
   assert.match(js, /home-detective\.png/);
   assert.match(js, /Jira 頭像/);
   assert.match(js, /五分鐘簡報/);
+  assert.doesNotMatch(js, />無動畫測試</);
   assert.match(game, /cases\.json/);
   assert.match(game, /escapeScore/);
   for (const portrait of ["robert.png", "michelle.png", "rebecca.png", "xu-ruiyu.png", "he-pinru.png", "huang-junlin.png"]) {
@@ -60,6 +63,8 @@ test("hosted source contains Rebecca's complete intro, the full PR #2 game, Jira
     const bytes = await readFile(new URL(`../public/${asset}`, import.meta.url));
     assert.ok(bytes.byteLength > 100_000, `${asset} should be a high-resolution original asset`);
   }
+  const kidLogo = await readFile(new URL("../public/kid-logo.png", import.meta.url));
+  assert.ok(kidLogo.byteLength > 50_000, "KID should use the attached full-resolution logo");
 });
 
 test("a full three-act case runs to results and never leaks owner/is_lie/answer to players", async () => {

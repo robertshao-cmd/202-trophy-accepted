@@ -1275,15 +1275,21 @@ html[data-test-mode="true"] .route-stop { animation: none; opacity: 1; }
 
 select.case-input { appearance: auto; }
 
-/* 發票載具風 logo：青綠漸層圓角方塊＋白色「發」 */
+/* KID 品牌 logo：直接使用團隊提供的正式圖像 */
 .case-seal.carrier-seal {
   border: none;
   border-radius: 12px;
-  background: linear-gradient(160deg, #00b8a2 0%, #0aa6c8 70%, #2b9fe0 100%);
-  color: #fffaf0;
-  font-size: 26px;
+  background: transparent;
   transform: none;
+  overflow: hidden;
   box-shadow: 0 4px 14px rgba(10, 166, 200, 0.4);
+}
+
+.case-seal.carrier-seal img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
 }
 
 /* 手機（玩家主要裝置）：新元件的小螢幕規則 */
