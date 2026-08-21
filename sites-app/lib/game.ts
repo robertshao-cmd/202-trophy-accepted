@@ -228,15 +228,22 @@ function introView(step: Step, c: CaseData) {
   return { kind: "intro", act: actLabelOf(step), actNumber: step.index + 1, label: intro.title, prompt: intro.body, choices: [] as { id: string; label: string }[] };
 }
 
-// 題目文案精簡：從編譯器產出的長 prompt 抽關鍵資訊重組
-function shortQuizPrompt(q: Act1Question, invoice: Invoice) {
+// 題目文案精簡＋分層：從編譯器產出的長 prompt 抽關鍵資訊，
+// 拆成「線索列（標籤＋大字）」與「提問句」兩層，方便前端做字級區分
+function quizPromptParts(q: Act1Question, invoice: Invoice) {
   const quoted = q.prompt.match(/「(.+?)」/)?.[1];
   const channel = q.prompt.match(/【(.+?)】/)?.[1];
   const addr = invoice.addr.slice(0, 6);
-  if (q.type === "品名分類推店家" && quoted) return `只認得出品項分類「${quoted}」。這是哪間店？`;
-  if (q.type === "登記名破解" && quoted) return `登記名「${quoted}」，地址在${addr}。這是哪間店？`;
-  if (q.type === "通路小分類推店家" && channel) return `一張【${channel}】通路的發票，開在${addr}。這是哪間店？`;
-  return q.prompt;
+  if (q.type === "品名分類推店家" && quoted) {
+    return { lines: [{ label: "品項分類", value: quoted }], ask: "這是哪間店？" };
+  }
+  if (q.type === "登記名破解" && quoted) {
+    return { lines: [{ label: "登記名", value: quoted }, { label: "地址", value: addr }], ask: "這是哪間店？" };
+  }
+  if (q.type === "通路小分類推店家" && channel) {
+    return { lines: [{ label: "通路類別", value: channel }, { label: "地址", value: addr }], ask: "這是哪間店？" };
+  }
+  return { lines: [] as { label: string; value: string }[], ask: q.prompt };
 }
 
 function questionView(room: Room, viewerPlayer: Player | null) {
@@ -253,8 +260,11 @@ function questionView(room: Room, viewerPlayer: Player | null) {
   if (step.kind === "quiz") {
     const q = c.act1[step.index];
     const invoice = c.invoices[q.invoice_idx];
+    const parts = quizPromptParts(q, invoice);
     return {
-      kind: "quiz", act, label: q.type, prompt: shortQuizPrompt(q, invoice),
+      kind: "quiz", act, label: q.type,
+      prompt: parts.lines.length ? `${parts.lines.map((line) => `${line.label}「${line.value}」`).join("，")}。${parts.ask}` : parts.ask,
+      parts,
       prop: { time: invoice.time, amt: invoice.amt, date: c.date },
       choices: q.options.map((option, index) => ({ id: String(index), label: option })),
       ...(reveal ? {
@@ -282,6 +292,7 @@ function questionView(room: Room, viewerPlayer: Player | null) {
     const viewerOnStage = viewerPlayer ? onStage(room, viewerPlayer, step) : false;
     return {
       kind: "vote", act, label: `口供第 ${round.round} 輪`, prompt: `「${round.theme}」——兩真一假，誰在說謊？`,
+      parts: { lines: [{ label: "本輪主題", value: round.theme }], ask: "兩真一假，誰在說謊？" },
       theme: round.theme, narration: round["旁白"], round: round.round, roundCount: c.act2.length,
       choices: round.statements.map((s, index) => ({ id: String(index), name: s.player, label: s.stmt })),
       viewerOnStage,
@@ -322,6 +333,7 @@ function questionView(room: Room, viewerPlayer: Player | null) {
   return {
     kind: "bet", act, label: round === 1 ? "首輪下注" : "末輪下注",
     prompt: round === 1 ? "誰是犯人？押中 400 分。" : "最後一注：誰是犯人？押中 150 分。",
+    parts: { lines: [{ label: round === 1 ? "首輪下注" : "末輪下注", value: "誰是犯人？" }], ask: round === 1 ? "押中 400 分・押錯不倒扣" : "最後一注・押中 150 分" },
     betRound: round,
     clue: round === 2 ? c.act3.final_clue : null,
     choices: castOf(c).map((name) => ({ id: name, label: name, suspect: room.suspects.includes(name) })),

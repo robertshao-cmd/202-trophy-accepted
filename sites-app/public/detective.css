@@ -1276,3 +1276,32 @@ select.case-input { appearance: auto; }
   .intro-act-number { width: 64px; height: 64px; font-size: 30px; }
   .intro-body { font-size: 15px; }
 }
+
+/* 題目分層：線索大字、提問句換行小字不粗體 */
+.prompt-block { margin: 26px 0 24px; display: grid; gap: 14px; }
+.clue-line { display: grid; gap: 6px; }
+.clue-line small {
+  justify-self: start;
+  padding: 2px 10px;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  color: var(--gold);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+}
+.clue-line strong {
+  font-size: clamp(24px, 4.2vw, 36px);
+  font-weight: 900;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+.prompt-ask {
+  margin: 4px 0 0;
+  color: var(--muted);
+  font-size: 16px;
+  font-weight: 400;
+}
+@media (max-width: 620px) {
+  .clue-line strong { font-size: 22px; }
+  .prompt-ask { font-size: 14px; }
+}

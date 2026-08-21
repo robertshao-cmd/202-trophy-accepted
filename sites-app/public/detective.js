@@ -333,6 +333,16 @@ function renderOptions(question, { interactive = false, selected = null, reveal 
   }).join("");
 }
 
+function renderPrompt(question) {
+  if (!question.parts?.lines?.length) return `<h1>${escapeHtml(question.parts?.ask ?? question.prompt)}</h1>`;
+  return `
+    <div class="prompt-block">
+      ${question.parts.lines.map((line) => `<div class="clue-line"><small>${escapeHtml(line.label)}</small><strong>${escapeHtml(line.value)}</strong></div>`).join("")}
+      <p class="prompt-ask">${escapeHtml(question.parts.ask)}</p>
+    </div>
+  `;
+}
+
 function renderTimelineStops(question) {
   return `<div class="timeline-route" aria-label="案發日行動線">
     ${question.stops.map((stop, index) => `
@@ -431,7 +441,7 @@ function renderQuestion() {
           ${renderCaseProgress(room)}
           ${renderStageProp(question)}
           ${narration}
-          <h1>${escapeHtml(question.prompt)}</h1>
+          ${renderPrompt(question)}
           <div class="option-grid ${question.kind === "bet" ? "bet-grid" : ""}">${renderOptions(question, { interactive: !room.viewerAnswered, selected: room.viewerChoice })}</div>
         </div>
       </section>
@@ -449,7 +459,7 @@ function renderQuestion() {
           ${renderCaseProgress(room)}
           ${renderStageProp(question)}
           ${narration}
-          <h1>${escapeHtml(question.prompt)}</h1>
+          ${renderPrompt(question)}
           <div class="option-grid ${question.kind === "bet" ? "bet-grid" : ""}">${renderOptions(question)}</div>
           <p class="panel-note" style="margin:14px 0 0">投影畫面僅供觀看 · 作答請用手機開玩家頁</p>
         </article>
