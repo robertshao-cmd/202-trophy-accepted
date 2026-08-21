@@ -181,14 +181,12 @@ function botAnswers(room: Room) {
   if (!room.phaseStartedAt || now - room.phaseStartedAt < timings.botAnswerMs) return;
   const answers = room.answers[room.stepIndex] ?? {};
   const c = caseOf(room);
-  for (const [botIndex, bot] of room.players.filter((p) => p.isBot && !answers[p.id]).entries()) {
+  for (const bot of room.players.filter((p) => p.isBot && !answers[p.id])) {
     if (onStage(room, bot, step)) continue;
     let choice: string | null = null;
     if (step.kind === "quiz") {
-      // 示範用：多數答對、少數答錯（沿用原殼節奏）
-      const ids = c.act1[step.index].options.map((_, i) => String(i));
-      const correct = correctChoiceOf(room, step)!;
-      choice = (room.stepIndex + botIndex) % 4 === 0 ? ids[(ids.indexOf(correct) + 1) % ids.length] : correct;
+      // 均勻亂猜：示範線民不偷看答案，分布才自然
+      choice = String(Math.floor(Math.random() * c.act1[step.index].options.length));
     } else if (step.kind === "vote") {
       // 均勻亂猜：投票分布不可洩漏誰是說謊者
       choice = String(Math.floor(Math.random() * c.act2[step.index].statements.length));
@@ -196,7 +194,7 @@ function botAnswers(room: Room) {
       const cast = castOf(c);
       choice = cast[Math.floor(Math.random() * cast.length)];
     }
-    if (choice !== null) answers[bot.id] = { choice, answeredAt: now, points: step.kind === "quiz" ? 125 : 0 };
+    if (choice !== null) answers[bot.id] = { choice, answeredAt: now, points: step.kind === "quiz" ? 100 : 0 };
   }
   room.answers[room.stepIndex] = answers;
 }
@@ -225,18 +223,19 @@ function actLabelOf(step: Step | null) {
 
 // 幕間介紹（Intro）文案
 function introView(step: Step, c: CaseData) {
+  // **…** 標記的重點，前端會渲染成粗體＋醒目色
   const intros = [
     {
       title: "蒐集資訊",
-      body: "犯罪現場一片狼藉，地上散落著沾滿污漬的發票，一些重要資訊被遮住了。推理出「消費的地點」，用來找出嫌疑人與當天的行動軌跡。",
+      body: "犯罪現場一片狼藉，地上散落著沾滿污漬的發票，一些重要資訊被遮住了。**推理出「消費的地點」**，用來找出**嫌疑人與當天的行動軌跡**。",
     },
     {
       title: "框出嫌疑人",
-      body: "透過犯罪現場的發票，你知道了嫌疑人當天出沒的地點。你找來去過那些地點的人盤問——三人一組提出口供，其中一人在說謊，他就是嫌疑人。",
+      body: "透過犯罪現場的發票，你知道了嫌疑人當天出沒的地點。你找來去過那些地點的人盤問——**三人一組提出口供，其中一人在說謊**，他就是嫌疑人。",
     },
     {
       title: "找出犯人",
-      body: `警探列出了完整消費軌跡。${c.act2.length} 位說謊的嫌疑人之中，誰才是犯人？`,
+      body: `警探列出了完整消費軌跡。${c.act2.length} 位說謊的嫌疑人之中，**誰才是犯人？**`,
     },
   ];
   const intro = intros[step.index];

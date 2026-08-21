@@ -45,6 +45,10 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function emphasize(text) {
+  return escapeHtml(text).replace(/\*\*(.+?)\*\*/g, `<strong class="hl">$1</strong>`);
+}
+
 function notify(message) {
   toast.textContent = message;
   toast.classList.add("show");
@@ -166,9 +170,9 @@ function renderHome() {
         <h2>消費軌跡失竊案</h2>
         <p>案件由真實發票編譯而成；犯人、口供與定罪皆為遊戲虛構。掃碼入局，領一個偵探代號就能玩。</p>
         <div class="act-briefs" aria-label="三幕流程簡介">
-          <div class="act-brief"><b>壹</b><span><strong>蒐集資訊</strong><small>犯罪現場散落污漬發票，推理「消費地點」，找出嫌疑人與行動軌跡</small></span></div>
-          <div class="act-brief"><b>貳</b><span><strong>框出嫌疑人</strong><small>傳喚去過那些地點的人——三人一組口供，其中一人在說謊</small></span></div>
-          <div class="act-brief"><b>參</b><span><strong>找出犯人</strong><small>攤開完整消費軌跡，下注指認：說謊的嫌疑人中誰是犯人</small></span></div>
+          <div class="act-brief"><b>壹</b><span><strong>蒐集資訊</strong><small>犯罪現場散落污漬發票，<strong class="hl">推理「消費地點」</strong>，找出嫌疑人與行動軌跡</small></span></div>
+          <div class="act-brief"><b>貳</b><span><strong>框出嫌疑人</strong><small>傳喚去過那些地點的人——<strong class="hl">三人一組口供，其中一人在說謊</strong></small></span></div>
+          <div class="act-brief"><b>參</b><span><strong>找出犯人</strong><small>攤開完整消費軌跡，下注指認：<strong class="hl">說謊的嫌疑人中誰是犯人</strong></small></span></div>
         </div>
         <form class="join-panel" data-form="enter-code">
           <label class="field-label" for="home-code">輸入 4 位案件編號</label>
@@ -358,7 +362,7 @@ function renderShowcase(question, room) {
           <p class="eyebrow">ACT ${question.actNumber} / 3</p>
           <div class="intro-act-number" aria-hidden="true">${["壹", "貳", "參"][question.actNumber - 1]}</div>
           <h1>${escapeHtml(question.label)}</h1>
-          <p class="intro-body">${escapeHtml(question.prompt)}</p>
+          <p class="intro-body">${emphasize(question.prompt)}</p>
           ${room.isHost ? `<div class="button-row" style="margin-top:24px"><button class="primary-button" data-action="advance">開始${["第一幕", "第二幕", "第三幕"][question.actNumber - 1]}</button></div>` : `<p class="panel-note">等主持人開始${["第一幕", "第二幕", "第三幕"][question.actNumber - 1]}…</p>`}
         </div>
       </section>
@@ -529,8 +533,9 @@ function renderVerdictReveal(question, room) {
 
 function viewerVerdictBanner(room, question) {
   if (!state.playerKey || state.view === "host") return "";
-  if (room.viewerChoice == null) return `<div class="verdict-banner miss">這題你沒作答</div>`;
-  if (room.viewerChoice === question.correctChoice) {
+  if (question.kind === "vote" && question.viewerOnStage) return `<div class="verdict-banner miss">你在台上受審，本輪不投票</div>`;
+  if (room.viewerChoice == null) return `<div class="verdict-banner wrong">✗ 未作答 · 本題 0 分</div>`;
+  if (question.correctChoice != null && String(room.viewerChoice) === String(question.correctChoice)) {
     return `<div class="verdict-banner hit">${question.kind === "vote" ? "🎯 投中說謊者 +100" : "🎯 答對！"}</div>`;
   }
   return `<div class="verdict-banner wrong">✗ 答錯了，下一題扳回來</div>`;

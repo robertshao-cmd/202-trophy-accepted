@@ -1396,3 +1396,7 @@ select.case-input { appearance: auto; }
 }
 .act-brief strong { display: block; font-size: 15px; }
 .act-brief small { display: block; margin-top: 2px; font-size: 12px; line-height: 1.6; opacity: 0.75; }
+
+/* 介紹文案重點標示 */
+.intro-body .hl { color: var(--gold); font-weight: 900; }
+.act-brief small .hl { color: #c0392b; font-weight: 700; }
