@@ -1305,3 +1305,66 @@ select.case-input { appearance: auto; }
   .clue-line strong { font-size: 22px; }
   .prompt-ask { font-size: 14px; }
 }
+
+/* 開牌對錯強化 */
+.verdict-banner {
+  margin: 0 0 18px;
+  padding: 14px 18px;
+  border: 3px solid #000;
+  border-radius: 6px;
+  font-size: 22px;
+  font-weight: 900;
+  text-align: center;
+  box-shadow: 5px 5px 0 #000;
+}
+.verdict-banner.hit { background: var(--mint); color: #07100f; }
+.verdict-banner.wrong { background: var(--red); color: #fffaf0; }
+.verdict-banner.miss { background: rgba(255, 255, 255, 0.12); color: var(--muted); }
+
+.option-button.correct {
+  border-width: 3px;
+  border-color: var(--mint);
+  background: rgba(109, 215, 199, 0.32);
+  opacity: 1;
+}
+.option-button.correct::after {
+  content: "✓ 正解";
+  position: absolute;
+  right: 10px;
+  top: -12px;
+  padding: 3px 10px;
+  border: 2px solid #000;
+  border-radius: 4px;
+  background: var(--mint);
+  color: #07100f;
+  font-size: 13px;
+  font-weight: 900;
+  transform: rotate(3deg);
+  box-shadow: 2px 2px 0 #000;
+}
+.option-button.wrong { opacity: 0.32; filter: grayscale(0.55); }
+.option-button.wrong.selected {
+  opacity: 1;
+  filter: none;
+  border-width: 3px;
+  border-color: var(--red);
+  background: rgba(217, 70, 54, 0.2);
+}
+.option-button.wrong.selected::after {
+  content: "✗ 你的選擇";
+  position: absolute;
+  right: 10px;
+  top: -12px;
+  padding: 3px 10px;
+  border: 2px solid #000;
+  border-radius: 4px;
+  background: var(--red);
+  color: #fffaf0;
+  font-size: 13px;
+  font-weight: 900;
+  transform: rotate(-3deg);
+  box-shadow: 2px 2px 0 #000;
+}
+@media (max-width: 620px) {
+  .verdict-banner { font-size: 18px; padding: 11px 14px; }
+}

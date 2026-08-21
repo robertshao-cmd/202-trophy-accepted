@@ -507,6 +507,7 @@ function renderVerdictReveal(question, room) {
     <section class="scene scene-wide act-timeline reveal-scene">
       <div class="evidence-layout">
         <article class="reveal-card">
+          ${state.playerKey && state.view !== "host" && room.viewerChoice != null ? (room.viewerChoice === verdict.owner ? `<div class="verdict-banner hit">🎯 押中真兇 +150</div>` : `<div class="verdict-banner wrong">✗ 押錯人了</div>`) : ""}
           <div class="reveal-impact" aria-hidden="true"><strong>啪！</strong><span>開牌</span></div>
           <span class="reveal-stamp">真兇鎖定</span>
           <p class="comic-caption">第三幕｜終局指認 · 所有下注封存完畢，開牌。</p>
@@ -531,6 +532,15 @@ function renderVerdictReveal(question, room) {
   `;
 }
 
+function viewerVerdictBanner(room, question) {
+  if (!state.playerKey || state.view === "host") return "";
+  if (room.viewerChoice == null) return `<div class="verdict-banner miss">這題你沒作答</div>`;
+  if (room.viewerChoice === question.correctChoice) {
+    return `<div class="verdict-banner hit">${question.kind === "vote" ? "🎯 投中說謊者 +100" : "🎯 答對！"}</div>`;
+  }
+  return `<div class="verdict-banner wrong">✗ 答錯了，下一題扳回來</div>`;
+}
+
 function renderReveal() {
   const room = state.room;
   const question = room.question;
@@ -542,6 +552,7 @@ function renderReveal() {
     <section class="scene scene-wide ${actClass(question)} reveal-scene">
       <div class="evidence-layout">
         <article class="reveal-card">
+          ${viewerVerdictBanner(room, question)}
           <div class="reveal-impact" aria-hidden="true"><strong>啪！</strong><span>封條撕開</span></div>
           <span class="reveal-stamp">證據成立</span>
           <p class="comic-caption">${escapeHtml(question.act)} · 所有人的印象，現在接受發票審判。</p>
