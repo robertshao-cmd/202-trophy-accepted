@@ -159,21 +159,16 @@ function renderHome() {
           <span class="proof-chip">真實發票證據</span>
           <span class="proof-chip">不需註冊</span>
         </div>
-        <div class="case-loop" aria-label="一局的三個步驟">
-          <span><b>01</b><strong>犯罪現場</strong><small>污漬發票推地點</small></span>
-          <span><b>02</b><strong>口供審訊</strong><small>兩真一假、台下投票</small></span>
-          <span><b>03</b><strong>終局指認</strong><small>行動線＋雙輪下注</small></span>
-        </div>
       </div>
       <aside class="folder-card" aria-label="案件檔案袋">
         <span class="paper-clip" aria-hidden="true"></span>
         <p class="eyebrow">CASE DOSSIER</p>
         <h2>消費軌跡失竊案</h2>
         <p>案件由真實發票編譯而成；犯人、口供與定罪皆為遊戲虛構。掃碼入局，領一個偵探代號就能玩。</p>
-        <div class="sealed-dossiers" aria-label="案件規模">
-          <span><strong>3–5</strong><small>張污漬發票</small></span>
-          <span><strong>3–4</strong><small>輪口供審訊</small></span>
-          <span><strong>02</strong><small>輪終局下注</small></span>
+        <div class="act-briefs" aria-label="三幕流程簡介">
+          <div class="act-brief"><b>壹</b><span><strong>蒐集資訊</strong><small>犯罪現場散落污漬發票，推理「消費地點」，找出嫌疑人與行動軌跡</small></span></div>
+          <div class="act-brief"><b>貳</b><span><strong>框出嫌疑人</strong><small>傳喚去過那些地點的人——三人一組口供，其中一人在說謊</small></span></div>
+          <div class="act-brief"><b>參</b><span><strong>找出犯人</strong><small>攤開完整消費軌跡，下注指認：說謊的嫌疑人中誰是犯人</small></span></div>
         </div>
         <form class="join-panel" data-form="enter-code">
           <label class="field-label" for="home-code">輸入 4 位案件編號</label>

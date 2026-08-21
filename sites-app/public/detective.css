@@ -1368,3 +1368,31 @@ select.case-input { appearance: auto; }
 @media (max-width: 620px) {
   .verdict-banner { font-size: 18px; padding: 11px 14px; }
 }
+
+/* 檔案袋內的三幕簡介（取代原數字格） */
+.act-briefs { display: grid; gap: 10px; margin: 18px 0 22px; }
+.act-brief {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr);
+  align-items: start;
+  gap: 10px;
+  padding: 10px 12px;
+  border: 2px solid rgba(40, 35, 27, 0.75);
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.4);
+  box-shadow: 3px 3px 0 rgba(40, 35, 27, 0.5);
+}
+.act-brief b {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 2px solid #c0392b;
+  border-radius: 50%;
+  color: #c0392b;
+  font-size: 16px;
+  font-weight: 900;
+  transform: rotate(-4deg);
+}
+.act-brief strong { display: block; font-size: 15px; }
+.act-brief small { display: block; margin-top: 2px; font-size: 12px; line-height: 1.6; opacity: 0.75; }
