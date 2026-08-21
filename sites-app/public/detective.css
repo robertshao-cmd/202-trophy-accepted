@@ -1233,3 +1233,17 @@ select.case-input { appearance: auto; }
   transform: none;
   box-shadow: 0 4px 14px rgba(10, 166, 200, 0.4);
 }
+
+/* 手機（玩家主要裝置）：新元件的小螢幕規則 */
+@media (max-width: 620px) {
+  .option-grid.bet-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .option-grid.bet-grid .option-button { min-height: 52px; padding: 10px 8px 10px 44px; font-size: 14px; }
+  .option-grid.bet-grid .option-button::before { left: 10px; width: 26px; height: 26px; font-size: 14px; }
+  .narration-strip { font-size: 13px; padding: 8px 12px; }
+  .route-stop { grid-template-columns: 56px minmax(0, 1fr) auto; padding: 10px 12px; }
+  .route-stop strong { font-size: 15px; }
+  .clue-card { padding: 20px 16px; }
+  .clue-card h1 { font-size: 19px; }
+  .onstage-meter { padding: 12px; }
+  .showcase-card h1 { font-size: 22px; }
+}

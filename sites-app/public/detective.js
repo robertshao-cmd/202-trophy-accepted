@@ -546,7 +546,7 @@ function renderReveal() {
         </article>
         <aside class="receipt" aria-label="發票證據卡">
           <div class="evidence-tape" aria-hidden="true">EVIDENCE / 請勿移動</div>
-          <div class="receipt-head"><small>${escapeHtml(evidence.eyebrow ?? "INVOICE EVIDENCE")}</small><strong>發票證據卡</strong></div>
+          <div class="receipt-head"><small>${escapeHtml(evidence.eyebrow ?? "INVOICE EVIDENCE")}</small><strong>${escapeHtml(evidence.title ?? "證物")}</strong></div>
           ${renderEvidenceRows(evidence)}
           <p class="receipt-finding">${escapeHtml(evidence.finding)}</p>
         </aside>

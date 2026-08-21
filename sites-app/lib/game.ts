@@ -229,6 +229,7 @@ function questionView(room: Room, viewerPlayer: Player | null) {
       ...(reveal ? {
         correctChoice: String(q.options.indexOf(q.answer)),
         evidence: {
+          title: `證物 ${q.invoice_idx + 1} 號`,
           eyebrow: `EVIDENCE ${q.invoice_idx + 1} / ${c.invoices.length}`,
           rows: [
             ["時間", `${c.date} ${invoice.time}`],
@@ -257,6 +258,7 @@ function questionView(room: Room, viewerPlayer: Player | null) {
       ...(reveal ? {
         correctChoice: String(liarIndex(round)),
         evidence: {
+          title: `證物 ${c.invoices.length + round.round} 號`,
           eyebrow: `INTERROGATION ${round.round} / ${c.act2.length}`,
           rows: [
             ["主題商家", round.theme],
