@@ -22,14 +22,18 @@ const state = {
 
 const errorMessages = {
   case_not_found: "找不到這個案件。請確認案件編號。",
-  case_full: "本案偵探已滿，請等待下一局。",
+  case_full: "本案偵探已滿（上限 8 位），請等待下一局。",
   case_already_started: "案件已經開辦，現在無法加入。",
   nickname_too_short: "偵探代號至少需要兩個字。",
   nickname_taken: "這個偵探代號已有人使用。",
+  identity_taken: "這個身分已被認領，請選別的。",
+  identity_unknown: "這個身分不在本案名單裡。",
   need_four_detectives: "至少需要 4 位偵探才能開始辦案。",
   answer_locked: "證詞已封存，不能反悔。",
   answering_closed: "本題已經開牌。",
+  on_stage_locked: "你在台上受審，這一輪不能投票。",
   host_required: "只有開局者能執行這個動作。",
+  case_unknown: "沒有這個案件可選。",
 };
 
 function escapeHtml(value) {
@@ -83,7 +87,7 @@ function setRoute(code, view) {
 
 function updateHeader() {
   if (!state.room) {
-    headerStatus.textContent = "202 TROPHY CASE · 真實彙總／虛構案件";
+    headerStatus.textContent = "發票推理局 · 真實發票／虛構案件";
     return;
   }
   const labels = {
@@ -97,18 +101,20 @@ function updateHeader() {
 }
 
 function demoCue(room) {
-  const index = room.questionIndex;
-  if (index < 0) return "0:00–0:30｜一句話：發票不只記帳，還能變成辦公室社交遊戲。";
-  if (index <= 2) return "0:30–1:20｜只講：先復原發票，不先猜人。";
-  if (index <= 6) return "1:20–3:20｜只講：三人一組，唯一說謊者進嫌疑區。";
-  if (index <= 8) return "3:20–4:15｜只講：四條完整消費行動線，才有資格定案。";
-  return "4:15–5:00｜收尾：發票不可替代、30 秒有答案、結果值得互相比。";
+  const act = room.act ?? "";
+  if (room.phase === "lobby") return "開場一句話：發票不只記帳，還能變成辦公室推理遊戲。";
+  if (act.includes("第一幕")) return "第一幕：污漬發票推地點——先復原證據，不先猜人。";
+  if (act.includes("第二幕")) return "第二幕：三人上台唸口供、兩真一假，台下投票抓說謊者。";
+  if (act.includes("第三幕")) return "第三幕：行動線回放 → 兩輪下注 → 開牌真兇。";
+  return "收尾：發票不可替代、每局 13 分鐘內、結果值得互相比。";
 }
 
 function portraitMarkup(person, className = "") {
   const label = person?.name ?? person?.label ?? "嫌疑人";
-  if (!person?.avatarUrl) return `<span class="portrait-fallback ${className}" aria-hidden="true">?</span>`;
-  return `<span class="portrait-wrap ${className}"><img src="${escapeHtml(person.avatarUrl)}" alt="${escapeHtml(label)}的 Jira 頭像" /><small>JIRA</small></span>`;
+  if (!person?.avatarUrl) {
+    return `<span class="portrait-fallback ${className}" aria-hidden="true">${escapeHtml(String(label).slice(0, 1))}</span>`;
+  }
+  return `<span class="portrait-wrap ${className}"><img src="${escapeHtml(person.avatarUrl)}" alt="${escapeHtml(label)}的頭像" /><small>CAST</small></span>`;
 }
 
 function actClass(question) {
@@ -118,40 +124,30 @@ function actClass(question) {
 }
 
 function renderStageProp(question) {
-  if (question.type === "merchant" || question.type === "item" || question.type === "invoice") {
-    return `<div class="crime-receipt" aria-hidden="true"><span class="receipt-stain stain-one"></span><span class="receipt-stain stain-two"></span><b>電子發票證明聯</b><i>20██/06/15　NT$ 1,687</i><em>${question.type === "merchant" ? "全聯實業…██分公司" : question.type === "item" ? "除菌・噴霧・NT$ ██" : "日期 → 商家 → 品項"}</em><small>線索正在對焦…</small></div>`;
+  if (question.kind === "quiz") {
+    return `<div class="crime-receipt" aria-hidden="true"><span class="receipt-stain stain-one"></span><span class="receipt-stain stain-two"></span><b>電子發票證明聯</b><i>${escapeHtml(question.prop?.date ?? "20██")}　NT$ ${escapeHtml(String(question.prop?.amt ?? "██"))}</i><em>${escapeHtml(question.prop?.time ?? "██:██")}　店名：██████</em><small>線索正在對焦…</small></div>`;
   }
-  if (question.type === "lie") {
+  if (question.kind === "vote") {
     return `<div class="interrogation-lamp" aria-hidden="true"><span></span><b>誰在說謊？</b></div>`;
   }
-  return `<div class="timeline-radar" aria-hidden="true"><span></span><b>四條行動線同步展開</b></div>`;
-}
-
-function renderSuspects(suspects = []) {
-  return suspects.map((suspect) => `
-    <div class="suspect-line">
-      ${portraitMarkup(suspect, "suspect-avatar")}
-      <span><strong>${escapeHtml(suspect.name)}</strong><small>${escapeHtml(suspect.alias)}</small></span>
-      <span class="suspect-status" aria-hidden="true">已框出</span>
-    </div>
-  `).join("");
+  return `<div class="timeline-radar" aria-hidden="true"><span></span><b>終局指認進行中</b></div>`;
 }
 
 function renderCaseProgress(room) {
-  return `<div class="case-progress" aria-label="目前第 ${room.questionIndex + 1} 題，共 ${room.questionCount} 題">
-    ${Array.from({ length: room.questionCount }, (_, index) => `<span class="${index < room.questionIndex ? "done" : index === room.questionIndex ? "active" : ""}">${index + 1}</span>`).join("")}
+  return `<div class="case-progress" aria-label="目前第 ${room.stepIndex + 1} 步，共 ${room.stepCount} 步">
+    ${Array.from({ length: room.stepCount }, (_, index) => `<span class="${index < room.stepIndex ? "done" : index === room.stepIndex ? "active" : ""}">${index + 1}</span>`).join("")}
   </div>`;
 }
 
 function humanObservation(question) {
   const observations = {
-    merchant: "品牌名、公司名與記憶中的地點常常不一樣；發票讓我們把印象重新對焦。",
-    item: "幾個殘缺字就會喚起不同故事，直到價格與品名一起出現，猜測才成為證據。",
-    invoice: "單一線索容易誤導；日期、商家、品項與金額互相扣合，才是一張完整發票。",
-    lie: "人會本能地縮小高頻習慣，因為『偶爾』聽起來比真實次數更像自己。",
-    route: "我們會急著用人設定罪，但只有完整行動線才能把懷疑變成答案。",
+    quiz: "品牌名、登記名與記憶中的地點常常不一樣；發票讓我們把印象重新對焦。",
+    vote: "人會本能地縮小高頻習慣，因為『偶爾』聽起來比真實次數更像自己。",
+    bet: "我們會急著用人設定罪，但只有完整行動線才能把懷疑變成答案。",
+    timeline: "一天的發票連起來，就是一條沒人能否認的行動線。",
+    clue: "決定性線索不是新證據，是舊證據終於排成一直線。",
   };
-  return observations[question.type] ?? "發票記錄行為；當事人的解釋，才補上行為背後的人。";
+  return observations[question.kind] ?? "發票記錄行為；當事人的解釋，才補上行為背後的人。";
 }
 
 function renderHome() {
@@ -160,35 +156,35 @@ function renderHome() {
       <div class="hero-copy">
         <div class="issue-strip"><span>ISSUE #0821</span><strong>辦公室限定公演</strong></div>
         <p class="eyebrow">KAHOOT × DETECTIVE × INVOICE</p>
-        <h1>誰是<em>犯人？</em></h1>
+        <h1>發票<em>推理局</em></h1>
         <div class="hero-burst" aria-hidden="true"><strong>發票不會</strong><span>說謊！</span></div>
-        <p class="hero-lead">202 獎盃憑空消失。犯罪現場只剩沾滿污漬的發票；你有 9 題時間破解線索、審問四組同事，再從四名嫌疑人中揪出犯人。</p>
+        <p class="hero-lead">有人的一天被做成了案件。三幕流程：先擦掉發票上的污漬推理消費地點，再看三位同事上台唸口供、投票抓說謊者，最後沿行動線下注指認真兇。</p>
         <div class="button-row">
           <button class="primary-button" data-action="create-case">立案，成為主持人</button>
           <button class="ghost-button" data-action="focus-join">我有案件編號</button>
           ${testMode ? `<span class="test-mode-badge">${demoMode ? "5-MIN DEMO" : "TEST MODE"} · 動畫已關閉</span>` : `<a class="ghost-button test-mode-link" href="/detective.html?test=1">無動畫測試</a><a class="ghost-button test-mode-link" href="/detective.html?demo=1">五分鐘簡報</a>`}
         </div>
         <div class="hero-proof">
-          <span class="proof-chip">9 題三幕破案</span>
+          <span class="proof-chip">三幕破案</span>
           <span class="proof-chip">4–8 位偵探</span>
-          <span class="proof-chip">發票證據開牌</span>
+          <span class="proof-chip">真實發票證據</span>
           <span class="proof-chip">不需註冊</span>
         </div>
         <div class="case-loop" aria-label="一局的三個步驟">
-          <span><b>01</b><strong>蒐集資訊</strong><small>髒污發票逐格對焦</small></span>
-          <span><b>02</b><strong>框出嫌疑人</strong><small>四組三人、每組一謊</small></span>
-          <span><b>03</b><strong>找出犯人</strong><small>四條行動線正面對決</small></span>
+          <span><b>01</b><strong>犯罪現場</strong><small>污漬發票推地點</small></span>
+          <span><b>02</b><strong>口供審訊</strong><small>兩真一假、台下投票</small></span>
+          <span><b>03</b><strong>終局指認</strong><small>行動線＋雙輪下注</small></span>
         </div>
       </div>
-      <aside class="folder-card" aria-label="案件嫌疑人名冊">
+      <aside class="folder-card" aria-label="案件檔案袋">
         <span class="paper-clip" aria-hidden="true"></span>
-        <p class="eyebrow">SUSPECT DOSSIER</p>
-        <h2>202 獎盃失竊案</h2>
-        <p>消費數字取自真實發票；失竊、說謊與犯人設定完全是遊戲虛構。偵探只需一個代號即可加入。</p>
+        <p class="eyebrow">CASE DOSSIER</p>
+        <h2>消費軌跡失竊案</h2>
+        <p>案件由真實發票編譯而成；犯人、口供與定罪皆為遊戲虛構。掃碼入局，領一個偵探代號就能玩。</p>
         <div class="sealed-dossiers" aria-label="案件規模">
-          <span><strong>03</strong><small>張髒污發票</small></span>
-          <span><strong>04</strong><small>組交叉口供</small></span>
-          <span><strong>04</strong><small>名最終嫌疑人</small></span>
+          <span><strong>3–5</strong><small>張污漬發票</small></span>
+          <span><strong>3–4</strong><small>輪口供審訊</small></span>
+          <span><strong>02</strong><small>輪終局下注</small></span>
         </div>
         <form class="join-panel" data-form="enter-code">
           <label class="field-label" for="home-code">輸入 4 位案件編號</label>
@@ -203,6 +199,8 @@ function renderHome() {
 }
 
 function renderJoin() {
+  const identities = state.room?.identities ?? [];
+  const open = identities.filter((identity) => !identity.claimedBy);
   app.innerHTML = `
     <section class="scene join-scene">
       <div class="join-card">
@@ -210,10 +208,15 @@ function renderJoin() {
         <div class="join-ghost ghost-shape" aria-hidden="true"><i></i></div>
         <p class="eyebrow">CASE #${escapeHtml(state.code)}</p>
         <h1>領取偵探證</h1>
-        <p>不用綁載具、不用選身分。今天你只負責拆穿口供，找回消失的 202 獎盃。</p>
+        <p>取一個偵探代號；如果你是本案關係人，認領自己的身分——第二幕會傳喚你上台。</p>
         <form data-form="join-case">
           <label class="field-label" for="detective-name">偵探代號</label>
           <input id="detective-name" class="case-input" name="nickname" maxlength="16" placeholder="例如：宵夜目擊者" autocomplete="nickname" autofocus />
+          <label class="field-label" for="detective-identity">我的身分（本案關係人才選）</label>
+          <select id="detective-identity" class="case-input" name="identity">
+            <option value="">路人偵探（不認領身分）</option>
+            ${open.map((identity) => `<option value="${escapeHtml(identity.name)}">${escapeHtml(identity.name)}</option>`).join("")}
+          </select>
           <button class="primary-button" type="submit">進入案件 #${escapeHtml(state.code)}</button>
         </form>
       </div>
@@ -237,7 +240,7 @@ function renderDetectiveList(players) {
   return players.map((player, index) => `
     <div class="detective-card">
       <span class="badge">${index + 1}</span>
-      <span><strong>${escapeHtml(player.nickname)}</strong><small>${player.isBot ? "示範線民" : "已完成報到"}</small></span>
+      <span><strong>${escapeHtml(player.nickname)}</strong><small>${player.identity ? `身分：${escapeHtml(player.identity)}` : player.isBot ? "示範線民" : "路人偵探"}</small></span>
     </div>
   `).join("");
 }
@@ -246,6 +249,7 @@ function renderLobby() {
   const room = state.room;
   if (state.view === "host") {
     const canStart = room.players.length >= 4 && room.isHost;
+    const meta = room.caseMeta;
     app.innerHTML = `
       <section class="scene scene-wide">
         <div class="case-topline">
@@ -263,22 +267,34 @@ function renderLobby() {
               <button class="ghost-button small-button" data-action="copy-link">複製邀請連結</button>
               <a class="ghost-button small-button" href="${escapeHtml(caseUrl(room.code))}" target="_blank" rel="noreferrer">開啟玩家頁</a>
             </div>
+            ${room.caseOptions ? `
+              <div class="case-brief" style="margin-top:18px">
+                <strong>選擇案件</strong>
+                <select class="case-input" data-select="case-index">
+                  ${room.caseOptions.map((option) => `<option value="${option.index}" ${option.index === room.caseIndex ? "selected" : ""}>案件 ${String.fromCharCode(65 + option.index)}｜${escapeHtml(option.date)}｜${option.invoiceCount} 張發票｜${option.roundCount} 輪口供｜混淆度 ${option.confusable}</option>`).join("")}
+                </select>
+                <small>開局前請先人工過一遍案件腳本（隱私規則見 docs/handoff.md §8）。</small>
+              </div>` : ""}
           </section>
           <section class="panel">
             <p class="eyebrow">${room.players.length} / 8 DETECTIVES</p>
             <h2>報到名單</h2>
             <div class="live-ticker"><span>現場快報</span><strong>${room.players.length >= 4 ? "已達開案門檻，隨時可以撕封條！" : `再 ${4 - room.players.length} 位偵探即可開案`}</strong></div>
-            <p class="panel-note">滿 4 人即可開案；Demo 時可補入示範線民，單人也能順跑完整一局。</p>
-            ${demoMode ? `<div class="demo-cue"><span>5-MIN RUN OF SHOW</span><strong>${escapeHtml(demoCue(room))}</strong><small>每題最多 10 秒；答案一出就按「Demo 快轉」，不等待排行榜動畫。</small></div>` : ""}
+            <p class="panel-note">滿 4 人開案、8 人滿座。Demo 可補示範線民（會自動認領空身分），單人也能順跑完整一局。</p>
+            ${demoMode ? `<div class="demo-cue"><span>5-MIN RUN OF SHOW</span><strong>${escapeHtml(demoCue(room))}</strong><small>答案一出就按「快轉」，不等待動畫。</small></div>` : ""}
             <div class="case-brief">
               <strong>案情摘要</strong>
-              <p>展示櫃斷電後，202 獎盃消失。先復原三張髒污發票，再審問四組、每組三位同事；四名說謊者會進入最終行動線比對。</p>
-              <small>消費紀錄為真實彙總；失竊、口供與犯人皆為虛構。</small>
+              <p>${escapeHtml(meta.date)} 這一天，有人的消費軌跡被做成了案件：${meta.invoiceCount} 張污漬發票、${meta.roundCount} 輪口供審訊、行動線回放與兩輪下注。真兇就藏在 ${meta.castCount} 名關係人之中。</p>
+              <small>消費紀錄為真實發票；案件、口供與定罪皆為虛構。</small>
+            </div>
+            <div class="case-brief">
+              <strong>身分認領（${(room.identities ?? []).filter((identity) => identity.claimedBy).length} / ${(room.identities ?? []).length}）</strong>
+              <p>${(room.identities ?? []).map((identity) => identity.claimedBy ? `<b>${escapeHtml(identity.name)}</b>（${escapeHtml(identity.claimedBy)}）` : escapeHtml(identity.name)).join("、")}</p>
             </div>
             <div class="detective-list">${renderDetectiveList(room.players)}</div>
             <div class="button-row">
               <button class="ghost-button" data-action="fill-demo" ${room.isHost ? "" : "disabled"}>補滿 6 位示範偵探</button>
-              <button class="primary-button" data-action="start-case" ${canStart ? "" : "disabled"}>開始辦案 · 9 題</button>
+              <button class="primary-button" data-action="start-case" ${canStart ? "" : "disabled"}>開始辦案 · 三幕</button>
             </div>
           </section>
         </div>
@@ -292,11 +308,11 @@ function renderLobby() {
       <div class="join-card">
         <div class="waiting-illustration" aria-hidden="true">⌕</div>
         <div class="waiting-tape" aria-hidden="true">EVIDENCE SEALED · 證物封存中</div>
-        <p class="eyebrow">CASE #${escapeHtml(room.code)}</p>
+        <p class="eyebrow">CASE #${escapeHtml(state.code)}</p>
         <h1>${escapeHtml(state.playerName ?? "偵探")}，報到完成</h1>
-        <p>案件資料正在封存。等主持人按下「開始辦案」，第一份發票證據就會出現。</p>
-        <div class="waiting-list">${room.players.map((player) => `<span class="waiting-chip">${escapeHtml(player.nickname)}</span>`).join("")}</div>
-        <p><strong>${room.players.length} / 8</strong> 位偵探已入局</p>
+        <p>${state.room?.viewerIdentity ? `你以「${escapeHtml(state.room.viewerIdentity)}」的身分應訊——第二幕若被傳喚，請照螢幕唸出口供。` : "案件資料正在封存。等主持人按下「開始辦案」，第一張污漬發票就會出現。"}</p>
+        <div class="waiting-list">${(state.room?.players ?? []).map((player) => `<span class="waiting-chip">${escapeHtml(player.nickname)}</span>`).join("")}</div>
+        <p><strong>${state.room?.players?.length ?? 0} / 8</strong> 位偵探已入局</p>
       </div>
     </section>
   `;
@@ -307,28 +323,101 @@ function secondsLeft(room) {
   return Math.max(0, Math.ceil((room.phaseEndsAt - Date.now()) / 1000));
 }
 
+function phaseProgress(room) {
+  if (!room.phaseEndsAt || !room.phaseStartedAt) return 0;
+  const total = room.phaseEndsAt - room.phaseStartedAt;
+  const left = Math.max(0, room.phaseEndsAt - Date.now());
+  return total > 0 ? Math.max(0, Math.min(100, (left / total) * 100)) : 0;
+}
+
 function renderOptions(question, { interactive = false, selected = null, reveal = false } = {}) {
   return question.choices.map((choice, index) => {
     const correct = reveal && choice.id === question.correctChoice;
     const wrong = reveal && choice.id !== question.correctChoice;
     const classes = [selected === choice.id ? "selected" : "", correct ? "correct" : "", wrong ? "wrong" : ""].filter(Boolean).join(" ");
     return `
-      <button class="option-button ${classes} ${choice.avatarUrl ? "has-portrait" : ""} ${choice.timeline ? "has-timeline" : ""}" data-letter="${String.fromCharCode(65 + index)}" ${interactive ? `data-answer="${escapeHtml(choice.id)}"` : "disabled"}>
-        ${choice.avatarUrl ? portraitMarkup(choice, "option-portrait") : ""}
-        <span class="option-copy">${choice.name ? `<strong>${escapeHtml(choice.name)}</strong>` : ""}<span>${escapeHtml(choice.label)}</span></span>
-        ${choice.timeline ? `<span class="mini-timeline" aria-hidden="true">${choice.timeline.map((stop) => `<i>${escapeHtml(stop)}</i>`).join("")}</span>` : ""}
+      <button class="option-button ${classes} ${choice.name ? "has-portrait" : ""}" data-letter="${String.fromCharCode(65 + index)}" ${interactive ? `data-answer="${escapeHtml(choice.id)}"` : "disabled"}>
+        ${choice.name ? portraitMarkup(choice, "option-portrait") : ""}
+        <span class="option-copy">${choice.name ? `<strong>${escapeHtml(choice.name)}</strong>` : ""}<span>${escapeHtml(choice.label)}</span>${choice.suspect ? `<small class="suspect-tag">嫌疑名單</small>` : ""}</span>
       </button>
     `;
   }).join("");
 }
 
+function renderTimelineStops(question) {
+  return `<div class="timeline-route" aria-label="案發日行動線">
+    ${question.stops.map((stop, index) => `
+      <div class="route-stop" style="--stop:${index}">
+        <b>${escapeHtml(stop.time)}</b>
+        <strong>${escapeHtml(stop.brand)}</strong>
+        <span>NT$ ${escapeHtml(String(stop.amt))}</span>
+      </div>
+    `).join("")}
+  </div>`;
+}
+
+function renderShowcase(question, room) {
+  const isClue = question.kind === "clue";
+  app.innerHTML = `
+    <section class="scene scene-wide ${actClass(question)}">
+      <div class="question-card showcase-card">
+        <div class="question-progress"><span class="question-label">${escapeHtml(question.label)}</span><span>${escapeHtml(question.act)}</span></div>
+        ${renderCaseProgress(room)}
+        ${isClue ? `
+          <div class="clue-card">
+            <span class="reveal-stamp">機密</span>
+            <p class="eyebrow">FINAL CLUE</p>
+            <h1>${escapeHtml(question.prompt)}</h1>
+            <p>下一輪是最後下注。線索已亮，賠率下降：押中 150 分。</p>
+          </div>` : `
+          <h1>${escapeHtml(question.prompt)}</h1>
+          ${renderTimelineStops(question)}
+          <p class="panel-note">行動線播完自動開盤：首輪下注，押中真兇 400 分。</p>`}
+        ${room.isHost ? `<div class="button-row" style="margin-top:20px"><button class="ghost-button small-button" data-action="advance">快轉</button></div>` : ""}
+      </div>
+    </section>
+  `;
+}
+
+function renderVoteStage(question, room) {
+  const distribution = question.liveDistribution ?? {};
+  const totalVotes = Object.values(distribution).reduce((sum, count) => sum + count, 0);
+  app.innerHTML = `
+    <section class="scene join-scene player-question ${actClass(question)}">
+      <div class="question-card">
+        <span class="question-sfx" aria-hidden="true">盯——</span>
+        <div class="question-progress"><span class="question-label">${escapeHtml(question.label)}</span><span>${escapeHtml(question.act)}</span></div>
+        <div class="interrogation-lamp" aria-hidden="true"><span></span><b>你在台上</b></div>
+        <h1>你被傳喚上台。請照著唸你的口供，這一輪不能投票。</h1>
+        <div class="narration-strip">${escapeHtml(question.narration)}</div>
+        <div class="option-grid">${renderOptions(question)}</div>
+        <div class="onstage-meter">
+          <p class="eyebrow">大家怎麼看你</p>
+          ${question.choices.map((choice) => {
+            const count = distribution[choice.id] ?? 0;
+            const percent = totalVotes ? Math.round((count / totalVotes) * 100) : 0;
+            return `<div class="distribution-row"><span>${escapeHtml(choice.name)}</span><span class="distribution-bar"><span style="width:${percent}%"></span></span><strong>${count}</strong></div>`;
+          }).join("")}
+        </div>
+      </div>
+    </section>
+    <div class="player-status locked">台上受審中 · 目前 ${totalVotes} 票</div>
+  `;
+}
+
 function renderQuestion() {
   const room = state.room;
   const question = room.question;
+  if (question.kind === "timeline" || question.kind === "clue") return renderShowcase(question, room);
+  if (question.kind === "vote" && question.viewerOnStage && state.view !== "host") return renderVoteStage(question, room);
+
   const remaining = secondsLeft(room);
-  const progress = Math.max(0, Math.min(100, (remaining / 10) * 100));
-  const progressText = `第 ${room.questionIndex + 1} / ${room.questionCount} 題`;
-  const answerPercent = room.players.length ? Math.round((room.answeredCount / room.players.length) * 100) : 0;
+  const progress = phaseProgress(room);
+  const progressText = `第 ${room.stepIndex + 1} / ${room.stepCount} 步`;
+  const eligibleCount = room.eligibleCount || room.players.length;
+  const answerPercent = eligibleCount ? Math.round((room.answeredCount / eligibleCount) * 100) : 0;
+  const statusText = question.kind === "bet" ? "壓上你的判斷 · 下注不倒扣" : question.kind === "vote" ? "台下投票 · 誰在說謊？" : "選一個消費地點";
+  const narration = question.kind === "vote" ? `<div class="narration-strip">${escapeHtml(question.narration)}</div>` : "";
 
   if (state.view !== "host") {
     app.innerHTML = `
@@ -338,11 +427,12 @@ function renderQuestion() {
           <div class="question-progress"><span class="question-label">${escapeHtml(question.label)}</span><span>${escapeHtml(question.act)} · ${progressText}</span></div>
           ${renderCaseProgress(room)}
           ${renderStageProp(question)}
+          ${narration}
           <h1>${escapeHtml(question.prompt)}</h1>
-          <div class="option-grid">${renderOptions(question, { interactive: !room.viewerAnswered, selected: room.viewerChoice })}</div>
+          <div class="option-grid ${question.kind === "bet" ? "bet-grid" : ""}">${renderOptions(question, { interactive: !room.viewerAnswered, selected: room.viewerChoice })}</div>
         </div>
       </section>
-      <div class="player-status ${room.viewerAnswered ? "locked" : ""}">${room.viewerAnswered ? "✓ 證詞已蓋章・不能反悔" : `剩餘 ${remaining} 秒 · 選一份口供`}</div>
+      <div class="player-status ${room.viewerAnswered ? "locked" : ""}">${room.viewerAnswered ? "✓ 證詞已蓋章・不能反悔" : `剩餘 ${remaining} 秒 · ${statusText}`}</div>
     `;
     return;
   }
@@ -355,19 +445,20 @@ function renderQuestion() {
           <div class="question-progress"><span class="question-label">${escapeHtml(question.label)}</span><span>${escapeHtml(question.act)} · ${progressText}</span></div>
           ${renderCaseProgress(room)}
           ${renderStageProp(question)}
+          ${narration}
           <h1>${escapeHtml(question.prompt)}</h1>
-          <div class="option-grid">${renderOptions(question)}</div>
+          <div class="option-grid ${question.kind === "bet" ? "bet-grid" : ""}">${renderOptions(question)}</div>
         </article>
         <aside class="panel timer-panel">
           <div class="timer-ring" style="--progress:${progress}%"><span class="timer-value">${remaining}</span></div>
           <div class="answer-meter">
             <p class="eyebrow">LIVE TESTIMONY</p>
-            <h2>${room.answeredCount} / ${room.players.length} 已作答</h2>
+            <h2>${room.answeredCount} / ${eligibleCount} 已${question.kind === "bet" ? "下注" : "作答"}</h2>
             <div class="meter-line"><span style="width:${answerPercent}%"></span></div>
-            <div class="testimony-badges" aria-hidden="true">${room.players.map((_, index) => `<span class="${index < room.answeredCount ? "answered" : ""}">${index < room.answeredCount ? "✓" : "?"}</span>`).join("")}</div>
-            <p class="panel-note">全員回答會提前開牌；逾時則視為未作答。</p>
+            ${question.kind === "vote" ? `<p class="panel-note">台上 ${Math.max(0, room.players.length - eligibleCount)} 人受審中，不能投票。</p>` : ""}
+            <p class="panel-note">全員作答會提前開牌；逾時視為未作答，局不會停。</p>
             ${demoMode ? `<div class="demo-cue compact"><span>PRESENTER CUE</span><strong>${escapeHtml(demoCue(room))}</strong></div>` : ""}
-            ${room.isHost ? `<button class="ghost-button small-button" data-action="advance">Demo 快轉開牌</button>` : ""}
+            ${room.isHost ? `<button class="ghost-button small-button" data-action="advance">快轉開牌</button>` : ""}
           </div>
         </aside>
       </div>
@@ -381,7 +472,7 @@ function renderDistribution(question, total) {
     const percent = total ? Math.round((count / total) * 100) : 0;
     return `
       <div class="distribution-row">
-        <span>${escapeHtml(choice.label)}</span>
+        <span>${escapeHtml(choice.name ?? choice.label)}</span>
         <span class="distribution-bar"><span style="width:${percent}%"></span></span>
         <strong>${count}</strong>
       </div>
@@ -390,23 +481,46 @@ function renderDistribution(question, total) {
 }
 
 function renderEvidenceRows(evidence) {
-  const rows = Array.isArray(evidence.rows) ? evidence.rows : [
-    ["嫌疑人", evidence.owner],
-    ["商家", evidence.merchant],
-    ["品項", evidence.item],
-    ["金額", Number.isFinite(Number(evidence.amount)) ? `NT$ ${Number(evidence.amount).toLocaleString("zh-TW")}` : evidence.amount],
-    ["時間", evidence.date],
-    ["發票", evidence.invoice],
-  ];
-  return rows
+  return (evidence.rows ?? [])
     .filter(([, value]) => value !== undefined && value !== null && value !== "")
     .map(([label, value]) => `<div class="receipt-row"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`)
     .join("");
 }
 
+function renderVerdictReveal(question, room) {
+  const verdict = question.verdict;
+  app.innerHTML = `
+    <section class="scene scene-wide act-timeline reveal-scene">
+      <div class="evidence-layout">
+        <article class="reveal-card">
+          <div class="reveal-impact" aria-hidden="true"><strong>啪！</strong><span>開牌</span></div>
+          <span class="reveal-stamp">真兇鎖定</span>
+          <p class="comic-caption">第三幕｜終局指認 · 所有下注封存完畢，開牌。</p>
+          <h1 class="truth-reveal">真兇是 <span>${escapeHtml(verdict.owner)}</span></h1>
+          ${verdict.ownerNickname ? `<p>由「${escapeHtml(verdict.ownerNickname)}」飾演。潛逃成績：口供未被過半識破 +${verdict.escapeAct2}、首輪未被過半押中 +${verdict.escapeBet1}。</p>` : `<p>本局無人認領真兇身分；潛逃分從缺。</p>`}
+          ${verdict.culpritLie ? `
+            <div class="humanity-note">
+              <span>打臉現場</span>
+              <strong>他在「${escapeHtml(verdict.culpritLie.theme)}」那輪說：「${escapeHtml(verdict.culpritLie.stmt)}」</strong>
+              <small>發票開牌：${escapeHtml(verdict.culpritLie.note)}</small>
+            </div>` : ""}
+          ${room.isHost ? `<div class="button-row" style="margin-top:24px"><button class="ghost-button small-button" data-action="advance">前往結案頁</button></div>` : ""}
+        </article>
+        <aside class="receipt" aria-label="押注回放">
+          <div class="evidence-tape" aria-hidden="true">BETTING LEDGER</div>
+          <div class="receipt-head"><small>BET HISTORY</small><strong>押注回放</strong></div>
+          ${verdict.betHistory.map((entry) => `<div class="receipt-row"><span>${escapeHtml(entry.nickname)}</span><strong>${escapeHtml(entry.bet1 ?? "—")} → ${escapeHtml(entry.bet2 ?? "—")}</strong></div>`).join("")}
+          <p class="receipt-finding">首輪押中 400、末輪押中 150；押錯不倒扣。</p>
+        </aside>
+      </div>
+    </section>
+  `;
+}
+
 function renderReveal() {
   const room = state.room;
   const question = room.question;
+  if (question.kind === "bet" && question.verdict) return renderVerdictReveal(question, room);
   const correctChoice = question.choices.find((choice) => choice.id === question.correctChoice);
   const correctLabel = correctChoice?.name ?? correctChoice?.label ?? "真相";
   const evidence = question.evidence;
@@ -417,8 +531,8 @@ function renderReveal() {
           <div class="reveal-impact" aria-hidden="true"><strong>啪！</strong><span>封條撕開</span></div>
           <span class="reveal-stamp">證據成立</span>
           <p class="comic-caption">${escapeHtml(question.act)} · 所有人的印象，現在接受發票審判。</p>
-          <h1 class="truth-reveal">真相是 <span>${escapeHtml(correctLabel)}</span></h1>
-          ${question.type === "lie" && correctChoice ? `<div class="suspect-frame"><span class="spotlight" aria-hidden="true"></span>${portraitMarkup(correctChoice, "suspect-reveal-portrait")}<div><small>LOCKED SUSPECT</small><strong>嫌疑人 ${Math.max(1, room.questionIndex - 2)} / 4</strong><span>說謊 ≠ 定罪，先框起來再查行動線。</span></div><b class="suspect-stamp">嫌疑人</b></div>` : ""}
+          <h1 class="truth-reveal">${question.kind === "vote" ? "說謊的是" : "真相是"} <span>${escapeHtml(correctLabel)}</span></h1>
+          ${question.kind === "vote" && correctChoice ? `<div class="suspect-frame"><span class="spotlight" aria-hidden="true"></span>${portraitMarkup(correctChoice, "suspect-reveal-portrait")}<div><small>SUSPECT LISTED</small><strong>嫌疑名單 ${room.suspects.length} 人</strong><span>說謊 ≠ 定罪，先框起來，等第三幕行動線。</span></div><b class="suspect-stamp">嫌疑人</b></div>` : ""}
           <p>${escapeHtml(evidence.finding)}</p>
           <div class="humanity-note">
             <span>HUMANITY / 人性觀察</span>
@@ -428,7 +542,7 @@ function renderReveal() {
           ${demoMode ? `<div class="demo-cue compact"><span>PRESENTER CUE</span><strong>${escapeHtml(demoCue(room))}</strong></div>` : ""}
           <div class="option-grid">${renderOptions(question, { selected: room.viewerChoice, reveal: true })}</div>
           ${state.view === "host" ? `<div class="distribution">${renderDistribution(question, room.answeredCount)}</div>` : ""}
-          ${room.isHost ? `<div class="button-row" style="margin-top:24px"><button class="ghost-button small-button" data-action="advance">Demo 快轉排行榜</button></div>` : ""}
+          ${room.isHost ? `<div class="button-row" style="margin-top:24px"><button class="ghost-button small-button" data-action="advance">快轉排行榜</button></div>` : ""}
         </article>
         <aside class="receipt" aria-label="發票證據卡">
           <div class="evidence-tape" aria-hidden="true">EVIDENCE / 請勿移動</div>
@@ -443,23 +557,28 @@ function renderReveal() {
 
 function renderLeaderboard() {
   const room = state.room;
+  const board = room.leaderboard;
+  const viewerIndex = state.playerKey ? board.findIndex((player) => player.id === state.playerKey) : -1;
+  const shown = board.slice(0, 5);
+  const viewerOutside = viewerIndex >= 5 ? board[viewerIndex] : null;
   app.innerHTML = `
     <section class="scene">
       <article class="leaderboard-card">
         <div class="newspaper-flag" aria-hidden="true">EXTRA! EXTRA!</div>
-        <p class="eyebrow">CASE RANKING · ${room.questionIndex + 1}/${room.questionCount}</p>
+        <p class="eyebrow">CASE RANKING · ${room.stepIndex + 1}/${room.stepCount}</p>
         <h1>誰最會<br /><span>讀同事？</span></h1>
-        <p>速度有加分，亂猜沒有倒扣。前三名暫時取得搜查令。</p>
+        <p>答題有速度加分、投票命中 +100、下注押中大額入帳；亂猜沒有倒扣。</p>
         <div class="rank-list">
-          ${room.leaderboard.slice(0, 6).map((player, index) => `
-            <div class="rank-row">
+          ${shown.map((player, index) => `
+            <div class="rank-row ${player.id === state.playerKey ? "self" : ""}">
               <span class="rank-number">${["👑", "🥈", "🥉"][index] ?? `#${index + 1}`}</span>
               <strong>${escapeHtml(player.nickname)}</strong>
               <span class="rank-score">${player.score} pts</span>
             </div>
           `).join("")}
+          ${viewerOutside ? `<div class="rank-row self"><span class="rank-number">#${viewerIndex + 1}</span><strong>${escapeHtml(viewerOutside.nickname)}</strong><span class="rank-score">${viewerOutside.score} pts</span></div>` : ""}
         </div>
-        ${room.isHost ? `<div class="button-row" style="justify-content:center;margin-top:24px"><button class="ghost-button small-button" data-action="advance">Demo 快轉下一題</button></div>` : ""}
+        ${room.isHost ? `<div class="button-row" style="justify-content:center;margin-top:24px"><button class="ghost-button small-button" data-action="advance">快轉下一步</button></div>` : ""}
       </article>
     </section>
   `;
@@ -471,44 +590,41 @@ function renderResults() {
   const champion = results.champion ?? { nickname: "無人破案", score: 0 };
   app.innerHTML = `
     <section class="scene scene-wide">
-      <div class="case-topline"><div><p class="eyebrow">CASE CLOSED</p><h1>犯人已鎖定</h1></div><span class="case-number">案件 #${escapeHtml(room.code)}</span></div>
+      <div class="case-topline"><div><p class="eyebrow">CASE CLOSED</p><h1>結案</h1></div><span class="case-number">案件 #${escapeHtml(room.code)}</span></div>
       <div class="result-grid">
         <article class="result-card" id="share-card">
           <div class="result-burst" aria-hidden="true">破案！</div>
           <div class="confetti-field" aria-hidden="true">✦　●　▲　✦　■　●</div>
-          <div class="receipt-blaster" aria-hidden="true"><span class="blaster-body">發票</span><span class="blaster-barrel"></span><b>BANG!</b>${Array.from({ length: 9 }, (_, index) => `<i style="--shot:${index}">🧾</i>`).join("")}</div>
           <p class="eyebrow" style="color:#8d211d">FICTIONAL CULPRIT</p>
-          <div class="culprit-lockup">${portraitMarkup({ name: results.culprit, avatarUrl: results.culpritPortrait }, "culprit-portrait")}<span>證據命中</span></div>
-          <h1><span class="champion-name">${escapeHtml(results.culprit)}</span><br />誰是犯人</h1>
-          <div class="evidence-chain" aria-label="完整證據鏈">
-            ${results.evidenceChain.map((item, index) => `<span><b>${index + 1}</b>${escapeHtml(item)}</span>`).join("")}
+          <div class="culprit-lockup">${portraitMarkup({ name: results.culprit }, "culprit-portrait")}<span>證據命中</span></div>
+          <h1><span class="champion-name">${escapeHtml(results.culprit)}</span><br />就是真兇</h1>
+          ${results.culpritLie ? `<div class="humanity-note"><span>謊言 × 打臉發票</span><strong>「${escapeHtml(results.culpritLie.stmt)}」</strong><small>${escapeHtml(results.culpritLie.note)}（主題：${escapeHtml(results.culpritLie.theme)}）</small></div>` : ""}
+          <div class="evidence-chain" aria-label="案發日行動線">
+            ${results.timeline.map((stop, index) => `<span><b>${index + 1}</b>${escapeHtml(stop.time)} ${escapeHtml(stop.brand)}</span>`).join("")}
           </div>
           <div class="result-metrics">
-            <div class="result-metric"><strong>${escapeHtml(champion.nickname)}</strong><small>辦案冠軍 · ${champion.score} pts</small></div>
+            <div class="result-metric"><strong>${escapeHtml(champion.nickname)}</strong><small>冠軍偵探 · ${champion.score} pts</small></div>
+            <div class="result-metric"><strong>${results.escapeTotal}</strong><small>真兇潛逃分${results.culpritNickname ? ` · ${escapeHtml(results.culpritNickname)}` : ""}</small></div>
             <div class="result-metric"><strong>${results.accuracy}%</strong><small>全局答對率</small></div>
-            <div class="result-metric"><strong>${room.players.length}</strong><small>入局偵探</small></div>
+          </div>
+          <div class="result-metrics">
+            <div class="result-metric"><strong>NT$ ${results.aggregate.invoiceTotal.toLocaleString("zh-TW")}</strong><small>本案 ${results.aggregate.invoiceCount} 張證據發票合計</small></div>
+            <div class="result-metric"><strong>${escapeHtml(results.aggregate.clue.replace(/^決定性線索:/, ""))}</strong><small>本局最驚人的一條紀錄</small></div>
           </div>
           <p class="case-finding">${escapeHtml(results.caseFinding)}</p>
-          <div class="humanity-note result-humanity"><span>HUMANITY / 人性觀察</span><strong>發票只能回答「做了什麼」；當事人的 10 秒自白，才回答「為什麼」。</strong></div>
-          ${demoMode ? `<div class="demo-cue final-cue"><span>4:15–5:00 · FINAL LINE</span><strong>「拿掉發票，這個遊戲就不存在；看完結果，每個人都會想比較下一位同事。」</strong></div>` : ""}
-          <section class="needs-section" aria-label="五大需求層次對照">
-            <div class="needs-heading"><span>WHY PEOPLE CARE</span><strong>這不只是在猜人：五層人性價值都有回報</strong></div>
-            <div class="needs-pyramid">${results.needPyramid.map((need, index) => `<div class="need-tier need-${index + 1}"><strong>${escapeHtml(need.level)}</strong><span>${escapeHtml(need.value)}</span></div>`).join("")}</div>
-            <div class="reflection-card"><span>SELF-ACTUALIZATION</span><strong>我以為自己＿＿；發票顯示＿＿；接下來我想改＿＿。</strong></div>
-          </section>
         </article>
         <aside class="panel">
           <p class="eyebrow">NEXT CASE</p>
-          <h2>你真的了解同事嗎？</h2>
+          <h2>開新案件，考你的朋友</h2>
           <div class="share-hook"><strong>下一局的誘餌</strong><span>「你看到的是人設，發票記得的是日常。」</span></div>
           <p class="panel-note">分享的不是誰被公開處刑，而是整間辦公室對同一個人的印象，如何被一張張發票翻轉。</p>
-          <div class="final-suspect-list"><strong>四名最終嫌疑人</strong>${renderSuspects(results.finalSuspects)}</div>
+          <div class="rank-list" style="margin-top:8px">
+            ${results.leaderboard.slice(0, 5).map((player, index) => `<div class="rank-row"><span class="rank-number">#${index + 1}</span><strong>${escapeHtml(player.nickname)}</strong><span class="rank-score">${player.score}</span></div>`).join("")}
+          </div>
+          <div class="final-suspect-list" style="margin-top:18px"><strong>押注回放</strong>${results.betHistory.map((entry) => `<div class="suspect-line"><span><strong>${escapeHtml(entry.nickname)}</strong><small>${escapeHtml(entry.bet1 ?? "—")} → ${escapeHtml(entry.bet2 ?? "—")}</small></span><span class="suspect-status">${entry.bet2 === results.culprit ? "押中" : "落空"}</span></div>`).join("")}</div>
           <div class="button-row">
             ${room.isHost ? `<button class="primary-button" data-action="reset-case">開新案件</button>` : ""}
             <button class="secondary-button" data-action="share-result">分享戰績</button>
-          </div>
-          <div class="rank-list" style="margin-top:26px">
-            ${room.leaderboard.slice(0, 5).map((player, index) => `<div class="rank-row"><span class="rank-number">#${index + 1}</span><strong>${escapeHtml(player.nickname)}</strong><span class="rank-score">${player.score}</span></div>`).join("")}
           </div>
         </aside>
       </div>
@@ -518,7 +634,7 @@ function renderResults() {
 
 function renderError() {
   app.innerHTML = `
-    <section class="scene"><div class="error-card"><p class="eyebrow">CASE ERROR</p><h1>這個案件斷線了</h1><p>${escapeHtml(state.error ?? "請回到首頁重新立案。")}</p><a class="primary-button" style="display:inline-grid;place-items:center;text-decoration:none" href="/detective.html">回到誰是犯人</a></div></section>
+    <section class="scene"><div class="error-card"><p class="eyebrow">CASE ERROR</p><h1>這個案件斷線了</h1><p>${escapeHtml(state.error ?? "請回到首頁重新立案。")}</p><a class="primary-button" style="display:inline-grid;place-items:center;text-decoration:none" href="/detective.html">回到發票推理局</a></div></section>
   `;
 }
 
@@ -560,13 +676,13 @@ async function syncRoom({ quiet = false } = {}) {
 function updateQuestionClock() {
   if (state.room?.phase !== "question") return;
   const remaining = secondsLeft(state.room);
-  const progress = Math.max(0, Math.min(100, (remaining / 10) * 100));
+  const progress = phaseProgress(state.room);
   const timerValue = document.querySelector(".timer-value");
   const timerRing = document.querySelector(".timer-ring");
   const playerStatus = document.querySelector(".player-status:not(.locked)");
   if (timerValue) timerValue.textContent = remaining;
   if (timerRing) timerRing.style.setProperty("--progress", `${progress}%`);
-  if (playerStatus) playerStatus.textContent = `剩餘 ${remaining} 秒 · 選一份口供`;
+  if (playerStatus) playerStatus.textContent = playerStatus.textContent.replace(/剩餘 \d+ 秒/, `剩餘 ${remaining} 秒`);
 }
 
 async function createCase() {
@@ -586,13 +702,13 @@ async function createCase() {
   }
 }
 
-async function hostAction(action) {
+async function hostAction(action, extra = {}) {
   if (!state.hostKey || state.busy) return;
   state.busy = true;
   try {
     state.room = await request(`/api/detective/rooms/${state.code}/${action}`, {
       method: "POST",
-      body: JSON.stringify({ hostKey: state.hostKey }),
+      body: JSON.stringify({ hostKey: state.hostKey, ...extra }),
     });
     render();
   } catch (error) {
@@ -602,13 +718,13 @@ async function hostAction(action) {
   }
 }
 
-async function joinCase(nickname) {
+async function joinCase(nickname, identity) {
   if (state.busy) return;
   state.busy = true;
   try {
     const data = await request(`/api/detective/rooms/${state.code}/join`, {
       method: "POST",
-      body: JSON.stringify({ nickname }),
+      body: JSON.stringify({ nickname, identity }),
     });
     state.playerKey = data.playerKey;
     state.playerName = nickname.trim();
@@ -651,10 +767,11 @@ async function copyText(text, message) {
 }
 
 async function shareResult() {
-  const champion = state.room?.results?.champion?.nickname ?? "首席偵探";
-  const text = `案件 #${state.code} 已結案：${champion} 成為辦案冠軍。你看到的是人設，發票記得的是日常。`;
+  const results = state.room?.results;
+  const champion = results?.champion?.nickname ?? "首席偵探";
+  const text = `案件 #${state.code} 已結案：${champion} 成為冠軍偵探，真兇是 ${results?.culprit ?? "？？"}。你看到的是人設，發票記得的是日常。`;
   if (navigator.share) {
-    try { await navigator.share({ title: "KAHOOT × DETECTIVE × INVOICE｜誰是犯人？", text, url: caseUrl(state.code) }); return; } catch { /* user cancelled */ }
+    try { await navigator.share({ title: "發票推理局｜誰是真兇？", text, url: caseUrl(state.code) }); return; } catch { /* user cancelled */ }
   }
   await copyText(`${text} ${caseUrl(state.code)}`, "戰績文案已複製");
 }
@@ -669,7 +786,13 @@ document.addEventListener("submit", (event) => {
     if (code.length !== 4) return notify("請輸入 4 位案件編號。");
     location.href = caseUrl(code, "join");
   }
-  if (form.dataset.form === "join-case") joinCase(String(data.get("nickname") ?? ""));
+  if (form.dataset.form === "join-case") joinCase(String(data.get("nickname") ?? ""), String(data.get("identity") ?? ""));
+});
+
+document.addEventListener("change", (event) => {
+  const select = event.target.closest("[data-select='case-index']");
+  if (!select) return;
+  hostAction("case", { caseIndex: Number(select.value) });
 });
 
 document.addEventListener("click", (event) => {
